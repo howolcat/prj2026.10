@@ -7,6 +7,12 @@
 - 교과 7 FINAL: `data/subject7_final/` (원본: master_data/final, Git 미포함, 읽기 전용)
 - JPG 900장 / YOLO TXT 900개 확인
 
+- scene_type 분포: kimchi_with_target 750장 / object_only 150장 (normal_kimchi 0장, other_review 0장)
+- Empty Label: 0개
+- Class 4(고무장갑): 0건 (교과 7에서 enabled: false)
+- QA 상태: 900장 전체 QA PASS
+- 교과 7 QA 결과: `prj07/reports/qa_summary.md` 참고
+
 ## Dataset 설명
 | source_dataset | original_split | 수량 |
 |---|---|---|
@@ -19,7 +25,7 @@
 | ID | 이물 종류 | 영문 이름 | 사용 |
 |---|---|---|---|
 | 0 | 나뭇잎·종이류 | leaf_paper | O |
-| 1 | 플라스틱류·돌·금속 등 | plastic_stone_metal | O |
+| 1 | 플라스틱류·돌·금속류 | plastic_stone_metal | O |
 | 2 | 나뭇가지류 | branch | O |
 | 3 | 벌레류 | insect | O |
 | 4 | 고무장갑 | rubber_glove_unused | X (발견 시 REVIEW 확인) |
@@ -58,3 +64,6 @@ TBD
 TBD
 ## 교과 14 Handoff
 TBD
+
+## 알려진 한계
+- 교과 7 FINAL에 normal_kimchi(정상 김치, Negative Sample)가 0장 → 정상 김치 FP 가능성, 5~6일차에 확인
