@@ -12,4 +12,5 @@
 2026-10-12,이승훈,Done,팀 공지,디스코드 - 구조 변경 · 환경 세팅 · PR 방법 · 보안 규칙 · 1일차 요약,완료,
 2026-10-12,팀원 전원,Doing,팀원 환경 확인,01_check_environment.py 결과 공유 → 전원 확인 시 Day1 Gate 통과,진행 중,Day1
 2026-10-12,최용훈,Todo,정상 김치 0장 대응,normal_kimchi 0장 → 정상 김치 FP 가능성 · 2일차 Split 정책 논의 안건,예정,Day2
-2026-10-12,최용훈,Todo,옛 레포 정리,GitHub prj08_team01 레포 Archive,예정,
+2026-10-12,최용훈,Todo,옛 레포 정리,GitHub prj08_team01 레포 Archive,완료,
+2026-10-12,최용훈,Done,Audit 기대값 정리,reports/audit_expected.md - Handoff·QA Summary·Manifest 대조 · Leakage 75.6% 재확인 · 세션 18개 중 17개 혼합,완료,Day2
