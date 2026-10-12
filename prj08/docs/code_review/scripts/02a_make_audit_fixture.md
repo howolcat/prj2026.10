@@ -100,27 +100,3 @@ append_line(lbl(7), "0 abc 0.5 0.1 0.1")      # PARSE_ERROR
 | 원본 | `data/subject7_final/` (읽기 전용) |
 | 다음 실행 | `scripts/02_audit_subject7_final.py --fixture` |
 | 검사하는 기능 | `src/dataset_audit.py` |
-
-## 6. 리뷰 포인트
-
-- ✅ 원본은 읽기만 · 복사본만 수정 · 매번 새로 생성
-- ✅ 파일 하나에 버그 하나 → 결과 대조가 쉬움
-- ✅ 원본이 8개보다 적으면 `RuntimeError`로 즉시 알림
-- ✅ 이 테스트로 실제 버그(Class 9 줄이 BBox 합계에 들어가던 문제)를 찾아 고침
-- 🔧 기대 결과(9종 각 1건)를 **사람이 눈으로 비교** → 자동 판정을 넣으면 진짜 테스트
-  ```python
-  expected = {t: 1 for t, _, _ in planted}
-  assert counts == expected, f"검사기 결과가 다름: {counts}"
-  ```
-- 🔧 `SIZE_RANGE`(너비 0 이하) · `NOT_IN_MANIFEST` · 빈 줄이 중간에 있는 TXT(줄 번호 문제)는 Fixture에 없음 → 추가 후보
-- 🔧 이미지가 `.jpg`라고 가정(`f"{s}.jpg"`) → `.JPG`나 `.jpeg`가 섞이면 복사 실패
-- ❓ `lambda`로 경로 함수를 만든 부분을 일반 `def`로 바꾸면 읽기 쉬울까?
-
-## 7. 직접 확인해 보기
-
-```bash
-cd prj08 && source .venv/bin/activate
-python scripts/02a_make_audit_fixture.py
-python scripts/02_audit_subject7_final.py --fixture     # 9종이 각 1로 나오면 정상
-ls data/audit_test/labels | wc -l                        # 8개 (1개 삭제 + orphan 1개)
-```

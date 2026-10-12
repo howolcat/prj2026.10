@@ -112,28 +112,3 @@ return pd.Series(out, index=target.index)
 | 이 파일을 쓰는 곳 | `scripts/03_split_analysis.py` |
 | 결과가 쓰이는 곳 | `reports/capture_groups.csv` → `scripts/04_make_split.py` |
 | 같은 로직이 한 번 더 | `04_make_split.py`의 `split_e1()` (G01을 2분 기준으로 다시 나눔) |
-
-## 6. 리뷰 포인트
-
-- ✅ 형식 검증 후 실패하면 즉시 `ValueError` (조용한 오류 방지)
-- ✅ diff · cumsum · reindex로 짧고 빠르게 구현 · 주석으로 원리 설명
-- ✅ 시간 비교를 마이크로초까지 → 경계값(60.28초)을 정확히 판정
-- 🔧 `04_make_split.py`의 `split_e1()`이 같은 diff + cumsum 로직을 다시 씀 → `assign_capture_groups()`를 재사용하면 한 곳만 관리
-- 🔧 세션 이름(`G01`)을 만드는 코드가 `03`과 `04`에 따로 있음 → 여기에 `group_name(n) -> "G01"` 함수를 두면 항상 같은 이름
-- 🔧 `nearest_gap_seconds`는 target × reference 전부 비교(180 × 720) → 지금은 충분히 빠르지만 데이터가 커지면 정렬 후 `np.searchsorted`로 개선 가능
-- ❓ 날짜가 바뀌는 자정 근처(23:58 → 00:02) 촬영이 있다면 세션이 올바르게 나뉠까? (`datetime` 비교라 날짜까지 포함되므로 OK)
-- ❓ 파일명 규칙이 다른 새 데이터(교과 14)가 들어오면 이 함수를 어떻게 바꿔야 할까?
-
-## 7. 직접 확인해 보기
-
-```bash
-cd prj08 && source .venv/bin/activate
-python - <<'EOF'
-import pandas as pd
-from src.capture_group import parse_capture_time, assign_capture_groups
-names = ["250410_100000000000.jpg", "250410_100045000000.jpg", "250410_101300000000.jpg",
-         "250410_102000000000.jpg", "250410_102030000000.jpg"]
-t = pd.Series([parse_capture_time(n) for n in names])
-print(assign_capture_groups(t, 5).tolist())   # 예상: [1, 1, 2, 3, 3]
-EOF
-```
