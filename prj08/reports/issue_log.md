@@ -6,3 +6,4 @@
 | 10/12 | .gitignore 일부 규칙 미동작 | `echo` 명령이 파일에 그대로 기록됨 | 규칙 수정 + prj08 차단 구역 추가 |
 | 10/12 | 터미널 `code` 명령 실패 (ENOENT .sock) | 복원된 옛 터미널의 연결 정보 | Developer: Reload Window |
 | 10/12 | Ultralytics config not writable 경고 | `~/.config` 폴더 없음 | `mkdir -p ~/.config` |
+| 10/12 | Audit: 교과 7 문서 Class 수(4,602)와 FINAL 라벨(4,601) 불일치 | 10/07 QA 이후 10/08 라벨 추가 수정(Class 2→0 56개 등)이 교과 7 문서에 반영 안 됨. 이승훈 10/08 zip = master = subject7_final (diff 0) | 데이터 수정 없음 · 현재 FINAL(4,601)을 kimchi_v1 후보로 팀 확정 필요 · 근거 reports/audit_check.csv |
