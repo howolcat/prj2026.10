@@ -41,6 +41,15 @@
 | GPU | NVIDIA GeForce RTX 3060 (학교 PC) |
 | YOLO11n Load | 성공 |
 
+### 팀원 환경 확인 (2026-10-12)
+| 팀원 | Ultralytics | CUDA | GPU | YOLO Load |
+|---|---|---|---|---|
+| 최용훈 | 8.4.175 | True | RTX 3060 | 성공 |
+| 박건 | 8.4.175 | True | RTX 3060 | 성공 |
+| 이승훈 | 8.4.175 | True | RTX 3060 | 성공 |
+| 김하민 | 8.4.175 | True | RTX 3060 | 성공 |
+| 심준형 | 8.4.175 | True | RTX 3060 | 성공 |
+
 환경 확인: `cd prj08` → `python scripts/01_check_environment.py`
 
 ## 데이터 보안
