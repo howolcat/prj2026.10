@@ -45,5 +45,22 @@ data/
 handoff_subject08/
 *.zip
 
-echo "pratice/images/" >> .gitignore
-echo "pratice/labels/" >> .gitignore
+# 교과 7 연습용 폴더 (어느 위치에 있든 제외)
+**/pratice/images/
+**/pratice/labels/
+
+# ==========================================
+# prj08 (교과 8) - NDA 데이터·결과물 업로드 금지
+# ※ data/, runs/, *.pt 는 위에서 이미 제외됨
+# ==========================================
+prj08/models/
+prj08/demo/failure_analysis/
+prj08/demo/prediction_images/
+prj08/demo/auto_label/
+prj08/demo/*.mp4
+
+# prj08 안의 이미지는 위치와 상관없이 전부 제외 (이중 안전장치)
+prj08/**/*.jpg
+prj08/**/*.jpeg
+prj08/**/*.JPG
+prj08/**/*.JPEG
