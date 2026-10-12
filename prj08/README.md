@@ -10,6 +10,7 @@
 - scene_type 분포: kimchi_with_target 750장 / object_only 150장 (normal_kimchi 0장, other_review 0장)
 - Empty Label: 0개
 - Class 4(고무장갑): 0건 (교과 7에서 enabled: false)
+- BBox: 4,601개 (`kimchi_v1`, 아래 Class 표 참고)
 - QA 상태: 900장 전체 QA PASS
 - 교과 7 QA 결과: `prj07/reports/qa_summary.md` 참고
 
@@ -22,16 +23,20 @@
 | **합계** | | **900** |
 
 ## Class
-| ID | 이물 종류 | 영문 이름 | 사용 |
-|---|---|---|---|
-| 0 | 나뭇잎·종이류 | leaf_paper | O |
-| 1 | 플라스틱류·돌·금속류 | plastic_stone_metal | O |
-| 2 | 나뭇가지류 | branch | O |
-| 3 | 벌레류 | insect | O |
-| 4 | 고무장갑 | rubber_glove_unused | X (발견 시 REVIEW 확인) |
-| 5 | 병해·갈변 | disease_browning | O |
-| 6 | 파·고추 | green_onion_pepper | O |
 
+| ID | 이물 종류 | 영문 이름 | 사용 | BBox | 비율 |
+|---|---|---|---|---:|---:|
+| 0 | 나뭇잎·종이류 | leaf_paper | O | 924 | 20.1% |
+| 1 | 플라스틱류·돌·금속류 | plastic_stone_metal | O | 1,897 | 41.2% |
+| 2 | 나뭇가지류 | branch | O | 711 | 15.5% |
+| 3 | 벌레류 | insect | O | 378 | 8.2% |
+| 4 | 고무장갑 | rubber_glove_unused | X (발견 시 REVIEW 확인) | 0 | 0.0% |
+| 5 | 병해·갈변 | disease_browning | O | 439 | 9.5% |
+| 6 | 파·고추 | green_onion_pepper | O | 252 | 5.5% |
+| | **합계** | | | **4,601** | 100% |
+
+> **Dataset Version: `kimchi_v1`** · 라벨 지문(sha256 앞 12자리): `5c2b4fc2c3e6` · 5명 일치 확인 (2026-10-12)
+> 교과 7 문서(qa_summary · handoff)는 4,602개로 적혀 있지만, 10/08 라벨 추가 수정(Class 2→0 56개 등)을 반영한 4,601개를 기준으로 한다. 상세: `reports/issue_log.md`, `docs/split_policy.md`
 ## 실행환경
 | 항목 | 값 |
 |---|---|
