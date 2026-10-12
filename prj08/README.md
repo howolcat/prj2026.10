@@ -61,9 +61,6 @@ TBD
 ## Detection / Auto Label
 TBD
 ## 알려진 한계
-TBD
+- 교과 7 FINAL에 normal_kimchi(정상 김치, Negative Sample)가 0장 → 정상 김치 FP 가능성, 5~6일차에 확인
 ## 교과 14 Handoff
 TBD
-
-## 알려진 한계
-- 교과 7 FINAL에 normal_kimchi(정상 김치, Negative Sample)가 0장 → 정상 김치 FP 가능성, 5~6일차에 확인
