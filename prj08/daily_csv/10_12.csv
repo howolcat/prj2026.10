@@ -29,3 +29,4 @@
 2026-10-12,심준형,Todo,Val Class 편중 대응,Val BBox 389개 중 351개가 Class 1 → 3일차 모델 비교 때 Class별 AP 함께 확인,예정,Day3
 2026-10-12,심준형,Todo,YOLO 데이터 구성,kimchi_v1_split.csv → images · labels / train · val · test 폴더 · YOLO11n Baseline 학습,예정,Day3
 2026-10-12,심준형,Todo,Public 레포 사용 확인,회사 데이터 보안 정책상 Public 레포 사용 가능 여부 선생님께 확인,예정,
+2026-10-12,김하민,Done,동일 이미지 확인,900장 md5 비교 → 동일 이미지 0쌍 (가이드 15.3 보완),완료,Day2 · docs/split_policy.md
