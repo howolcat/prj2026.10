@@ -122,6 +122,8 @@ Split 결과는 아래를 **모두** 만족해야 확정한다. 하나라도 FAI
 - 사전 확인 (10/12): 위 기준을 모두 만족하는 조합이 **6,000개 이상** 존재함을 확인했다. 최종 배정은 스크립트 결과로 정한다.
 - 결과 파일: `splits/kimchi_v1_split.csv` (file_name, capture_group, role)
 - Frozen Test 목록은 확정 후 **sha256 지문**을 이 문서에 기록하고 바꾸지 않는다.
+- **Frozen Test 지문: `4f9291849fe6`** (80장 · 파일명 목록 sha256 앞 12자리 · 2026-10-12)
+- 배정 결과: Train 600 / Val 74 / Frozen Test 80 / Bridge 146 · 합격 기준 8개 PASS (`reports/split_check.csv`)
 - 라벨 수정이 필요하면 Issue Log 기록 → `kimchi_v2`로 버전을 올리고 이 문서를 새로 쓴다.
 
 ## 9. 알려진 한계
