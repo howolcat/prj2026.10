@@ -1,0 +1,9 @@
+﻿no,criterion,expected,actual,result
+1,누락 · 중복,900장 · 중복 0 · 역할 없음 0,900장 · 중복 0 · 역할 없음 0,PASS
+2,"Leakage (세션 걸침, E1 제외)",0건,0건 ,PASS
+3,수량 (±10장),train 600 / val 75 / test 75 / bridge 150,train 600 / val 74 / test 80 / bridge 146,PASS
+4,Test · Bridge Class별 최소,>= 20,20,PASS
+5,Val · Test · Bridge 김치 장면만 · 날짜 2개 이상,김치만 · >= 2,김치만 True · val 2 / test 3 / bridge 3,PASS
+6,재현성 (두 번 실행 결과 동일),동일,동일,PASS
+7,Train Class별 최소,>= 100,202,PASS
+8,Val Class별 최소,>= 1,6,PASS
