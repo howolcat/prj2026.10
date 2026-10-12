@@ -1,0 +1,14 @@
+path: data/yolo
+
+train: images/train
+val: images/val
+test: images/test
+
+names:
+  0: 나뭇잎·종이류
+  1: 플라스틱류·돌·금속류
+  2: 나뭇가지류
+  3: 벌레류
+  4: 고무장갑 — 현재 사용하지 않음
+  5: 병해·갈변
+  6: 파·고추
