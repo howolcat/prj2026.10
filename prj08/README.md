@@ -101,9 +101,13 @@ prj08/
 │   └── 04_make_split.py               # 3일차 선행 · 정책대로 전수 탐색 배정 + 합격 기준 8개 검증
 │
 ├── docs/
-│   ├── split_policy.md                # 산출물 1 · Split 정책 확정본 (5분 세션 · 600/75/75/150 · 예외 E1)
-│   ├── code_review.md                 # 파일별 코드 리뷰 (역할 · 함수 · 개선 후보)
-│   └── code_flow.md                   # Mermaid 코드 흐름도 6개
+│   ├── split_policy.md        # Split 정책 (팀 확정)
+│   ├── code_flow.md           # 코드 흐름 Mermaid
+│   └── code_review/           # 코드와 같은 구조의 파일별 리뷰
+│       ├── README.md          # 목차 · 읽는 순서
+│       ├── configs/
+│       ├── src/
+│       └── scripts/
 │
 ├── reports/                           # 결과 · 기록 (파일명 · 숫자만 · Git에 올림)
 │   ├── figures/                       # (예정) 학습 그래프 · Confusion Matrix 등 산출물 5
@@ -167,7 +171,7 @@ Git은 빈 폴더를 저장하지 않습니다. manifests/, demo/, presentation/
 02_audit_subject7_final.py	images · labels · 교과 7 Manifest · EXPECTED	reports/audit_*.csv	src.dataset_audit
 03_split_analysis.py	audit_label_stats.csv · images(EXIF)	reports/ CSV 5개	src.capture_group · PIL
 04_make_split.py	capture_groups.csv · audit_label_stats.csv	splits/ · reports/split_*.csv	pandas만 (src 의존 없음)
-함수 단위 설명과 리뷰는 docs/code_review.md, 그림은 docs/code_flow.md를 참고합니다.
+함수 단위 설명과 리뷰는 docs/code_review/README.md, 그림은 docs/code_flow.md를 참고합니다.
 
 9. Dataset Split
 상태: 정책 확정 (2026-10-12 · 팀 회의) · 배정 선행 완료 · 3일차에 Freeze (manifests/ 생성)
@@ -219,7 +223,7 @@ TBD (9일차 · docs/handoff_subject14.md)
 참고 문서
 문서	내용
 docs/split_policy.md	Split 정책 · 근거 · 결정 기록
-docs/code_review.md	폴더 구조 · 파일별 코드 리뷰
+docs/code_review/README.md	폴더 구조 · 파일별 코드 리뷰
 docs/code_flow.md	Mermaid 코드 흐름도
 reports/audit_expected.md	Audit 기대값 (Test Oracle)
 reports/issue_log.md	문제 · 원인 · 해결 기록
