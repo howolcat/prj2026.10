@@ -3,3 +3,6 @@
 pillow>=9.0
 # YAML 설정 파일 읽기
 pyyaml>=6.0
+
+ultralytics==8.4.175
+pandas
