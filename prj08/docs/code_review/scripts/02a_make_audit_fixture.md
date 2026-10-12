@@ -29,6 +29,27 @@
 | 47~66 | 버그 9종 목록 + 심기 |
 | 69~72 | 심은 버그 출력 |
 
+### 흐름 그림
+
+```mermaid
+flowchart TD
+    S[("data/subject7_final<br/>읽기 전용")] -.->|읽기만| E
+    A["main()"] --> B{"data/audit_test 있음?"}
+    B -->|있음| C["shutil.rmtree()<br/>통째로 삭제"]
+    B -->|없음| D
+    C --> D["images/ · labels/ 새로 만들기"]
+    D --> E["원본 labels 이름 정렬 → 앞 8개"]
+    E --> F{"8개 이상?"}
+    F -->|아니오| X["RuntimeError"]
+    F -->|예| G["copyfile()로 8쌍 복사<br/>(권한은 안 따라옴 → 쓰기 가능)"]
+    G --> H["파일 하나에 버그 하나 (9종)"]
+    H --> H1["0 CLASS_RANGE · 1 CENTER_RANGE · 2 COLUMN_COUNT<br/>3 EMPTY_LABEL · 4 MISSING_LABEL · 5 CLASS4_REVIEW<br/>6 BBOX_OUT_OF_IMAGE · 7 PARSE_ERROR · orphan MISSING_IMAGE"]
+    H1 --> I[/"data/audit_test/ (Git 제외)<br/>+ 화면에 심은 버그 목록"/]
+    I --> J["다음 실행: 02 --fixture<br/>9종 각 1건이면 검사기 OK"]
+```
+
+"지우고 → 복사하고 → 하나씩 망가뜨린다" 순서입니다. 원본(왼쪽 위 원통)은 읽기만 합니다.
+
 ## 4. 핵심 코드 읽기
 
 ### 4.1 매번 새로 만든다

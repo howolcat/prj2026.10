@@ -28,6 +28,29 @@ Split 정책을 정하기 전에 **"데이터 지도"**를 그립니다. Class�
 | 125 | `group_summary(df, gap)` | `capture_group_summary.csv` |
 | 146 | `main()` | 위 함수들 순서대로 + `capture_groups.csv` + Leakage 대조 |
 
+### 흐름 그림
+
+```mermaid
+flowchart TD
+    A[/"reports/audit_label_stats.csv"/] --> B["main()"]
+    B --> C["parse_capture_time()로 시각 · 날짜 컬럼 추가"]
+    C --> D["class_scene_distribution()"]
+    C --> E["filename_time_check()<br/>+ read_exif_time()"]
+    C --> F["assign_capture_groups() × 1 · 5 · 10분"]
+    F --> G["compare_gaps()"]
+    F --> H["group_summary(5분)"]
+    C --> I["nearest_gap_seconds()<br/>+ EXPECTED_LEAK 대조"]
+
+    D --> D1[/"class_scene_distribution.csv"/]
+    E --> E1[/"filename_time_check.csv<br/>EXIF 없음"/]
+    G --> G1[/"capture_group_compare.csv<br/>106 · 18 · 13"/]
+    F --> F1[/"capture_groups.csv → 04의 입력"/]
+    H --> H1[/"capture_group_summary.csv<br/>G01~G18"/]
+    I --> I1["화면: PASS 4 / FAIL 1<br/>136 vs 135 경계값"]
+```
+
+`main()` 하나가 다섯 갈래로 나뉘고, 갈래마다 CSV 하나씩 나옵니다. 세션 묶기 내부는 [`src/capture_group.md`](../src/capture_group.md)의 그림을 보세요.
+
 ## 4. 핵심 코드 읽기
 
 ### 4.1 파일명에서 시각 · 날짜 컬럼 만들기

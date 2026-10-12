@@ -28,6 +28,33 @@
 | 199 | `compare_with_expected(stats, expected)` | 기대값 대조 → PASS / FAIL |
 | 209 | `write_csv(rows, path, fields)` | utf-8-sig로 저장 |
 
+### 흐름 그림
+
+```mermaid
+flowchart TD
+    A["audit_dataset(images, labels, manifest)"] --> B["① stem으로 짝 맞추기 (집합 연산)<br/>images ∩ labels → pairs<br/>images − labels → MISSING_LABEL<br/>labels − images → MISSING_IMAGE"]
+    B --> C["② 빈 TXT → EMPTY_LABEL"]
+    C --> D["③ TXT 한 줄씩 반복"]
+    D --> E["validate_yolo_row(row)"]
+    E --> E1{"5칸?"}
+    E1 -->|아니오| X1["COLUMN_COUNT"]
+    E1 -->|예| E2{"숫자 변환?"}
+    E2 -->|실패| X2["PARSE_ERROR"]
+    E2 -->|성공| E3["Class 0~6 · Class 4 · 좌표 0~1 · 박스 경계"]
+    E3 --> I["_issue() → ERROR / WARN 기록"]
+    X1 --> I
+    X2 --> I
+    D --> J["형식이 정상인 줄만 Class 개수에 더함"]
+    A --> K["④ read_manifest()<br/>NOT_IN_MANIFEST · MISSING_IN_DATASET"]
+    I --> L[/"issues · stats · image_rows"/]
+    J --> L
+    K --> L
+    L --> M["compare_with_expected(stats, EXPECTED)<br/>→ PASS / FAIL 표"]
+    L --> W["write_csv(rows, path, fields)"]
+```
+
+두 갈래를 기억하면 됩니다. 문제는 `issues`로, 숫자는 `stats`로 모입니다. 형식이 깨진 줄은 Class 개수에 들어가지 않습니다.
+
 ## 4. 핵심 코드 읽기
 
 ### 4.1 상수 — 교과 7 기준을 코드에 고정

@@ -28,6 +28,29 @@ python scripts/02_audit_subject7_final.py             # 900장 · 정상 결과 
 | 57 | `ISSUE_FIELDS` (CSV 컬럼) |
 | 60~114 | `main()`: 옵션 → 검사 → 화면 → 저장 → 대조 |
 
+### 흐름 그림
+
+```mermaid
+flowchart TD
+    A["main()"] --> B{"--fixture ?"}
+    B -->|예| C["data/audit_test<br/>Manifest 없음"]
+    B -->|아니오| D{"교과 7 Manifest 있음?"}
+    D -->|없음| X["FileNotFoundError"]
+    D -->|있음| D2["data/subject7_final<br/>+ prj07/manifests/dataset_manifest.csv"]
+    C --> E
+    D2 --> E["① audit_dataset()<br/>(src/dataset_audit.py)"]
+    E --> F["② · ③ 화면 출력<br/>통계 · 문제 종류별 개수"]
+    F --> G["④ write_csv() → audit_issue.csv"]
+    G --> H{"fixture?"}
+    H -->|예| R["여기서 끝<br/>data/audit_test/audit_issue.csv"]
+    H -->|아니오| I["⑤ compare_with_expected(stats, EXPECTED 19항목)"]
+    I --> J[/"reports/audit_check.csv<br/>PASS 14 / FAIL 5"/]
+    I --> K[/"reports/audit_label_stats.csv<br/>→ 03 · 04의 입력"/]
+    J --> L["화면에 FAIL 항목만 따로 출력"]
+```
+
+`--fixture`일 때는 ④에서 끝나서 기대값 대조와 `reports/` 저장을 하지 않습니다. 검사 내부는 [`src/dataset_audit.md`](../src/dataset_audit.md)의 그림을 보세요.
+
 ## 4. 핵심 코드 읽기
 
 ### 4.1 교과 7 Manifest를 상대경로로
@@ -108,6 +131,7 @@ write_csv(image_rows, REPORT_DIR / "audit_label_stats.csv", stat_fields)
   EXPECTED_SOURCE = "교과 7 문서 (2026-10-07 QA · 4,602)"   # 화면 · CSV에 함께 출력
   ```
 - 🔧 `"prj07"` 폴더 이름이 코드에 직접 들어 있음 → 폴더 이름을 바꾸면 여기가 깨짐
+- 🔧 `--fixture` 분기 주석이 "5장뿐이라"인데 실제 Fixture는 **8쌍 + orphan 1개** → 주석을 코드에 맞게 수정
 - 🔧 Fixture 결과를 자동 판정하지 않음 → `--fixture`일 때 9종 각 1건인지 `assert`
 - ❓ kimchi_v1(4,601) 기준 기대값을 새로 만든다면, 기존 4,602 기대값은 지울까 남길까?
 

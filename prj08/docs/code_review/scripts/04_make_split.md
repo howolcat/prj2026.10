@@ -28,6 +28,43 @@
 | 199 | `fingerprint(names)` | 파일명 목록 sha256 앞 12자리 |
 | 205 | `main()` | 전체 순서 · 저장 · 출력 |
 
+### 흐름 그림
+
+```mermaid
+flowchart TD
+    A[/"capture_groups.csv"/] --> L["load_images()<br/>두 CSV 합치기 · 900행 · 결측 확인"]
+    B[/"audit_label_stats.csv"/] --> L
+    L --> E1["split_e1()<br/>G01 → 2분 하위 세션 S1~S5"]
+    E1 --> E2{"하위 세션 5개?<br/>(정책 표와 같나)"}
+    E2 -->|아니오| STOP["ValueError로 멈춤<br/>문서와 코드 불일치"]
+    E2 -->|예| U["배정 단위 표 (units)<br/>세션별 이미지 · 날짜 · Class 수"]
+
+    U --> FX["고정 배정<br/>G18 → train<br/>G01-S1 · S2 → test · S3 → bridge<br/>S4 → val · S5 → train"]
+    FX --> S["search(units, fixed)"]
+
+    subgraph SEARCH["search() 전수 탐색"]
+        S1["subsets_in_range()<br/>Test 후보 (75 ± 10)"] --> C1{"Class ≥ 20<br/>날짜 ≥ 2"}
+        C1 -->|통과| S2["Val 후보 (75 ± 10)"]
+        S2 --> C2{"Class ≥ 1<br/>날짜 ≥ 2"}
+        C2 -->|통과| S3["Bridge 후보 (150 ± 10)"]
+        S3 --> C3{"Class ≥ 20<br/>날짜 ≥ 2"}
+        C3 -->|통과| S4["나머지 = Train"]
+        S4 --> C4{"600 ± 10<br/>Class ≥ 100"}
+        C4 -->|통과| OK["후보 목록에 추가"]
+    end
+
+    S --> S1
+    OK --> SORT["정렬: 목표 차이 → 평가 Class 최소 → 이름 순<br/>5,606개 중 1순위"]
+    SORT --> R["search() 한 번 더 → 같은 1순위인지<br/>(재현성)"]
+    R --> V["verify(df)<br/>파일 900개 단위로 다시 검증 · 기준 8개"]
+    V --> FP["fingerprint()<br/>Frozen Test 파일명 sha256"]
+    FP --> O1[/"splits/kimchi_v1_split.csv"/]
+    FP --> O2[/"reports/split_check.csv · 8 / 8 PASS"/]
+    FP --> O3[/"reports/split_summary.csv · 600 / 74 / 80 / 146"/]
+```
+
+탐색(가운데 상자)과 검증(`verify`)이 서로 다른 길로 계산한다는 점이 핵심입니다.
+
 ## 4. 핵심 코드 읽기
 
 ### 4.1 정책 상수 — 문서와 1:1
@@ -120,7 +157,7 @@ return hashlib.sha256(text).hexdigest()[:12]
 - ✅ 탐색과 검증 분리 · 재현성을 실제로 확인
 - ✅ 정책과 데이터가 어긋나면 `ValueError` · 조합이 없으면 `sys.exit`으로 이유 출력
 - ✅ 세션 18개라 전수 탐색 가능 → seed 없이 재현 가능
-- 🔧 맨 위 설명이 **"2일차 5단계"** → "Split 배정 (3일차 선행)"으로 수정
+- ✅ 맨 위 설명 "2일차 5단계" → 3일차 선행으로 수정 완료 (10/12)
 - 🔧 **출력 형식이 가이드 16.1과 다름** → `manifests/split_manifest.csv`(image_path · label_path · source_dataset · original_split · scene_type · capture_group · split · dataset_version) + 역할별 CSV 4개 + `reports/dataset_summary.csv`
 - 🔧 역할 이름 `bridge` → 가이드 `bridge_holdout`
 - 🔧 `checks.insert(5, ...)` — **위치 번호로** 재현성 결과를 끼워 넣음 → 기준 순서가 바뀌면 틀어짐. `verify(df, reproducible)`처럼 인자로 넘기기

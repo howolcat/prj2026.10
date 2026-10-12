@@ -24,6 +24,29 @@
 | 30 | `assign_capture_groups(times, gap_minutes)` |
 | 46 | `nearest_gap_seconds(target, reference)` |
 
+### 흐름 그림
+
+```mermaid
+flowchart LR
+    A["파일명<br/>250410_180800068444.jpg"] --> B["parse_capture_time()<br/>YYMMDD + HHMMSS + 마이크로초"]
+    B --> C["촬영 시각 (datetime)"]
+    C --> D["assign_capture_groups(times, gap)"]
+
+    subgraph G["assign_capture_groups 내부"]
+        D1["sort_values()<br/>시각 순 정렬"] --> D2["diff()<br/>앞 사진과의 시간 차"]
+        D2 --> D3["gap > 5분 ?<br/>True = 새 세션 시작"]
+        D3 --> D4["cumsum()<br/>True 누적합 = 세션 번호"]
+        D4 --> D5["reindex()<br/>원래 행 순서로"]
+    end
+
+    D --> D1
+    D5 --> E["세션 번호 1~18<br/>(5분 기준)"]
+    C --> F["nearest_gap_seconds(val, train)<br/>가장 가까운 train까지 초"]
+    F --> H["60초 이내 135장 · 최소 8초"]
+```
+
+핵심은 가운데 네 칸(정렬 → 차이 → 비교 → 누적합)입니다. `for` 문 없이 세션 번호가 나옵니다.
+
 ## 4. 핵심 코드 읽기
 
 ### 4.1 `parse_capture_time` — 파일명 → 시각
