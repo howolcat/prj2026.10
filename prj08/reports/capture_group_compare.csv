@@ -1,0 +1,4 @@
+﻿gap_min,groups,max_images,min_images,single_image_groups,mixed_split_groups,mixed_scene_groups,val_in_mixed_groups
+1,106,132,1,29,57,0,167
+5,18,150,1,1,17,0,180
+10,13,150,11,0,13,0,180

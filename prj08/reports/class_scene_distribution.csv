@@ -1,0 +1,7 @@
+﻿source_dataset,original_split,scene_type,images,bbox,class_0,class_1,class_2,class_3,class_4,class_5,class_6
+dataset1,train,kimchi_with_target,500,2762,531,1271,377,79,0,302,202
+dataset2,train,kimchi_with_target,100,527,174,119,53,155,0,26,0
+dataset2,train,object_only,120,372,57,143,101,71,0,0,0
+dataset2,validation,kimchi_with_target,150,844,142,327,159,55,0,111,50
+dataset2,validation,object_only,30,96,20,37,21,18,0,0,0
+합계,,,900,4601,924,1897,711,378,0,439,252
