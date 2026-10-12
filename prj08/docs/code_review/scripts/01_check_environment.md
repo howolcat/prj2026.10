@@ -24,6 +24,25 @@
 | 17~33 | `main()`: ① 버전 ② GPU ③ YOLO Load |
 | 36 | `if __name__ == "__main__": main()` |
 
+### 흐름 그림
+
+```mermaid
+flowchart TD
+    A["main()"] --> B["① 버전 출력<br/>Python · PyTorch · Ultralytics"]
+    B --> C{"② torch.cuda.is_available()"}
+    C -->|True| D["GPU 이름 출력<br/>get_device_name(0)"]
+    C -->|False| E["그대로 진행<br/>(경고 없음 · 🔧)"]
+    D --> F["③ YOLO('yolo11n.pt')"]
+    E --> F
+    F --> G{"yolo11n.pt 있음?"}
+    G -->|없음| H["자동 다운로드<br/>→ prj08/yolo11n.pt (Git 제외)"]
+    G -->|있음| I
+    H --> I["len(model.names) → 80<br/>(COCO 사전학습 · 정상)"]
+    I --> J[/"화면 출력 → README 5장 팀원 환경 표<br/>(사람이 옮겨 적음)"/]
+```
+
+분기가 두 군데뿐인 짧은 파일입니다. CUDA가 False여도 멈추지 않는다는 점이 🔧 항목입니다.
+
 ## 4. 핵심 코드 읽기
 
 ```python

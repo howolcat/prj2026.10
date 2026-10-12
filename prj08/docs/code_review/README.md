@@ -37,6 +37,15 @@ docs/code_review/
 | `scripts/03_split_analysis.py` | 2 | 202 | 분포 · EXIF · 세션 비교 · Leakage | [03_split_analysis.md](scripts/03_split_analysis.md) |
 | `scripts/04_make_split.py` | 3 선행 | 266 | 전수 탐색 배정 + 합격 기준 검증 | [04_make_split.md](scripts/04_make_split.md) |
 
+## 그림은 어디에?
+
+| 보고 싶은 것 | 위치 |
+|---|---|
+| 파일 **하나 안**의 흐름 (함수 순서 · 분기) | 각 리뷰 문서 3장 **흐름 그림** |
+| 파일 **사이**의 흐름 (무엇을 읽고 무엇을 넘기나) · import 관계 | [`../code_flow.md`](../code_flow.md) |
+
+같은 그림을 두 곳에 두지 않습니다. 코드를 고치면 **그 파일의 리뷰 문서 그림 하나만** 고치면 됩니다.
+
 ## 읽는 순서 (추천)
 
 데이터가 흐르는 순서대로 읽으면 이해가 쉽습니다.
@@ -57,7 +66,7 @@ capture_group (기능) → 03_split_analysis
 
 1. **한 줄 요약** — 이 파일이 왜 필요한가
 2. **입력 · 출력 · 실행** — 무엇을 받아서 무엇을 만드나
-3. **구조** — 함수 · 구간별 위치(줄 번호)
+3. **구조** — 함수 · 구간별 위치(줄 번호) + **흐름 그림**(Mermaid · 이 파일 안에서 어떤 순서로 도나)
 4. **핵심 코드 읽기** — 중요한 코드 발췌와 설명
 5. **연결된 파일** — 누가 이 파일을 쓰고, 이 파일은 누구를 쓰나
 6. **리뷰 포인트** — ✅ 잘한 점 · 🔧 개선 후보 · ❓ 토론 질문
@@ -69,7 +78,7 @@ capture_group (기능) → 03_split_analysis
 
 | 순위 | 파일 | 내용 | 언제 |
 |:-:|---|---|---|
-| 1 | `04_make_split.py` | 가이드 16.1 형식(`manifests/`) 출력 · `bridge_holdout` 이름 · 설명 줄 수정 | 3일차 |
+| 1 | `04_make_split.py` | 가이드 16.1 형식(`manifests/`) 출력 · `bridge_holdout` 이름 | 3일차 |
 | 2 | `scripts/` 번호 | 가이드 번호(`03_build_split` · `04_preview` · `05_smoke`)와 맞추기 | 3일차 시작 전 |
 | 3 | `02a` · `02` | Fixture 결과 자동 판정 (`assert`) | 여유 있을 때 |
 | 4 | `dataset_audit.py` | 줄 번호 어긋남 · 중복 stem · 인코딩 오류 처리 | 여유 있을 때 |

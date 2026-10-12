@@ -33,6 +33,24 @@ names:
   6: green_onion_pepper
 ```
 
+### 흐름 그림
+
+```mermaid
+flowchart LR
+    Y[/"configs/dataset.yaml"/] --> P["path: data/yolo<br/>(prj08/에서 실행 기준)"]
+    P --> T["train: images/train"]
+    P --> V["val: images/val"]
+    P --> TE["test: images/test<br/>⚠ Frozen Test · 8일차 한 번만"]
+    T -.->|"images → labels 자동 치환"| TL[("data/yolo/labels/train")]
+    V -.-> VL[("data/yolo/labels/val")]
+    TE -.-> TEL[("data/yolo/labels/test")]
+    Y --> N["names: 0 ~ 6<br/>4 rubber_glove_unused도 번호 유지"]
+    BR["Bridge Holdout<br/>yaml에 넣지 않음 · 교과 14용"]
+    NOW["data/yolo/ 폴더는 3일차에 생성"]
+```
+
+점선은 YOLO가 스스로 찾아가는 경로입니다. 라벨 폴더를 따로 적지 않는 이유가 이것입니다.
+
 ## 4. 핵심 읽기
 
 ### 4.1 라벨 폴더는 적지 않는다
