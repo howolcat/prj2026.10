@@ -1,0 +1,15 @@
+날짜,작성자,구분,항목,세부내용,상태,관련
+2026-10-12,최용훈,Fix,학교 PC Git 동기화,연휴 후 학교 PC ch와 GitHub ch 분기 → merge 후 push · main v4.1 및 태그 동기화,완료,prj07 v4.1
+2026-10-12,최용훈,Done,레포 구조 변경,선생님 안내로 기존 레포에 prj07/ · prj08/ 폴더 분리 (PR #60) · 기존 파일 이동만 (내용 변경 없음),완료,
+2026-10-12,최용훈,Done,main 보호 규칙 적용,Ruleset main_master 활성화 (Restrict updates · deletions · force push) · Repository admin만 bypass · 팀원 merge 차단 동작 확인,완료,
+2026-10-12,박건,Fix,.gitignore 정리,echo 명령이 파일에 그대로 기록된 줄 수정 · prj08 NDA 차단 규칙 추가 (models · demo · jpg),완료,
+2026-10-12,박건,Done,교과 7 FINAL 확보,master_data/final → data/subject7_final 복사 · JPG 900 / TXT 900 · 읽기 전용 잠금 · git check-ignore로 업로드 차단 확인,완료,Day1
+2026-10-12,심준형,Done,교과 7 FINAL 통계 확인,scene_type 750/150/0 · Empty Label 0 · Class 4 0건 · QA PASS 900,완료,Day1 · 산출물7
+2026-10-12,심준형,Done,개발환경 확인,scripts/01_check_environment.py · Python 3.10.12 · PyTorch 2.14.1+cu130 · Ultralytics 8.4.175 · RTX 3060 CUDA True · YOLO11n Load 성공,완료,Day1
+2026-10-12,김하민,Done,README 초안,prj08/README.md - 목적 · 교과 7 연결 · Dataset · Class · 실행환경 · 알려진 한계,완료,Day1 · 산출물7
+2026-10-12,김하민,Done,dataset.yaml Class 이름 통일,Class ID 0~6 순서 유지 · 이름만 영문(leaf_paper 등)으로 통일,완료,Day1 · 산출물1
+2026-10-12,이승훈,Done,Issue Log 작성,reports/issue_log.md - 가상환경 손상 · .gitignore 오기록 · code 명령 ENOENT · ~/.config 없음,완료,Day1
+2026-10-12,이승훈,Done,팀 공지,디스코드 - 구조 변경 · 환경 세팅 · PR 방법 · 보안 규칙 · 1일차 요약,완료,
+2026-10-12,팀원 전원,Doing,팀원 환경 확인,01_check_environment.py 결과 공유 → 전원 확인 시 Day1 Gate 통과,진행 중,Day1
+2026-10-12,최용훈,Todo,정상 김치 0장 대응,normal_kimchi 0장 → 정상 김치 FP 가능성 · 2일차 Split 정책 논의 안건,예정,Day2
+2026-10-12,최용훈,Todo,옛 레포 정리,GitHub prj08_team01 레포 Archive,예정,
