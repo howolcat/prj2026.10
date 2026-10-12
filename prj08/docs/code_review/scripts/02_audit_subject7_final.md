@@ -118,27 +118,3 @@ write_csv(image_rows, REPORT_DIR / "audit_label_stats.csv", stat_fields)
 | 교과 7 입력 | `prj07/manifests/dataset_manifest.csv` |
 | 결과를 쓰는 곳 | `audit_label_stats.csv` → `03_split_analysis.py` · `04_make_split.py` |
 | 원인 기록 | `reports/issue_log.md` |
-
-## 6. 리뷰 포인트
-
-- ✅ `--fixture` 하나로 테스트 / 실제 모드 · 테스트 결과는 Git 밖에 저장
-- ✅ 기대값 주석에 Test Oracle 원칙 명시 → FAIL을 숨기지 않음
-- ✅ 결과를 화면 + CSV로 남김 (가이드 9.4) · 화면에 FAIL 항목만 따로 출력
-- ✅ Manifest가 없으면 즉시 멈춤
-- 🔧 **기대값이 두 곳**(`audit_expected.md` · `EXPECTED`) → `configs/audit_expected.yaml` 하나에서 읽기 (Single Source of Truth)
-- 🔧 **기대값의 데이터 버전 표기 없음** → 옛 버전 라벨이 "PASS 19"로 통과했던 근본 원인
-  ```python
-  EXPECTED_SOURCE = "교과 7 문서 (2026-10-07 QA · 4,602)"   # 화면 · CSV에 함께 출력
-  ```
-- 🔧 `"prj07"` 폴더 이름이 코드에 직접 들어 있음 → 폴더 이름을 바꾸면 여기가 깨짐
-- 🔧 `--fixture` 분기 주석이 "5장뿐이라"인데 실제 Fixture는 **8쌍 + orphan 1개** → 주석을 코드에 맞게 수정
-- 🔧 Fixture 결과를 자동 판정하지 않음 → `--fixture`일 때 9종 각 1건인지 `assert`
-- ❓ kimchi_v1(4,601) 기준 기대값을 새로 만든다면, 기존 4,602 기대값은 지울까 남길까?
-
-## 7. 직접 확인해 보기
-
-```bash
-cd prj08 && source .venv/bin/activate
-python scripts/02_audit_subject7_final.py
-git status --short reports/        # 아무것도 안 나오면 팀 기준 결과와 동일
-```

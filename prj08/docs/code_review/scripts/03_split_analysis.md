@@ -122,24 +122,3 @@ for k, exp in EXPECTED_LEAK.items():
 | 입력 | `reports/audit_label_stats.csv` (← `02`) |
 | 불러 쓰는 기능 | `src/capture_group.py` |
 | 결과를 쓰는 곳 | `capture_groups.csv` → `04_make_split.py` · 모든 CSV → `docs/split_policy.md` 근거 |
-
-## 6. 리뷰 포인트
-
-- ✅ 분석마다 함수 하나 · 결과는 전부 CSV
-- ✅ EXIF 실패에도 멈추지 않고 기록
-- ✅ Leakage 숫자도 기대값과 대조 → 경계값 발견
-- ✅ `--gap` 옵션으로 상세 표 기준을 바꿔 볼 수 있음
-- 🔧 세션 이름 `f"G{gid:02d}"`를 여기와 `04`에서 따로 만듦 → `src/capture_group.py`에 함수로 통합
-- 🔧 `LEAK_SECONDS` 비교가 `<=` (60초 포함) · 마이크로초 계산 → 이 정의를 `split_policy.md`에 명시
-- 🔧 `EXPECTED_LEAK`도 교과 7 문서 기준 → 02와 같은 "기대값 버전 표기" 문제
-- 🔧 `main()`이 50줄 이상 → ①~④ 단계를 각각 함수로 나누면 테스트 · 재사용이 쉬움
-- ❓ 1 · 5 · 10분 외에 2 · 3분도 비교했다면 결론이 달라졌을까? (G01 · G18 분석 참고)
-
-## 7. 직접 확인해 보기
-
-```bash
-cd prj08 && source .venv/bin/activate
-python scripts/03_split_analysis.py
-python scripts/03_split_analysis.py --gap 10     # 10분 기준 상세 표 (13세션)
-git restore reports/                             # 확인 후 원래대로
-```

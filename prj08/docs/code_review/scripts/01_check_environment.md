@@ -31,7 +31,7 @@ flowchart TD
     A["main()"] --> B["① 버전 출력<br/>Python · PyTorch · Ultralytics"]
     B --> C{"② torch.cuda.is_available()"}
     C -->|True| D["GPU 이름 출력<br/>get_device_name(0)"]
-    C -->|False| E["그대로 진행<br/>(경고 없음 · 🔧)"]
+    C -->|False| E["그대로 진행<br/>(경고 없음)"]
     D --> F["③ YOLO('yolo11n.pt')"]
     E --> F
     F --> G{"yolo11n.pt 있음?"}
@@ -41,7 +41,7 @@ flowchart TD
     I --> J[/"화면 출력 → README 5장 팀원 환경 표<br/>(사람이 옮겨 적음)"/]
 ```
 
-분기가 두 군데뿐인 짧은 파일입니다. CUDA가 False여도 멈추지 않는다는 점이 🔧 항목입니다.
+분기가 두 군데뿐인 짧은 파일입니다. CUDA가 False여도 멈추지 않고 그대로 진행합니다.
 
 ## 4. 핵심 코드 읽기
 
@@ -69,22 +69,3 @@ print("YOLO Load 성공, Class 수:", len(model.names))        # 80 (COCO)
 | 버전 기준 | `requirements.txt` (`ultralytics==8.4.175`) |
 | 결과 기록 | `README.md` 5장 |
 | 다운로드 결과 | `prj08/yolo11n.pt` (Git 제외 `*.pt`) → 4일차 Baseline의 시작 가중치 |
-
-## 6. 리뷰 포인트
-
-- ✅ 가이드 14.3(환경) + 14.4(YOLO Load)를 한 파일로
-- ✅ "80개가 정상인 이유"를 주석으로 남겨 팀원이 당황하지 않게 함
-- ✅ `PROJECT_ROOT` · `if __name__ == "__main__"` 공통 구조 (가이드 9.1)
-- 🔧 결과가 화면에만 남음 → 가이드 9.4 "결과는 파일로". 예: `reports/env/env_<이름>.txt`로 저장하면 README 표의 근거가 됨
-- 🔧 CUDA가 False여도 그냥 진행 → 학습 전 단계라 경고만 하되, 눈에 띄게(`⚠`) 출력하면 놓치지 않음
-- 🔧 `yolo11n.pt`가 실행 위치(`prj08/`)에 떨어짐 → `models/pretrained/`처럼 정해진 위치를 쓰면 정리가 쉬움
-- 🔧 `PROJECT_ROOT`를 `sys.path`에 넣지만 `src`를 import하지 않음 → 지금은 불필요한 코드 (다른 스크립트와 구조를 맞추려는 목적이면 주석으로 이유 남기기)
-- ❓ GPU 메모리 크기(`torch.cuda.get_device_properties(0).total_memory`)도 출력하면 4일차 Batch 크기 정할 때 도움이 될까?
-
-## 7. 직접 확인해 보기
-
-```bash
-cd prj08 && source .venv/bin/activate
-python scripts/01_check_environment.py
-pip show ultralytics | head -2      # Version: 8.4.175 확인
-```

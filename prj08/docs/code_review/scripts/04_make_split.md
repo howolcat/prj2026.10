@@ -150,28 +150,3 @@ return hashlib.sha256(text).hexdigest()[:12]
 | 입력 | `capture_groups.csv` (← `03`) · `audit_label_stats.csv` (← `02`) |
 | import | 없음 (pandas · 표준 라이브러리만) → 앞 단계 코드가 바뀌어도 CSV가 같으면 결과가 같음 |
 | 다음 단계 | (3일차) `manifests/split_manifest.csv` · YOLO 폴더 구성 |
-
-## 6. 리뷰 포인트
-
-- ✅ 정책 값을 상수로 모아 문서와 1:1
-- ✅ 탐색과 검증 분리 · 재현성을 실제로 확인
-- ✅ 정책과 데이터가 어긋나면 `ValueError` · 조합이 없으면 `sys.exit`으로 이유 출력
-- ✅ 세션 18개라 전수 탐색 가능 → seed 없이 재현 가능
-- ✅ 맨 위 설명 "2일차 5단계" → 3일차 선행으로 수정 완료 (10/12)
-- 🔧 **출력 형식이 가이드 16.1과 다름** → `manifests/split_manifest.csv`(image_path · label_path · source_dataset · original_split · scene_type · capture_group · split · dataset_version) + 역할별 CSV 4개 + `reports/dataset_summary.csv`
-- 🔧 역할 이름 `bridge` → 가이드 `bridge_holdout`
-- 🔧 `checks.insert(5, ...)` — **위치 번호로** 재현성 결과를 끼워 넣음 → 기준 순서가 바뀌면 틀어짐. `verify(df, reproducible)`처럼 인자로 넘기기
-- 🔧 `900`이 코드에 직접 있음 (`load_images`) → 데이터 버전이 바뀌면 같이 바꿔야 함
-- 🔧 탐색을 두 번 하느라 시간이 두 배 → 첫 결과를 저장한 뒤 다시 읽어 비교하는 방식도 가능
-- 🔧 `split_e1`이 `src/capture_group.assign_capture_groups`와 같은 로직을 다시 씀
-- 🔧 Val이 Class 1 중심으로 뽑힘(389개 중 351개) → 정렬 기준에 Val 균형 추가 여부는 팀 결정 (다시 배정하면 Frozen Test 지문이 바뀜)
-- ❓ 세션이 18개가 아니라 200개였다면 전수 탐색이 가능할까? 어떤 방법으로 바꿔야 할까?
-
-## 7. 직접 확인해 보기
-
-```bash
-cd prj08 && source .venv/bin/activate
-time python scripts/04_make_split.py          # PASS 8 / FAIL 0 · 4f9291849fe6
-python -c "import pandas as pd; d=pd.read_csv('splits/kimchi_v1_split.csv'); print(d.role.value_counts())"
-git status --short splits/ reports/           # 아무것도 안 나오면 팀 기준과 동일
-```

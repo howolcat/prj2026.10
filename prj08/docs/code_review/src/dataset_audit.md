@@ -166,36 +166,3 @@ with open(path, "w", encoding="utf-8-sig", newline="") as f:   # 엑셀 한글 �
 | 테스트 데이터 | `scripts/02a_make_audit_fixture.py` → `data/audit_test/` |
 | 결과가 쓰이는 곳 | `audit_label_stats.csv` → `03_split_analysis.py` · `04_make_split.py` |
 | 기대값 | `reports/audit_expected.md` (→ `02`의 `EXPECTED`) |
-
-## 6. 리뷰 포인트
-
-- ✅ 한 줄 검사를 **순수 함수**로 분리 → 단위 테스트 쉬움
-- ✅ 조기 반환 + 조건부 경계 검사로 **같은 문제를 두 번 세지 않음**
-- ✅ ERROR / WARN 구분 → Empty · Class 4를 오류로 단정하지 않음 (가이드 15.1)
-- ✅ 입력 폴더가 없으면 가장 먼저 `FileNotFoundError` (가이드 9.3)
-- ✅ 결과를 `sorted()`로 정렬 → 실행마다 같은 순서 (Git 비교 가능)
-- 🔧 **줄 번호 어긋남**: 빈 줄을 먼저 걸러낸 뒤 번호를 매김 → TXT 중간에 빈 줄이 있으면 `line`이 실제 줄과 다름
-  ```python
-  for no, line in enumerate(txt.read_text(encoding="utf-8").splitlines(), start=1):
-      if not line.strip():
-          continue
-  ```
-- 🔧 **같은 stem 덮어쓰기**: `a.jpg`와 `a.JPG`가 함께 있으면 dict에서 하나가 조용히 사라짐 → `DUPLICATE_STEM` 검사
-- 🔧 **인코딩 오류**: TXT가 UTF-8이 아니면 `read_text`에서 프로그램이 멈춤 → `UnicodeDecodeError`를 잡아 `ENCODING_ERROR`로 기록
-- 🔧 `_issue()`에서 `SEVERITY.get(issue_type, "ERROR")` → 오타로 없는 종류를 넣어도 조용히 ERROR가 됨. 개발 중에는 `SEVERITY[issue_type]`로 바로 알아채는 편이 안전
-- ❓ `VALID_CLASSES = range(0, 7)` 대신 `configs/dataset.yaml`의 `names`에서 읽으면 어떤 장단점이 있을까?
-- ❓ `EPS = 1e-6`은 4K 이미지(3840px)에서 몇 픽셀에 해당할까? (약 0.004px → 사실상 0)
-
-## 7. 직접 확인해 보기
-
-```bash
-cd prj08 && source .venv/bin/activate
-python - <<'EOF'
-from src.dataset_audit import validate_yolo_row
-for row in ["0 0.5 0.5 0.1 0.1", "9 0.5 0.5 0.1 0.1", "0 0.98 0.5 0.1 0.1",
-            "0 0.5 0.5 0.1", "0 abc 0.5 0.1 0.1", "4 0.5 0.5 0.1 0.1", "0 1.5 0.5 0.1 0.1"]:
-    print(f"{row:<24} → {validate_yolo_row(row)}")
-EOF
-```
-
-예상: `[]` · `['CLASS_RANGE']` · `['BBOX_OUT_OF_IMAGE']` · `['COLUMN_COUNT']` · `['PARSE_ERROR']` · `['CLASS4_REVIEW']` · `['CENTER_RANGE']`

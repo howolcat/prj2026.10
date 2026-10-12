@@ -72,24 +72,3 @@ yaml에 적힌 경로는 YOLO가 언제든 읽을 수 있습니다. Bridge는 �
 | 이름 기준 | README 4장 Class 표 · 교과 7 `configs/classes.yaml` |
 | 폴더를 만들 파일 | (3일차) Split Freeze · YOLO 폴더 구성 스크립트 |
 | 이 파일을 읽을 파일 | (3일차) Smoke Test · (4일차) Baseline 학습 |
-
-## 6. 리뷰 포인트
-
-- ✅ Class ID 0~6 유지 · 영문 이름이 README 표와 일치
-- ✅ Bridge 미포함
-- ✅ `path`를 상대경로로 → 팀원마다 레포 위치가 달라도 동작
-- 🔧 `test:` 줄이 있으면 실수로 `model.val(split="test")`를 실행할 수 있음 → 8일차 전까지 Test를 쓰지 않는다는 규칙을 주석으로 남기기
-  ```yaml
-  test: images/test        # ⚠ Frozen Test · Final Model 선택 후 8일차에 한 번만
-  ```
-- 🔧 README Class 표와 이름이 두 곳에 있음 → 하나를 고치면 다른 쪽도 고쳐야 함
-- 🔧 마지막 줄(`6: green_onion_pepper`) 뒤에 줄바꿈이 없음 → `wc -l`이 13으로 나오고 Git diff에 `\ No newline at end of file`이 뜸. VS Code 설정 `files.insertFinalNewline: true`로 예방
-- ❓ `nc: 7`(Class 수)을 따로 적지 않아도 될까? (Ultralytics는 `names` 개수로 계산)
-
-## 7. 직접 확인해 보기
-
-```bash
-cd prj08
-python -c "import yaml; d=yaml.safe_load(open('configs/dataset.yaml')); print(len(d['names']), d['names'][4])"
-# 7 rubber_glove_unused 가 나오면 정상
-```
