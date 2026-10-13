@@ -18,6 +18,18 @@
 2026-10-13,김하민,Done,3일차 Daily Gate 대조,가이드 16.A · 16.8과 레포 대조 → 누락 3건 발견 (reports/dataset_summary.csv · 이미지 Prediction · reports/smoke_test.md) → A가 마무리,완료,Day3 Gate
 2026-10-13,김하민,Done,산출물 1 dataset_summary.csv,05a_dataset_summary.py 작성 · 검사 6개 PASS (네 역할 합 900 · BBox 4601 · 통계 짝 0 · 세션 섞임 0 · Bridge dataset.yaml 미포함) · 역할별 이미지 · 비율 · BBox · Class별 · 세션 · 날짜 · 장면 · yaml 포함 여부 → 산출물 1 (8개 파일) 완료,완료,Day3 · 산출물 1 · PR #83
 2026-10-13,김하민,Done,Smoke Test (A PC) · Prediction,YOLO11n 1 epoch 약 22초 · GPU_mem 1.25G · Val Prediction 74장 (conf 0.05 · 0.25 비교) · BBox · Class · Confidence 표시 확인 · Frozen Test · Bridge 미사용 · Smoke Weight는 Baseline 아님 · 오류/경고와 해결 기록,완료,Day3 · reports/smoke_test.md · PR #83
+2026-10-13,심준형,Docs,06 코드 리뷰 · 문서 갱신,README · code_flow · code_review README 수정 · scripts/06_build_yolo_dataset.md 리뷰 추가,완료,PR #86
+2026-10-13,최용훈,Fix,manifests 스키마 v2,가이드 16.1 최소 컬럼 대조 → v1(3칸 · 값 bridge) 발견 · src/manifest.py · 05b_upgrade_manifest_schema.py로 v2 9칸(split = train / val / test / bridge_holdout · dataset_version kimchi_v1) · 배정 변경 0 · 05 · 05a · 06 · 07 v2 대응 · 회귀 확인(freeze_check · yolo_build_summary · yolo_verify_check 변화 없음),완료,Day3 보완 · PR #87
+2026-10-13,최용훈,Done,라벨 Preview 20장,가이드 16.4 · train 10 · val 5 · test 5 · Class 0~3 · 5 · 6 · object_only 포함 · 교과 7 도구를 읽기 전용 작업 공간(~/preview_ws 하드 링크)으로 열람 · 20/20 일치 · 새 코드 없음,완료,reports/label_preview.md · PR #88
+2026-10-13,최용훈,Docs,Smoke Test 가이드 차이 기록,smoke_test.md 6장 · 가이드 16.5 data/smoke · 16.6 05_smoke_train.py 대신 data/yolo 전체 + CLI 명령으로 진행한 이유 기록,완료,PR #88
+2026-10-13,최용훈,Done,1~3일차 Daily Gate 재대조,가이드 전체 리뷰 · 14.7 9/9 · 15.6 8/8 · 16.8 17/17 충족 · 남은 문서 차이 목록화(README 7 · 8장 · code_review · code_flow · issue_log),완료,Day1~3 Gate
+2026-10-13,박건,Docs,README 3일차 갱신,진행 상황 · 6.2 05a 행 · 7장 scripts · reports 추가 · code_flow · dataset_yaml 문구 갱신,완료,PR #89
+2026-10-13,최용훈,Docs,README 7장 · 8장 3일차 반영,7장 src/manifest.py · reports 3일차 7개 · manifests v2 9칸 표시 · 8장 05 → 05a → 06 → 07 → Preview → Smoke 흐름 · 의존 표 src.manifest · PR #89 표기 정리,완료,README 7 · 8장 PR
+2026-10-13,최용훈,Docs,issue_log · daily_csv 정리,issue_log 10/13 6건 · 10_12 Day1 Gate 8/8 → 9/9 · 10_13 오후 작업 추가,완료,reports/issue_log.md
+2026-10-13,최용훈,Docs,10/13 요약 이미지,DAY 02 · 10.13 표기 요약 이미지 4장(⑤~⑧) 제작,완료,포트폴리오용
+2026-10-13,최용훈,Docs,교과 7 이해 문서,교과7_prj07_처음부터_이해하기.pdf 20쪽(데이터 흐름 · 저장 로직 · 자동 테스트 · prj07 → prj08 연결),완료,팀 공유용 · Git 미포함
+2026-10-13,최용훈,Todo,4일차 Baseline 파일 준비,configs/baseline.yaml · src/train_detector.py · scripts/08_train_baseline.py(사전검사 12개 · --dry-run) 작성 · 가짜 학습으로 판단 로직 확인 · 레포 미적용 · ★ 값 팀 확정 후 적용,예정,Day4
+2026-10-13,팀원 전원,Todo,Public 레포 확인,가이드 22.2 외부 공개 저장소 금지 → 선생님께 Public 사용 가능 여부 확인 · 불가 시 Private 전환,예정,보안
 2026-10-13,최용훈,Todo,Baseline 학습 설정 고정,Smoke Test에서 optimizer=auto가 AdamW(lr 0.000909)를 자동 선택 → 4일차 Baseline에서 optimizer · lr0 · batch · epochs 팀 공통으로 고정 (1 epoch 약 22초 · GPU_mem 1.25G 근거),예정,Day4
 2026-10-13,최용훈,Todo,Leakage 기대값 136 vs 135 결정,03 실행 시 정상 FAIL 1 반복 → 교과 8 코드(마이크로초) 기준 135로 개정할지 팀 결정 · 개정 시 audit v2와 같은 절차(근거 · 합의 · 개정 이력),예정,Day4
 2026-10-13,팀원 전원,Todo,Ultralytics 버전 고정 유지,8.4.176 업데이트 안내가 나와도 업데이트하지 않음 · 5명 8.4.175 유지,예정,Day4~
