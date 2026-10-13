@@ -9,3 +9,9 @@
 | 10/12 | Audit: 교과 7 문서 Class 수(4,602)와 FINAL 라벨(4,601) 불일치 | 10/07 QA 이후 10/08 라벨 추가 수정(Class 2→0 56개 등)이 교과 7 문서에 반영 안 됨. 이승훈 10/08 zip = master = subject7_final (diff 0) | 데이터 수정 없음 · 현재 FINAL(4,601)을 kimchi_v1 후보로 팀 확정 필요 · 근거 reports/audit_check.csv |
 | 10/12 | 팀원 데이터 버전 불일치 해결 | 10/07본(4,602)과 10/08 수정본(4,601) 혼재 | kimchi_v1 = 10/08 수정본(4,601) 확정 · 5명 라벨 sha256 지문 일치 확인 |
 | 10/12 | Leakage 60초 이내 validation 기대 136 / 실제 135 | 1장이 가장 가까운 train과 60.28초 차이 · 교과 7은 초 단위로 잘라 계산(포함) · 교과 8 코드는 마이크로초까지 계산(제외) | 기준 정밀도 차이 · 결론(Leakage 높음)에는 영향 없음 · 기대값 유지 |
+| 10/13 | `git pull` 거부 (`divergent branches`) | 내 브랜치와 main 양쪽에 새 커밋 · pull 방식 미설정 | `git config --global pull.rebase false` 후 다시 pull (merge) · 순서: commit → `git pull origin main` → push |
+| 10/13 | 다운로드한 스크립트 `cp` 실패 (No such file) | 같은 이름이 있어 브라우저가 `(1)`을 붙여 저장 | `ls`로 실제 파일명 확인 후 복사 · 옛 파일 정리 |
+| 10/13 | `manifests/`와 split CSV 내용은 같은데 바이트 비교 불일치 | `csv.DictWriter` 기본 줄바꿈이 `\r\n`(CRLF) | 모든 CSV 쓰기에 `lineterminator="\n"` · 재실행 후 바이트 동일 확인 |
+| 10/13 | `manifests/`가 3칸(file_name · capture_group · role) · 값 `bridge` → 가이드 16.1 최소 컬럼 · `bridge_holdout`과 다름 | 05가 split CSV 칸을 그대로 옮김 | `src/manifest.py` + `05b`로 v2 9칸 · 배정 변경 0 · 불변 조건 검사 PASS (`manifest_schema_check.csv`) · 다른 검사 결과 변화 없음 · PR #87 |
+| 10/13 | 라벨 Preview 때 교과 7 도구로 `data/yolo`를 바로 열면 그 안에 `manifests/`가 생길 위험 | 교과 7 도구는 연 폴더 아래 `manifests/`를 만듦 | 레포 밖 `~/preview_ws/raw/yolo`에 하드 링크(`cp -al`) 작업 공간 · 저장 · QA 버튼 안 누름 · 확인 후 삭제 · 20/20 일치 (`label_preview.md`) |
+| 10/13 | Smoke Test 경고 · 이상 결과 6건 (mAP≈0 · Prediction 박스 과다 · `optimizer=auto` · 8.4.176 안내 등) | 1 epoch · 기본 설정 | 모두 정상이거나 4일차에 조치 (optimizer · lr0 고정 · 버전 유지) · 상세 `reports/smoke_test.md` 4장 |

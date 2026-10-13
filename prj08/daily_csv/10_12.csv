@@ -10,7 +10,7 @@
 2026-10-12,김하민,Done,dataset.yaml Class 이름 통일,Class ID 0~6 순서 유지 · 이름만 영문(leaf_paper 등)으로 통일,완료,Day1 · 산출물1
 2026-10-12,이승훈,Done,Issue Log 작성,reports/issue_log.md - 가상환경 손상 · .gitignore 오기록 · code 명령 ENOENT · ~/.config 없음,완료,Day1
 2026-10-12,이승훈,Done,팀 공지,디스코드 - 구조 변경 · 환경 세팅 · PR 방법 · 보안 규칙 · 1일차 요약,완료,
-2026-10-12,팀원 전원,Done,팀원 환경 확인,5명 전원 Ultralytics 8.4.175 · CUDA True · RTX 3060 · YOLO11n Load 성공 → Day1 Gate 8/8 통과,완료,Day1
+2026-10-12,팀원 전원,Done,팀원 환경 확인,5명 전원 Ultralytics 8.4.175 · CUDA True · RTX 3060 · YOLO11n Load 성공 → Day1 Gate 9/9 통과 (가이드 14.7 · 10/13 재대조),완료,Day1
 2026-10-12,최용훈,Done,정상 김치 0장 대응,normal_kimchi 0장 → 정상 김치 FP 평가 불가 · split_policy.md 9장 알려진 한계로 기록,완료,Day2 · docs/split_policy.md
 2026-10-12,최용훈,Done,옛 레포 정리,GitHub prj08_team01 레포 Archive,완료,
 2026-10-12,최용훈,Done,Audit 기대값 정리,reports/audit_expected.md - Handoff·QA Summary·Manifest 대조 · Leakage 75.6% 재확인 · 세션 18개 중 17개 혼합,완료,Day2
