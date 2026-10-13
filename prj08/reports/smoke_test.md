@@ -80,7 +80,17 @@ yolo detect predict model=runs/smoke_day3/weights/best.pt source=data/yolo/image
 - B (pg 브랜치) PC 에서도 같은 설정으로 1 epoch 정상 종료 (PR #82 커밋 메시지)
 - `data/yolo` 구성 결과는 A PC · B PC 가 완전히 같음 (`reports/yolo_build_summary.csv` diff 0 · Test 지문 `4f9291849fe6`)
 
-## 6. 주의 · 결론
+## 6. 가이드(16.5 · 16.6)와 다른 점
+
+| 가이드 | 우리 팀 | 이유 |
+|---|---|---|
+| 작은 Smoke Dataset (Train 30~40 · Val 5~10장) · `data/smoke/` · `configs/smoke_dataset.yaml` | 전체 Train 600 · Val 74 · `configs/dataset.yaml` 그대로 · 1 epoch | 1 epoch 약 22초로 충분히 빠름 · 실제 학습 경로(`data/yolo`)를 그대로 검증해 4일차와 같은 조건 확인 |
+| `scripts/05_smoke_train.py` · `runs/smoke_v1` | `yolo detect train` CLI · `runs/smoke_day3` | 1회성 확인이라 스크립트 대신 명령 기록 (2장) · 우리 05 번호는 Freeze 스크립트가 사용 중 |
+| Prediction 1장 · conf 0.25 | Val 74장 · conf 0.05 / 0.25 비교 | 1 epoch 모델의 오검출 양상을 함께 확인 |
+
+> Test · Bridge 미사용 · Smoke Weight ≠ Baseline 원칙은 가이드와 같다.
+
+## 7. 주의 · 결론
 
 - **Smoke Weight 는 Baseline 으로 사용하지 않는다.** (1 epoch · warmup 구간 · 점수 비교 대상 아님) Baseline 은 4일차에 정한 설정으로 새로 학습한다.
 - Frozen Test · Bridge Holdout 은 학습과 Prediction 어디에도 사용하지 않았다.
