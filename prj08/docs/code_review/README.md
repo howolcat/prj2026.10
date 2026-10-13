@@ -19,7 +19,9 @@ docs/code_review/
     ├── 02a_make_audit_fixture.md      # scripts/02a_make_audit_fixture.py
     ├── 02_audit_subject7_final.md     # scripts/02_audit_subject7_final.py
     ├── 03_split_analysis.md           # scripts/03_split_analysis.py
-    └── 04_make_split.md               # scripts/04_make_split.py
+    ├── 04_make_split.md               # scripts/04_make_split.py
+    ├── 05_freeze_split.md             # scripts/05_freeze_split.py
+    └── 07_verify_yolo_dataset.md      # scripts/07_verify_yolo_dataset.py
 ```
 
 `src/__init__.py`는 내용이 없는 파일(“src를 패키지로 인식시키는 표시”)이라 별도 문서를 만들지 않았습니다.
@@ -36,6 +38,8 @@ docs/code_review/
 | `scripts/02_audit_subject7_final.py` | 2 | 118 | 900장 Audit + 기대값 대조 | [02_audit_subject7_final.md](scripts/02_audit_subject7_final.md) |
 | `scripts/03_split_analysis.py` | 2 | 202 | 분포 · EXIF · 세션 비교 · Leakage | [03_split_analysis.md](scripts/03_split_analysis.md) |
 | `scripts/04_make_split.py` | 3 선행 | 266 | 전수 탐색 배정 + 합격 기준 검증 | [04_make_split.md](scripts/04_make_split.md) |
+| `scripts/05_freeze_split.py` | 3 | 147 | 13항목 검사 후 `manifests/`로 Split Freeze | [05_freeze_split.md](scripts/05_freeze_split.md) |
+| `scripts/07_verify_yolo_dataset.py` | 3 | 130 | `data/yolo`가 Freeze 본과 같은지 19항목 검증 | [07_verify_yolo_dataset.md](scripts/07_verify_yolo_dataset.md) |
 
 ## 그림은 어디에?
 
@@ -58,6 +62,10 @@ dataset_audit (기능) → 02a_make_audit_fixture → 02_audit_subject7_final
 capture_group (기능) → 03_split_analysis
       ↓  capture_groups.csv  +  docs/split_policy.md (사람의 결정)
 04_make_split
+      ↓  splits/kimchi_v1_split.csv
+05_freeze_split
+      ↓  manifests/split_manifest.csv
+07_verify_yolo_dataset
 ```
 
 ## 표기법
