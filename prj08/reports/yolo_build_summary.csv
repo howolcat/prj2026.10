@@ -1,0 +1,4 @@
+﻿role,images,labels,bbox,fingerprint
+train,600,600,2957,a185cefcffea
+val,74,74,389,f59de6f7bbb9
+test,80,80,477,4f9291849fe6
