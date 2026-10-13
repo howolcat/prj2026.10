@@ -21,6 +21,7 @@ docs/code_review/
     ├── 03_split_analysis.md           # scripts/03_split_analysis.py
     ├── 04_make_split.md               # scripts/04_make_split.py
     ├── 05_freeze_split.md             # scripts/05_freeze_split.py
+    ├── 06_build_yolo_dataset.md       # scripts/06_build_yolo_dataset.py
     └── 07_verify_yolo_dataset.md      # scripts/07_verify_yolo_dataset.py
 ```
 
@@ -39,6 +40,7 @@ docs/code_review/
 | `scripts/03_split_analysis.py` | 2 | 202 | 분포 · EXIF · 세션 비교 · Leakage | [03_split_analysis.md](scripts/03_split_analysis.md) |
 | `scripts/04_make_split.py` | 3 선행 | 266 | 전수 탐색 배정 + 합격 기준 검증 | [04_make_split.md](scripts/04_make_split.md) |
 | `scripts/05_freeze_split.py` | 3 | 147 | 13항목 검사 후 `manifests/`로 Split Freeze | [05_freeze_split.md](scripts/05_freeze_split.md) |
+| `scripts/06_build_yolo_dataset.py` | 3 | 179 | Split 목록으로 `data/yolo` 학습 폴더 구성 (Bridge 제외) | [06_build_yolo_dataset.md](scripts/06_build_yolo_dataset.md) |
 | `scripts/07_verify_yolo_dataset.py` | 3 | 130 | `data/yolo`가 Freeze 본과 같은지 19항목 검증 | [07_verify_yolo_dataset.md](scripts/07_verify_yolo_dataset.md) |
 
 ## 그림은 어디에?
@@ -65,6 +67,8 @@ capture_group (기능) → 03_split_analysis
       ↓  splits/kimchi_v1_split.csv
 05_freeze_split
       ↓  manifests/split_manifest.csv
+06_build_yolo_dataset
+      ↓  data/yolo
 07_verify_yolo_dataset
 ```
 

@@ -50,7 +50,17 @@ flowchart LR
         O04[/"splits/kimchi_v1_split.csv<br/>split_check.csv · split_summary.csv<br/>Frozen Test 지문 4f9291849fe6"/]
     end
 
-    NEXT["3일차 남은 일<br/>manifests/*.csv · data/yolo · Smoke Test"]
+    subgraph FRZ["⑦ 3일차 · Freeze · YOLO 폴더"]
+        S05["scripts/05_freeze_split.py"]
+        O05[/"manifests/split_manifest.csv<br/>train · val · test · bridge_holdout .csv<br/>reports/freeze_check.csv"/]
+        S06["scripts/06_build_yolo_dataset.py"]
+        YOLO[("data/yolo<br/>images · labels / train · val · test<br/>Bridge 제외 · Git 제외")]
+        O06[/"reports/yolo_build_summary.csv"/]
+        S07["scripts/07_verify_yolo_dataset.py"]
+        O07[/"reports/yolo_verify_check.csv<br/>19항목 · 종료 코드 0 / 1"/]
+    end
+
+    NEXT["3일차 남은 일<br/>Smoke Test"]
 
     S01 --> ENV
 
@@ -77,7 +87,27 @@ flowchart LR
     O03 -->|capture_groups| S04
     O02 -->|audit_label_stats| S04
     S04 --> O04
-    O04 -.-> NEXT
+
+    O04 -->|"split 목록"| S05
+    IMG -->|"이미지 짝 확인"| S05
+    LBL -->|"라벨 지문 확인"| S05
+    POL -.->|"장수 · 지문 기준값"| S05
+    S05 --> O05
+
+    O04 -.->|"리허설 (from-split)"| S06
+    O05 -->|"본 실행"| S06
+    IMG -->|"복사"| S06
+    LBL -->|"복사"| S06
+    S06 --> YOLO
+    S06 --> O06
+
+    O05 -->|"정답표"| S07
+    YOLO -->|"읽기만"| S07
+    LBL -->|"바이트 비교"| S07
+    O04 -->|"split_summary BBox 합계"| S07
+    S07 --> O07
+
+    O07 -.-> NEXT
     YAML -.-> NEXT
 
     classDef data fill:#E9ECE8,stroke:#9AA3AE,color:#1B2430
@@ -87,13 +117,15 @@ flowchart LR
     classDef human fill:#FBF1E6,stroke:#C26A1E,stroke-width:2px,color:#1B2430
     classDef next fill:#F3F4F1,stroke:#B8C2CF,stroke-dasharray:4 3,color:#6B7280
 
-    class IMG,LBL,MAN,FIX data
+    class IMG,LBL,MAN,FIX,YOLO data
     class SRC1,SRC2 src
-    class S01,S02A,S02,S03,S04 script
-    class O02,O03,O04,ENV,YAML out
+    class S01,S02A,S02,S03,S04,S05,S06,S07 script
+    class O02,O03,O04,O05,O06,O07,ENV,YAML out
     class EXP,POL,LOG human
     class NEXT next
 ```
+
+`data/yolo`는 원본(읽기 전용)이 아니라 **06이 만든 복사본**입니다. 같은 폴더를 06(만든 쪽)과 07(검사하는 쪽)이 따로 확인합니다.
 
 ---
 
@@ -111,6 +143,9 @@ flowchart LR
 | `scripts/02_audit_subject7_final.py` | fixture 분기 → Audit → 기대값 대조 | [02_audit_subject7_final.md](code_review/scripts/02_audit_subject7_final.md#흐름-그림) |
 | `scripts/03_split_analysis.py` | main → 분석 5갈래 → CSV 5개 | [03_split_analysis.md](code_review/scripts/03_split_analysis.md#흐름-그림) |
 | `scripts/04_make_split.py` | E1 → 전수 탐색 → 재현성 → verify | [04_make_split.md](code_review/scripts/04_make_split.md#흐름-그림) |
+| `scripts/05_freeze_split.py` | 검사 13항목 → 전부 PASS면 Freeze · 이미 Freeze면 확인만 | [05_freeze_split.md](code_review/scripts/05_freeze_split.md#흐름-그림) |
+| `scripts/06_build_yolo_dataset.py` | 입력 고르기 → 검사 1 · 2 → 복사 → 검사 3 | [06_build_yolo_dataset.md](code_review/scripts/06_build_yolo_dataset.md#흐름-그림) |
+| `scripts/07_verify_yolo_dataset.py` | 전제 확인 → 검사 1~6 → 저장 · 종료 코드 | [07_verify_yolo_dataset.md](code_review/scripts/07_verify_yolo_dataset.md#흐름-그림) |
 
 ---
 
@@ -128,6 +163,9 @@ flowchart LR
         S02["02_audit_subject7_final.py"]
         S03["03_split_analysis.py"]
         S04["04_make_split.py"]
+        S05["05_freeze_split.py"]
+        S06["06_build_yolo_dataset.py"]
+        S07["07_verify_yolo_dataset.py"]
     end
     subgraph LIB["외부 라이브러리"]
         T["torch · ultralytics"]
@@ -143,9 +181,14 @@ flowchart LR
     S03 --> PD
     S04 --> PD
     S04 --> STD
+    S05 --> STD
+    S06 --> STD
+    S07 --> STD
     S02A --> STD
     DA --> STD
     CG --> PD
 ```
 
 > `04_make_split.py`는 `src`를 import하지 않고 **결과 CSV 두 개만** 읽습니다. 그래서 앞 단계 코드가 바뀌어도 CSV가 같으면 배정 결과가 같습니다.
+
+> `05` · `06` · `07`도 `src`를 import하지 않고 CSV와 파일만 읽습니다. 특히 `07`은 `06`의 코드를 import하지 않습니다. 만든 쪽(B)과 검사하는 쪽(A)을 나눠서, 06에 실수가 있어도 07의 검사가 같이 틀리지 않게 하려는 설계입니다. 그래서 `fingerprint()`는 04 · 05 · 06 · 07에 **같은 계산으로 각각** 들어 있습니다.
