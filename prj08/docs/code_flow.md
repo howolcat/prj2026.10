@@ -60,7 +60,7 @@ flowchart LR
         O07[/"reports/yolo_verify_check.csv<br/>19항목 · 종료 코드 0 / 1"/]
     end
 
-    NEXT["3일차 남은 일<br/>Smoke Test"]
+    NEXT["3일차 <br/>Smoke Test <br/> 완료"]
 
     S01 --> ENV
 

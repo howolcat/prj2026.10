@@ -2,7 +2,7 @@
 
 > 교과 7에서 검수한 정답 데이터로 YOLO11 객체검출 모델을 학습 · 평가 · 개선한다.
 >
-> **Dataset Version** `kimchi_v1` · **라벨 지문** `5c2b4fc2c3e6` · **진행 상황** 2일차 완료 (Split 정책 확정) · 3일차 진행 중 (Split Freeze · data/yolo 구성 · 검증 스크립트 추가)
+> **Dataset Version** `kimchi_v1` · **라벨 지문** `5c2b4fc2c3e6` · **진행 상황**  "3일차 완료 (Freeze · YOLO 데이터 · Smoke Test)"
 
 ---
 
@@ -101,9 +101,10 @@ LC_ALL=C cat data/subject7_final/labels/*.txt | sha256sum | cut -c1-12
 | 5 | `python scripts/03_split_analysis.py` | Leakage PASS 4 / FAIL 1 (136 vs 135 경계값 · 정상) |
 | 6 | `python scripts/04_make_split.py` | 합격 기준 8 / 8 PASS · Frozen Test 지문 `4f9291849fe6` |
 | 7 | `python scripts/05_freeze_split.py` | 검사 13항목 전부 PASS 후 `manifests/` 생성 (이미 Freeze 되어 있고 같으면 확인만) |
-| 8 | `python scripts/06_build_yolo_dataset.py --overwrite` | `data/yolo` 구성 (train 600 / val 74 / test 80 · Bridge 제외 · Freeze 전 리허설은 `--from-split`) |
-| 9 | `python scripts/07_verify_yolo_dataset.py` | 19항목 모두 PASS · 종료 코드 0 |
-| 10 | `git status --short` | **아무것도 안 나오면** 내 결과 = 팀 기준 결과 (확인 후 `git restore reports/ splits/`) |
+| 8 | `python scripts/05a_dataset_summary.py` | 검사 6항목 전부 PASS |
+| 9 | `python scripts/06_build_yolo_dataset.py --overwrite` | `data/yolo` 구성 (train 600 / val 74 / test 80 · Bridge 제외 · Freeze 전 리허설은 `--from-split`) 검사 3 PASS|
+| 10 | `python scripts/07_verify_yolo_dataset.py` | 19항목 모두 PASS · FAIL 0 |
+| 11 | `git status --short` | **아무것도 안 나오면** 내 결과 = 팀 기준 결과 (확인 후 `git restore reports/ splits/`) |
 
 ## 7. 폴더 구조
 
@@ -129,6 +130,8 @@ prj08/
 │   ├── 03_split_analysis.py           # 2일차 · Class 분포 · EXIF · 1/5/10분 세션 비교 · Leakage 재확인
 │   ├── 04_make_split.py               # 3일차 선행 · 정책대로 전수 탐색 배정 + 합격 기준 8개 검증
 │   ├── 05_freeze_split.py             # 3일차 · 검사 13항목 통과 시 split을 manifests/로 Freeze
+│   ├── 05a_dataset_summary.py         # 3일차 · 산출물 1 — reports/dataset_summary.csv (학습용 Dataset Version 요약표)
+│   ├── 05b_upgrade_manifest_schema.py # 3일차 보완 · manifests/ 스키마 v1 → v2 (가이드 16.1 "최소 컬럼"). 배정은 한 장도 바꾸지 않는다.
 │   ├── 06_build_yolo_dataset.py       # 3일차 · Split 목록대로 data/yolo 학습 폴더 구성 (복사 · Bridge 제외)
 │   └── 07_verify_yolo_dataset.py      # 3일차 · data/yolo가 manifests와 같은지 19항목 검증 (읽기만)
 │
@@ -149,11 +152,14 @@ prj08/
 │   ├── audit_label_stats.csv          # 이미지별 BBox · Class 수 · 출처 · split · scene_type → 03 · 04의 입력
 │   ├── class_scene_distribution.csv   # 출처 × split × scene_type별 이미지 · Class 수
 │   ├── filename_time_check.csv        # 파일명 시각 vs EXIF (EXIF 없음)
+│   ├── freeze_check                   #
 │   ├── capture_group_compare.csv      # 1 · 5 · 10분 기준 세션 수 비교 (106 · 18 · 13)
 │   ├── capture_groups.csv             # 이미지별 촬영 시각 + 1/5/10분 세션 번호 → 04의 입력
 │   ├── capture_group_summary.csv      # 5분 세션 G01~G18 상세 (시각 · 이미지 · Class 수)
+│   ├── dataset_summary.csv            #
 │   ├── split_check.csv                # 배정 합격 기준 8개 PASS / FAIL
 │   ├── split_summary.csv              # 역할별 이미지 · BBox · Class · 날짜 · 세션 (600 / 74 / 80 / 146)
+│   ├── smoke_test.md                  # `data/yolo` → YOLO11n 학습 → Prediction 까지 파이프라인이 끝까지 연결되는지 확인
 │   ├── freeze_check.csv               # 05 · Freeze 전 검사 13항목 (item · expected · actual · result)
 │   ├── yolo_build_summary.csv         # 06 · 역할별 이미지 · 라벨 · BBox 수 · Test 지문
 │   ├── yolo_verify_check.csv          # 07 · data/yolo 검증 19항목 PASS / FAIL
@@ -236,7 +242,7 @@ prj08/
 
 ## 9. Dataset Split
 
-**상태**: 정책 확정 (2026-10-12 · 팀 회의) · 배정 선행 완료 · **3일차에 Freeze** (`05_freeze_split.py`가 `manifests/` 생성)
+**상태**: 정책 확정 (2026-10-12 · 팀 회의) · 배정 선행 완료 ·3일차 완료 (Freeze · YOLO 데이터 · Smoke Test)
 
 | 역할 | 목표 | 현재 배정 | 용도 |
 |---|---:|---:|---|
