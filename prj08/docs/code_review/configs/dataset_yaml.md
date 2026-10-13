@@ -12,7 +12,7 @@ YOLO에게 "학습 · 검증 · 시험 이미지가 어디 있고, Class 번호�
 |---|---|
 | 누가 읽나 | Ultralytics YOLO (`model.train(data="configs/dataset.yaml")`) · 4일차부터 |
 | 기준 위치 | `prj08/`에서 실행 (`path: data/yolo`는 실행 위치 기준) |
-| 지금 상태 | 파일만 있음 · 가리키는 `data/yolo/` 폴더는 **3일차에 생성** |
+| 지금 상태 | 파일만 있음 · 가리키는 `data/yolo/` 폴더는 **06으로 생성 완료** |
 
 ## 3. 내용
 
