@@ -97,7 +97,7 @@ LC_ALL=C cat data/subject7_final/labels/*.txt | sha256sum | cut -c1-12
 | 1 | `python scripts/01_check_environment.py` | CUDA True · YOLO Load 성공 (Class 80개) |
 | 2 | `python scripts/02a_make_audit_fixture.py` | `data/audit_test/` 생성 · 버그 9종 목록 |
 | 3 | `python scripts/02_audit_subject7_final.py --fixture` | 9종 각 1건 검출 |
-| 4 | `python scripts/02_audit_subject7_final.py` | PASS 14 / FAIL 5 (FAIL = 교과 7 문서 4,602 기준이라 정상) |
+| 4 | `python scripts/02_audit_subject7_final.py` | PASS 19 / FAIL 0 (기대값 v2 · kimchi_v1 기준 · 이력은 `reports/audit_expected.md` 9장) |
 | 5 | `python scripts/03_split_analysis.py` | Leakage PASS 4 / FAIL 1 (136 vs 135 경계값 · 정상) |
 | 6 | `python scripts/04_make_split.py` | 합격 기준 8 / 8 PASS · Frozen Test 지문 `4f9291849fe6` |
 | 7 | `git status --short` | **아무것도 안 나오면** 내 결과 = 팀 기준 결과 (확인 후 `git restore reports/ splits/`) |
@@ -139,7 +139,7 @@ prj08/
 │   ├── figures/                       # (예정) 학습 그래프 · Confusion Matrix 등 산출물 5
 │   ├── audit_expected.md              # Audit 전에 고정한 기대값 (Test Oracle · 교과 7 문서 기준)
 │   ├── audit_issue.csv                # 900장 문제 목록 (0건 → 제목 줄만)
-│   ├── audit_check.csv                # 기대값 vs 실제 19항목 (PASS 14 / FAIL 5)
+│   ├── audit_check.csv                # 기대값 vs 실제 19항목 (v2 기준 PASS 19 / FAIL 0)
 │   ├── audit_label_stats.csv          # 이미지별 BBox · Class 수 · 출처 · split · scene_type → 03 · 04의 입력
 │   ├── class_scene_distribution.csv   # 출처 × split × scene_type별 이미지 · Class 수
 │   ├── filename_time_check.csv        # 파일명 시각 vs EXIF (EXIF 없음)

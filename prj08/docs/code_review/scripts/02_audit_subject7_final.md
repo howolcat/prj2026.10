@@ -15,7 +15,7 @@
 
 ```bash
 python scripts/02_audit_subject7_final.py --fixture   # 검사기 시험
-python scripts/02_audit_subject7_final.py             # 900장 · 정상 결과 PASS 14 / FAIL 5
+python scripts/02_audit_subject7_final.py             # 900장 · 정상 결과 PASS 19 / FAIL 0 (기대값 v2)
 ```
 
 ## 3. 구조
@@ -44,7 +44,7 @@ flowchart TD
     G --> H{"fixture?"}
     H -->|예| R["여기서 끝<br/>data/audit_test/audit_issue.csv"]
     H -->|아니오| I["⑤ compare_with_expected(stats, EXPECTED 19항목)"]
-    I --> J[/"reports/audit_check.csv<br/>PASS 14 / FAIL 5"/]
+    I --> J[/"reports/audit_check.csv<br/>PASS 19 / FAIL 0 (v2)"/]
     I --> K[/"reports/audit_label_stats.csv<br/>→ 03 · 04의 입력"/]
     J --> L["화면에 FAIL 항목만 따로 출력"]
 ```
