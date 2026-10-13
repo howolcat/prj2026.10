@@ -30,8 +30,11 @@ MANIFEST = PROJECT_ROOT.parent / "prj07" / "manifests" / "dataset_manifest.csv"
 REPORT_DIR = PROJECT_ROOT / "reports"
 
 # ----------------------------------------------------------------------
-# 기대값: reports/audit_expected.md 1·2장에서 옮겨 적은 값 (실행 결과를 보고 고치지 않음)
+# 기대값: reports/audit_expected.md v2 1·2장에서 옮겨 적은 값 (실행 결과를 보고 고치지 않음)
+# 기준 데이터: kimchi_v1 (10/08 수정본 · 라벨 지문 5c2b4fc2c3e6)
+# v1 (교과 7 문서 4,602) → v2 (kimchi_v1 4,601) 개정 이유: audit_expected.md 9장
 # ----------------------------------------------------------------------
+EXPECTED_DOC_VERSION = "v2"
 EXPECTED = {
     "jpg_count": 900,
     "txt_count": 900,
@@ -41,14 +44,14 @@ EXPECTED = {
     "empty_label": 0,
     "class4_files": 0,
     "format_errors": 0,
-    "bbox_total": 4602,
-    "class_0": 868,
+    "bbox_total": 4601,   # v1: 4602
+    "class_0": 924,      # v1: 868 (10/08 Class 2→0 수정)
     "class_1": 1897,
-    "class_2": 767,
+    "class_2": 711,      # v1: 767
     "class_3": 378,
     "class_4": 0,
-    "class_5": 441,
-    "class_6": 251,
+    "class_5": 439,      # v1: 441
+    "class_6": 252,      # v1: 251
     "manifest_rows": 900,
     "not_in_manifest": 0,
     "missing_in_dataset": 0,
