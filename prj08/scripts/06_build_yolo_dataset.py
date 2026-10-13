@@ -21,10 +21,15 @@ import hashlib
 import shutil
 import sys
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]          # scripts/ 한 단계 위 = prj08/
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from src.manifest import read_manifest, SPLITS     # manifest v1 · v2 · split CSV 를 같은 모양(split 키)으로 읽기
+
 # ----------------------------------------------------------------------
 # 경로
 # ----------------------------------------------------------------------
-PROJECT_ROOT = Path(__file__).resolve().parents[1]          # scripts/ 한 단계 위 = prj08/
 SRC_IMG = PROJECT_ROOT / "data" / "subject7_final" / "images"
 SRC_LBL = PROJECT_ROOT / "data" / "subject7_final" / "labels"
 SPLIT_CSV = PROJECT_ROOT / "splits" / "kimchi_v1_split.csv"         # Freeze 전 (리허설용)
@@ -35,8 +40,8 @@ SUMMARY_CSV = PROJECT_ROOT / "reports" / "yolo_build_summary.csv"
 # ----------------------------------------------------------------------
 # 기준값 (split_policy.md · README 9장에서 옮겨 적은 값 · 실행 결과를 보고 고치지 않음)
 # ----------------------------------------------------------------------
-YOLO_ROLES = ["train", "val", "test"]       # data/yolo 에 넣는 역할 (bridge 제외)
-ALL_ROLES = set(YOLO_ROLES) | {"bridge"}
+YOLO_ROLES = ["train", "val", "test"]       # data/yolo 에 넣는 역할 (bridge_holdout 제외)
+ALL_ROLES = set(SPLITS)                     # train · val · test · bridge_holdout
 FROZEN_TEST_FP = "4f9291849fe6"             # Frozen Test 지문 (split_policy.md 8장)
 
 
@@ -48,16 +53,14 @@ def fingerprint(names) -> str:
 
 def load_rows(csv_path: Path) -> list[dict]:
     """split / manifest CSV 읽기 + 형식 검사 (칸 이름 · 역할 이름 · 중복)."""
-    with open(csv_path, encoding="utf-8-sig", newline="") as f:     # utf-8-sig: 맨 앞 BOM 제거
-        rows = list(csv.DictReader(f))
+    try:
+        rows, _ = read_manifest(csv_path)       # 모든 행에 split 키 (v1 의 role · bridge 는 split · bridge_holdout 로)
+    except (ValueError, KeyError) as e:
+        sys.exit(f"[중단] {csv_path.name} 칸 구성이 다릅니다: {e}")
 
-    need = {"file_name", "capture_group", "role"}
-    if not rows or not need <= set(rows[0].keys()):
-        sys.exit(f"[중단] {csv_path.name} 칸 이름이 다릅니다. 필요: {sorted(need)}")
-
-    bad_roles = {r["role"] for r in rows} - ALL_ROLES
+    bad_roles = {r["split"] for r in rows} - ALL_ROLES
     if bad_roles:
-        sys.exit(f"[중단] 알 수 없는 role: {bad_roles}")
+        sys.exit(f"[중단] 알 수 없는 split 값: {bad_roles}")
 
     names = [r["file_name"] for r in rows]
     if len(names) != len(set(names)):
@@ -87,7 +90,7 @@ def main():
     print(f"입력: {src_csv.relative_to(PROJECT_ROOT)}  ({'리허설' if args.from_split else '본 실행'})")
 
     rows = load_rows(src_csv)
-    by_role = {role: [r["file_name"] for r in rows if r["role"] == role] for role in ALL_ROLES}
+    by_role = {role: [r["file_name"] for r in rows if r["split"] == role] for role in ALL_ROLES}
 
     # ② 검사 1: Frozen Test 지문 (다르면 아무것도 복사하지 않음) -----------------
     test_fp = fingerprint(by_role["test"])
@@ -146,7 +149,7 @@ def main():
         if not (s["images"] == s["labels"] == expected):
             problems.append(f"{s['role']}: 이미지 {s['images']} / 라벨 {s['labels']} / 기대 {expected}")
     copied = {p.name for p in (OUT_DIR / "images").rglob("*.jpg")}
-    leaked = copied & set(by_role["bridge"])
+    leaked = copied & set(by_role["bridge_holdout"])
     if leaked:
         problems.append(f"Bridge 이미지가 data/yolo 에 들어감: {len(leaked)}장")
     test_row = next(s for s in summary if s["role"] == "test")
@@ -164,7 +167,7 @@ def main():
     print(f"{'role':<6} {'images':>6} {'labels':>6} {'bbox':>6}  fingerprint")
     for s in summary:
         print(f"{s['role']:<6} {s['images']:>6} {s['labels']:>6} {s['bbox']:>6}  {s['fingerprint']}")
-    print(f"bridge {len(by_role['bridge']):>6}장 → data/yolo 미포함 (교과 8 사용 금지)")
+    print(f"bridge_holdout {len(by_role['bridge_holdout'])}장 → data/yolo 미포함 (교과 8 사용 금지)")
     print(f"저장: {SUMMARY_CSV.relative_to(PROJECT_ROOT)}")
 
     if problems:

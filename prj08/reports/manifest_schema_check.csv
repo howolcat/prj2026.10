@@ -1,0 +1,15 @@
+﻿item,expected,actual,result
+rows,900,900,PASS
+assignment_same_as_old_manifest,yes,yes,PASS
+assignment_same_as_split_csv,yes,yes,PASS
+unknown_split_value,0,0,PASS
+count_train,600,600,PASS
+count_val,74,74,PASS
+count_test,80,80,PASS
+count_bridge_holdout,146,146,PASS
+test_fingerprint,4f9291849fe6,4f9291849fe6,PASS
+group_in_multiple_splits,0,0,PASS
+scene_kimchi_with_target,750,750,PASS
+scene_object_only,150,150,PASS
+dataset_version,kimchi_v1,kimchi_v1,PASS
+path_matches_file_name,0,0,PASS
