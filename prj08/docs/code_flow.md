@@ -65,7 +65,7 @@ flowchart LR
     SRC1 -.->|import| S02
     EXP -.->|EXPECTED 19항목| S02
     S02 --> O02
-    O02 -.->|FAIL 5 원인| LOG
+    O02 -.->|v1 FAIL 5 원인| LOG
 
     O02 -->|audit_label_stats| S03
     IMG -->|EXIF 확인| S03

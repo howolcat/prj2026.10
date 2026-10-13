@@ -15,7 +15,7 @@
 
 ```bash
 python scripts/02_audit_subject7_final.py --fixture   # 검사기 시험
-python scripts/02_audit_subject7_final.py             # 900장 · 정상 결과 PASS 14 / FAIL 5
+python scripts/02_audit_subject7_final.py             # 900장 · 정상 결과 PASS 19 / FAIL 0 (기대값 v2)
 ```
 
 ## 3. 구조
@@ -44,7 +44,7 @@ flowchart TD
     G --> H{"fixture?"}
     H -->|예| R["여기서 끝<br/>data/audit_test/audit_issue.csv"]
     H -->|아니오| I["⑤ compare_with_expected(stats, EXPECTED 19항목)"]
-    I --> J[/"reports/audit_check.csv<br/>PASS 14 / FAIL 5"/]
+    I --> J[/"reports/audit_check.csv<br/>PASS 19 / FAIL 0 (v2)"/]
     I --> K[/"reports/audit_label_stats.csv<br/>→ 03 · 04의 입력"/]
     J --> L["화면에 FAIL 항목만 따로 출력"]
 ```
@@ -64,19 +64,23 @@ MANIFEST = PROJECT_ROOT.parent / "prj07" / "manifests" / "dataset_manifest.csv"
 ### 4.2 기대값 — 결과를 보고 고치지 않는다
 
 ```python
-# 기대값: reports/audit_expected.md 1·2장에서 옮겨 적은 값 (실행 결과를 보고 고치지 않음)
+# 기대값: reports/audit_expected.md v2 1·2장에서 옮겨 적은 값 (실행 결과를 보고 고치지 않음)
+# 기준 데이터: kimchi_v1 (10/08 수정본 · 라벨 지문 5c2b4fc2c3e6)
+EXPECTED_DOC_VERSION = "v2"
 EXPECTED = {
     "jpg_count": 900, "txt_count": 900, "pair_count": 900,
     "missing_label": 0, "missing_image": 0, "empty_label": 0,
     "class4_files": 0, "format_errors": 0,
-    "bbox_total": 4602,
-    "class_0": 868, "class_1": 1897, "class_2": 767, "class_3": 378,
-    "class_4": 0, "class_5": 441, "class_6": 251,
+    "bbox_total": 4601,                                   # v1: 4602
+    "class_0": 924, "class_1": 1897, "class_2": 711, "class_3": 378,   # v1: 868 · 767
+    "class_4": 0, "class_5": 439, "class_6": 252,         # v1: 441 · 251
     "manifest_rows": 900, "not_in_manifest": 0, "missing_in_dataset": 0,
 }
 ```
 
-이 숫자들은 교과 7 문서(10/07 QA)에서 왔습니다. 실제 라벨(10/08 수정본)은 4,601이라 **FAIL 5건이 정상**입니다. 이 FAIL을 숨기지 않고 추적해서 "10/08 수정이 문서에 반영되지 않았다"는 원인을 찾았고, 팀원 2명이 옛 버전을 쓰고 있다는 것도 발견했습니다.
+**v1 (10/12)**: 교과 7 문서(10/07 QA)의 숫자를 그대로 옮겼습니다. 실제 라벨(10/08 수정본)은 4,601이라 **PASS 14 / FAIL 5**가 나왔고, 이 FAIL을 숨기지 않고 추적해서 "10/08 수정이 문서에 반영되지 않았다"는 원인을 찾았습니다. 팀원 2명이 옛 버전을 쓰고 있다는 것도 이때 발견했습니다.
+
+**v2 (10/13)**: 원인이 데이터 결함이 아니라 **기준 문서가 낡은 것**으로 확인되고, 팀이 `kimchi_v1`(4,601 · 지문 `5c2b4fc2c3e6`)을 확정했기 때문에 기준 문서를 v2로 개정하고 `EXPECTED`를 다시 옮겨 적었습니다. 실행 결과에 맞춰 숫자를 바꾼 것이 아니라 **근거 문서 → 팀 합의 → 문서 개정 → 코드 반영** 순서를 지켰고, 개정 이유는 `reports/audit_expected.md` 9장에 남겼습니다. 이제 이 값은 "교과 7 인계가 맞는지"가 아니라 **"kimchi_v1이 그대로인지"** 를 지키는 회귀 기준(Regression Baseline)입니다.
 
 ### 4.3 한 스크립트, 두 모드
 
