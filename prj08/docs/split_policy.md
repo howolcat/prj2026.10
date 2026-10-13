@@ -125,6 +125,8 @@ Split 결과는 아래를 **모두** 만족해야 확정한다. 하나라도 FAI
 - Frozen Test 목록은 확정 후 **sha256 지문**을 이 문서에 기록하고 바꾸지 않는다.
 - **Frozen Test 지문: `4f9291849fe6`** (80장 · 파일명 목록 sha256 앞 12자리 · 2026-10-12)
 - 배정 결과: Train 600 / Val 74 / Frozen Test 80 / Bridge 146 · 합격 기준 8개 PASS (`reports/split_check.csv`)
+- **Freeze (2026-10-13)**: `scripts/05_freeze_split.py` 검사 13개 PASS → `manifests/` 5개 생성 (`reports/freeze_check.csv`)
+- **manifest 스키마 v2 (2026-10-13)**: 가이드 16.1 최소 컬럼에 맞춰 `file_name · image_path · label_path · source_dataset · original_split · scene_type · capture_group · split · dataset_version` 9칸으로 업그레이드 · split 값 `bridge` → `bridge_holdout` · **배정 변경 0** (`scripts/05b_upgrade_manifest_schema.py` 불변 조건 14개 PASS · `reports/manifest_schema_check.csv`) · 읽기 공통 함수 `src/manifest.py`
 - 라벨 수정이 필요하면 Issue Log 기록 → `kimchi_v2`로 버전을 올리고 이 문서를 새로 쓴다.
 
 ## 9. 알려진 한계
@@ -149,3 +151,5 @@ Split 결과는 아래를 **모두** 만족해야 확정한다. 하나라도 FAI
 | 10/12 | Val · Test · Bridge는 2개 날짜 이상 세션으로 구성 | 위와 같음 | 한 시간대 · 한 조건에 치우치지 않게 |
 | 10/12 | ✅ 예외 E1 채택 (G01을 2분 기준 하위 세션으로 나눠 배정) | 최용훈 · 이승훈 · 심준형 · 김하민 · 박건 | Class 6이 G01에만 있어 다른 방법으로는 평가 불가 · Class 6 점수는 참고값으로 표기 |
 | 10/12 | 배정 = 전수 탐색 스크립트 (seed 없음) | 최용훈 제안 | 세션 18개라 전부 검사 가능 · 재현성 |
+| 10/13 | ✅ Split Freeze (`manifests/` 5개) | 최용훈 | 05 검사 13개 PASS · 라벨 지문 `5c2b4fc2c3e6` · Frozen Test 지문 `4f9291849fe6` · PR #81 |
+| 10/13 | manifest 스키마 v2 (가이드 16.1 최소 컬럼 · split 값 `bridge_holdout`) · 배정 변경 없음 | 최용훈 | 05b 불변 조건 14개 PASS (배정 · 역할별 수 · Test 지문 · 세션 섞임 · scene_type 750/150 동일) |

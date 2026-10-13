@@ -17,10 +17,15 @@ import csv
 import hashlib
 import sys
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]          # scripts/ 한 단계 위 = prj08/
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from src.manifest import read_manifest   # manifest 읽기만 공유 (06 의 구성 코드는 여전히 import 하지 않음)
+
 # ----------------------------------------------------------------------
 # 경로
 # ----------------------------------------------------------------------
-PROJECT_ROOT = Path(__file__).resolve().parents[1]          # scripts/ 한 단계 위 = prj08/
 MANIFEST_CSV = PROJECT_ROOT / "manifests" / "split_manifest.csv"
 SRC_LBL = PROJECT_ROOT / "data" / "subject7_final" / "labels"
 YOLO_DIR = PROJECT_ROOT / "data" / "yolo"
@@ -57,11 +62,10 @@ def main():
     if not YOLO_DIR.exists():
         sys.exit(f"[중단] data/yolo 가 없습니다. B 의 06 본 실행이 끝났는지 확인하세요.")
 
-    with open(MANIFEST_CSV, encoding="utf-8-sig", newline="") as f:
-        manifest = list(csv.DictReader(f))
-    role_of = {r["file_name"]: r["role"] for r in manifest}          # 파일명 → 역할 (정답표)
+    manifest, _ = read_manifest(MANIFEST_CSV)                        # 항상 split 키 · bridge_holdout 값
+    role_of = {r["file_name"]: r["split"] for r in manifest}         # 파일명 → 역할 (정답표)
     stem_role = {Path(k).stem: v for k, v in role_of.items()}
-    bridge = {k for k, v in role_of.items() if v == "bridge"}
+    bridge = {k for k, v in role_of.items() if v == "bridge_holdout"}
 
     checks = []
 
@@ -108,7 +112,7 @@ def main():
     # 6. 한 세션이 두 역할에 걸치지 않음 (manifest 기준 재확인) ---------------------------
     group_roles = {}
     for r in manifest:
-        group_roles.setdefault(r["capture_group"], set()).add(r["role"])
+        group_roles.setdefault(r["capture_group"], set()).add(r["split"])
     add(6, "group_in_multiple_roles", 0, sum(len(v) > 1 for v in group_roles.values()))
 
     # 저장 · 출력 ------------------------------------------------------------------

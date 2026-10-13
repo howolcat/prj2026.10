@@ -1,6 +1,6 @@
-﻿role,images,ratio_pct,bbox,class_0,class_1,class_2,class_3,class_4,class_5,class_6,capture_groups,dates,kimchi_with_target,object_only,in_dataset_yaml
+﻿split,images,ratio_pct,bbox,class_0,class_1,class_2,class_3,class_4,class_5,class_6,capture_groups,dates,kimchi_with_target,object_only,in_dataset_yaml
 train,600,66.7,2957,727,764,551,322,0,391,202,10,250410 250411 250424 250513,450,150,yes
 val,74,8.2,389,7,351,8,11,0,6,6,3,250410 250411,74,0,yes
 test,80,8.9,477,143,147,122,24,0,21,20,4,250410 250411 250424,80,0,yes
-bridge,146,16.2,778,47,635,30,21,0,21,24,5,250410 250411 250424,146,0,no
+bridge_holdout,146,16.2,778,47,635,30,21,0,21,24,5,250410 250411 250424,146,0,no
 total,900,100.0,4601,924,1897,711,378,0,439,252,22,250410 250411 250424 250513,750,150,-

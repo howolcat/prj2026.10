@@ -4,8 +4,9 @@
     python scripts/05_freeze_split.py
 
 결과:
-    manifests/split_manifest.csv     900행 전체 (file_name, capture_group, role)
+    manifests/split_manifest.csv     900행 전체 · 스키마 v2 (가이드 16.1 최소 컬럼 · src/manifest.py)
     manifests/train.csv · val.csv · test.csv · bridge_holdout.csv
+    ※ 10/13 Freeze 는 v1(3칸)으로 만들어졌고, 05b 로 v2 로 업그레이드했다 (배정 변경 0).
     reports/freeze_check.csv         Freeze 전 검사 결과 (item, expected, actual, result)
 
 원칙:
@@ -18,14 +19,20 @@ import csv
 import hashlib
 import sys
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from src.manifest import read_manifest, assignment, build_v2_rows, write_manifest_set, SPLIT_FILES
+
 # ----------------------------------------------------------------------
 # 경로
 # ----------------------------------------------------------------------
-PROJECT_ROOT = Path(__file__).resolve().parents[1]          # scripts/ 한 단계 위 = prj08/
 SPLIT_CSV = PROJECT_ROOT / "splits" / "kimchi_v1_split.csv"
 SRC_IMG = PROJECT_ROOT / "data" / "subject7_final" / "images"
 SRC_LBL = PROJECT_ROOT / "data" / "subject7_final" / "labels"
 MANIFEST_DIR = PROJECT_ROOT / "manifests"
+STATS_CSV = PROJECT_ROOT / "reports" / "audit_label_stats.csv"   # source_dataset · original_split · scene_type
 CHECK_CSV = PROJECT_ROOT / "reports" / "freeze_check.csv"
 
 # ----------------------------------------------------------------------
@@ -35,10 +42,8 @@ LABEL_FP = "5c2b4fc2c3e6"           # kimchi_v1 라벨 지문 (README 6.1 명령
 FROZEN_TEST_FP = "4f9291849fe6"     # Frozen Test 지문 (split_policy.md 8장)
 EXPECTED_COUNTS = {"train": 600, "val": 74, "test": 80, "bridge": 146}   # 배정 결과 (8장)
 TOTAL = 900
-FIELDS = ["file_name", "capture_group", "role"]
+FIELDS = ["file_name", "capture_group", "role"]   # 입력 splits/kimchi_v1_split.csv 의 칸 (04 결과 · v1)
 
-# 역할 → 파일 이름 (README 7장 manifests/ 구조)
-ROLE_FILES = {"train": "train.csv", "val": "val.csv", "test": "test.csv", "bridge": "bridge_holdout.csv"}
 
 
 def fingerprint(names) -> str:
@@ -59,13 +64,6 @@ def label_fingerprint(label_dir: Path) -> str:
 def read_split(csv_path: Path) -> list[dict]:
     with open(csv_path, encoding="utf-8-sig", newline="") as f:     # utf-8-sig: 맨 앞 BOM 제거
         return list(csv.DictReader(f))
-
-
-def write_rows(path: Path, rows: list[dict]) -> None:
-    with open(path, "w", encoding="utf-8-sig", newline="") as f:    # 기존 CSV 와 같은 인코딩 (BOM)
-        writer = csv.DictWriter(f, fieldnames=FIELDS, lineterminator="\n")   # 줄바꿈 \n (기존 CSV 와 같게)
-        writer.writeheader()
-        writer.writerows({k: r[k] for k in FIELDS} for r in rows)
 
 
 def main():
@@ -121,23 +119,27 @@ def main():
     if n_fail:
         sys.exit("\n[중단] FAIL 이 있어 Freeze 하지 않았습니다. manifests/ 는 만들지 않았습니다.")
 
-    # ⑥ 이미 Freeze 되어 있으면: 같으면 확인만, 다르면 중단 (얼린 것은 다시 쓰지 않는다) ---
+    # ⑥ 이미 Freeze 되어 있으면: 배정이 같으면 확인만, 다르면 중단 (얼린 것은 다시 쓰지 않는다) ---
+    #    스키마(v1 3칸 · v2 9칸)와 상관없이 "누가 어느 역할인가"(배정)만 비교한다.
     full_path = MANIFEST_DIR / "split_manifest.csv"
+    split_rows, _ = read_manifest(SPLIT_CSV)                          # role/bridge → split/bridge_holdout
     if full_path.exists():
-        frozen = read_split(full_path)
-        if [{k: r[k] for k in FIELDS} for r in frozen] == [{k: r[k] for k in FIELDS} for r in rows]:
-            print("\n이미 Freeze 되어 있고 split 과 내용이 같습니다. 아무것도 다시 쓰지 않았습니다.")
+        frozen, schema = read_manifest(full_path)
+        if assignment(frozen) == assignment(split_rows):
+            if schema == "v1":
+                print("\n배정은 같지만 manifests/ 가 스키마 v1 입니다 → python scripts/05b_upgrade_manifest_schema.py")
+            else:
+                print("\n이미 Freeze 되어 있고 split 과 배정이 같습니다 (스키마 v2). 아무것도 다시 쓰지 않았습니다.")
             return
         sys.exit("\n[중단] 이미 Freeze 된 manifests/ 가 split 과 다릅니다. 팀 확인 전에는 덮어쓰지 않습니다.")
 
-    # ⑦ Freeze: manifests/ 작성 ----------------------------------------------------
-    MANIFEST_DIR.mkdir(exist_ok=True)
-    write_rows(full_path, rows)                                       # 900행 전체 (split 순서 그대로)
-    for role, file_name in ROLE_FILES.items():
-        write_rows(MANIFEST_DIR / file_name, [r for r in rows if r["role"] == role])
+    # ⑦ Freeze: manifests/ 작성 (스키마 v2) -------------------------------------------
+    with open(STATS_CSV, encoding="utf-8-sig", newline="") as f:
+        stats = {r["file_name"]: r for r in csv.DictReader(f)}
+    write_manifest_set(MANIFEST_DIR, build_v2_rows(split_rows, stats))   # 900행 · split 순서 그대로
 
     print("\n=== Freeze 완료 ===")
-    for file_name in ["split_manifest.csv", *ROLE_FILES.values()]:
+    for file_name in ["split_manifest.csv", *SPLIT_FILES.values()]:
         n = len(read_split(MANIFEST_DIR / file_name))
         print(f"  manifests/{file_name:<22} {n:>4}행")
     print(f"  Frozen Test 지문 {FROZEN_TEST_FP} · 라벨 지문 {LABEL_FP}")

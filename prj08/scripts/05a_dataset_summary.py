@@ -19,10 +19,15 @@ import sys
 
 import yaml   # PyYAML (ultralytics 설치 시 함께 설치됨)
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from src.manifest import read_manifest, SPLITS, DATASET_VERSION
+
 # ----------------------------------------------------------------------
 # 경로
 # ----------------------------------------------------------------------
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_CSV = PROJECT_ROOT / "manifests" / "split_manifest.csv"
 STATS_CSV = PROJECT_ROOT / "reports" / "audit_label_stats.csv"
 DATASET_YAML = PROJECT_ROOT / "configs" / "dataset.yaml"
@@ -31,7 +36,7 @@ OUT_CSV = PROJECT_ROOT / "reports" / "dataset_summary.csv"
 # ----------------------------------------------------------------------
 # 기준값 (split_policy.md · audit_expected.md v2 에서 옮겨 적은 값)
 # ----------------------------------------------------------------------
-ROLES = ["train", "val", "test", "bridge"]
+ROLES = SPLITS                        # train · val · test · bridge_holdout (가이드 11.3)
 EXPECTED_TOTAL_IMAGES = 900
 EXPECTED_TOTAL_BBOX = 4601            # kimchi_v1 (audit_expected.md v2 2장)
 CLASSES = [f"class_{i}" for i in range(7)]
@@ -47,7 +52,7 @@ def main():
         if not p.exists():
             sys.exit(f"[중단] 입력 파일이 없습니다: {p.relative_to(PROJECT_ROOT)}")
 
-    manifest = read_csv(MANIFEST_CSV)
+    manifest, schema = read_manifest(MANIFEST_CSV)                     # 항상 split 키 (v1 이면 role 을 변환)
     stats = {r["file_name"]: r for r in read_csv(STATS_CSV)}          # 파일명 → 이미지별 통계
     data_yaml = yaml.safe_load(DATASET_YAML.read_text(encoding="utf-8"))
     yaml_roles = {k for k in ("train", "val", "test") if data_yaml.get(k)}   # yaml 이 가리키는 역할
@@ -56,10 +61,10 @@ def main():
     # ① 역할별 집계 -------------------------------------------------------------
     rows = []
     for role in ROLES:
-        files = [r for r in manifest if r["role"] == role]
+        files = [r for r in manifest if r["split"] == role]
         st = [stats[r["file_name"]] for r in files if r["file_name"] in stats]
         row = {
-            "role": role,
+            "split": role,
             "images": len(files),
             "ratio_pct": round(len(files) / EXPECTED_TOTAL_IMAGES * 100, 1),
             "bbox": sum(int(s["n_bbox"]) for s in st),
@@ -72,7 +77,7 @@ def main():
         }
         rows.append(row)
 
-    total = {"role": "total"}
+    total = {"split": "total"}
     for key in ["images", "ratio_pct", "bbox", *CLASSES, "capture_groups", "kimchi_with_target", "object_only"]:
         total[key] = round(sum(r[key] for r in rows), 1) if key == "ratio_pct" else sum(r[key] for r in rows)
     total["dates"] = " ".join(sorted({d for r in rows for d in r["dates"].split()}))
@@ -81,7 +86,7 @@ def main():
     # ② Daily Gate 산출물 1 검사 --------------------------------------------------
     group_roles = {}
     for r in manifest:
-        group_roles.setdefault(r["capture_group"], set()).add(r["role"])
+        group_roles.setdefault(r["capture_group"], set()).add(r["split"])
 
     checks = [
         ("네 역할 수량의 합 = 900", EXPECTED_TOTAL_IMAGES, total["images"]),
@@ -90,6 +95,8 @@ def main():
         ("BBox 합계 = kimchi_v1", EXPECTED_TOTAL_BBOX, total["bbox"]),
         ("두 역할에 섞인 capture_group", 0, sum(len(v) > 1 for v in group_roles.values())),
         ("Bridge 가 dataset.yaml 에 포함", "no", "yes" if ("bridge" in yaml_roles or "bridge" in yaml_paths) else "no"),
+        ("manifest 스키마 (가이드 16.1)", "v2", schema),
+        ("Dataset Version", DATASET_VERSION, ",".join(sorted({r.get("dataset_version", "-") for r in manifest}))),
     ]
     print("=== 산출물 1 검사 (3일차 Daily Gate) ===")
     n_fail = 0
@@ -101,7 +108,7 @@ def main():
         sys.exit(f"\n[중단] FAIL {n_fail}건 → dataset_summary.csv 를 쓰지 않았습니다.")
 
     # ③ 저장 · 출력 ----------------------------------------------------------------
-    fields = ["role", "images", "ratio_pct", "bbox", *CLASSES, "capture_groups", "dates",
+    fields = ["split", "images", "ratio_pct", "bbox", *CLASSES, "capture_groups", "dates",
               "kimchi_with_target", "object_only", "in_dataset_yaml"]
     with open(OUT_CSV, "w", encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fields, lineterminator="\n")   # 기존 CSV 와 같은 형식
@@ -109,9 +116,9 @@ def main():
         writer.writerows([*rows, total])
 
     print("\n=== reports/dataset_summary.csv ===")
-    print(f"{'role':<7}{'images':>7}{'%':>6}{'bbox':>6}  {'c0':>4}{'c1':>5}{'c2':>4}{'c3':>4}{'c4':>3}{'c5':>4}{'c6':>4}  yaml")
+    print(f"{'split':<15}{'images':>7}{'%':>6}{'bbox':>6}  {'c0':>4}{'c1':>5}{'c2':>4}{'c3':>4}{'c4':>3}{'c5':>4}{'c6':>4}  yaml")
     for r in [*rows, total]:
-        print(f"{r['role']:<7}{r['images']:>7}{r['ratio_pct']:>6}{r['bbox']:>6}  "
+        print(f"{r['split']:<15}{r['images']:>7}{r['ratio_pct']:>6}{r['bbox']:>6}  "
               + "".join(f"{r[c]:>{w}}" for c, w in zip(CLASSES, [4, 5, 4, 4, 3, 4, 4]))
               + f"  {r['in_dataset_yaml']}")
     print(f"저장: {OUT_CSV.relative_to(PROJECT_ROOT)}")
