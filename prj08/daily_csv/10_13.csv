@@ -2,5 +2,22 @@
 2026-10-13,최용훈,Fix,Audit 기대값 v2 개정,reports/audit_expected.md v1→v2 · 2장 Class별 BBox 5항목 kimchi_v1(4601) 기준으로 개정 (v1 값 보존) · 8장 규칙 0(라벨 지문 확인) · 규칙 4(기대값 개정 조건) 추가 · 9장 개정 이력 신설 · 02 EXPECTED 반영,완료,Day2 후속 · PR #79
 2026-10-13,최용훈,Done,Audit 재실행 (v2),라벨 지문 5c2b4fc2c3e6 확인 → PASS 19 / FAIL 0 · 발견된 문제 0건 · audit_issue · audit_label_stats 변경 없음 (데이터 그대로 · 기대값만 개정),완료,reports/audit_check.csv
 2026-10-13,팀원 전원,Done,팀원별 Audit v2 확인,PR #79 pull 후 각자 Audit 재실행 → PASS 19 / FAIL 0,완료,Day2 후속
-2026-10-13,최용훈,Docs,v1 결과 문구 갱신,README 6.2 · 7장 · code_review 02 · code_flow의 PASS 14 / FAIL 5 문구를 v2 기준(PASS 19 / FAIL 0)으로 갱신,완료,README.md
+2026-10-13,최용훈,Docs,v1 결과 문구 갱신,README 6.2 · 7장 · code_review 02 · code_flow의 PASS 14 / FAIL 5 문구를 v2 기준(PASS 19 / FAIL 0)으로 갱신,완료,README.md · PR #80
 2026-10-13,최용훈,Done,Split 재현성 확인,03 재실행 Leakage PASS 4 / FAIL 1 (136 vs 135 기존과 동일) · 04 재실행 합격 기준 8 / 8 PASS · Frozen Test 지문 4f9291849fe6 동일 · reports · splits 변경 없음,완료,Day3 Freeze 전 확인
+2026-10-13,최용훈,Docs,3일차 역할 분담 · B 가이드,A(Freeze · 검증) / B(YOLO 데이터 · Smoke Test) / C(문서) 분담 · 만드는 사람 ≠ 검사하는 사람 원칙 · B용 단계별 가이드 PDF(Step 0~6 · 리허설 → 본 실행 · 문제 해결) 작성 · 전달,완료,Day3
+2026-10-13,박건,Done,Split Freeze,05_freeze_split.py 작성 · 실행 → 검사 13개 PASS (라벨 지문 5c2b4fc2c3e6 · Frozen Test 지문 4f9291849fe6 · 세션 섞임 0) · manifests/ 5개 생성 (900 / 600 / 74 / 80 / 146) · manifest = split 바이트 동일 · 재실행 시 덮어쓰지 않음 확인,완료,Day3 · 산출물 1 · PR #81
+2026-10-13,박건,Done,data/yolo 검증 스크립트,07_verify_yolo_dataset.py 작성 · manifest 기준 19항목 (역할별 개수 · Test 지문 · Bridge 미포함 · 라벨 원본 바이트 일치 · 역할별 BBox · 세션 섞임) · 06 코드 import 안 함 · 가짜 데이터로 고의 오류 4종 검출 확인,완료,Day3 · PR #81
+2026-10-13,박건,Done,YOLO 데이터 구성,06_build_yolo_dataset.py manifest 기준 train 600 · val 74 · test 80 복사 · Bridge 146 미포함 · Test 지문 4f9291849fe6 · 리허설(split) = 본 실행(manifest) 결과 동일 · 07 검증 PASS 19 / FAIL 0,완료,Day3 · PR #82
+2026-10-13,박건,Done,Smoke Test,YOLO11n 1 epoch · GPU RTX 3060 · nc=80→7 · train Scanning 600/0/0 · val Scanning 74/0/0 · 18초 · GPU_mem 1.26G · runs/smoke_day3/weights(best.pt·last.pt) 생성,완료,Day3
+2026-10-13,박건,Fix,pg 브랜치 테스트 파일 삭제,PR 전 리뷰에서 10/12 테스트 커밋의 새 폴더/ddd.txt 발견 → 삭제 후 push · PR Files changed 3개 확인,완료,PR #82
+2026-10-13,심준형,Done,A PC 재현 · PR #82 머지,A PC에서 06 → 07 재실행 PASS 19 / FAIL 0 · 지문 train a185cefcffea · val f59de6f7bbb9 · test 4f9291849fe6 · B 결과와 yolo_build_summary.csv diff 0 (A PC = B PC) · PR #82 리뷰 후 머지,완료,Day3 · PR #82
+2026-10-13,심준형,Docs,05_freeze_split 코드 리뷰 문서,scripts/05_freeze_split.py 코드 리뷰 작성 (13항목 검사 · 전부 PASS일 때만 manifests/ Freeze · 이미 Freeze 시 덮어쓰지 않음 · 라벨 지문 5c2b4fc2c3e6 · Frozen Test 지문 4f9291849fe6),완료,docs/code_review/scripts/05_freeze_split.md
+2026-10-13,심준형,Docs,07_verify_yolo_dataset 코드 리뷰 문서,scripts/07_verify_yolo_dataset.py 코드 리뷰 작성 (data/yolo ↔ manifests 19항목 검증 · data/yolo는 읽기만 · 종료 코드 0/1 · 06 코드는 import 안 함),완료,docs/code_review/scripts/07_verify_yolo_dataset.md
+2026-10-13,심준형,Docs,code_review README 목차 갱신,README 구조 · 코드↔리뷰 문서 표 · 읽는 순서에 05 · 07 추가 (기존 양식 유지),완료,docs/code_review/README.md
+2026-10-13,김하민,Docs,교과 7 시스템 아키텍처 다이어그램,Subject 07 · BBox Labeling System 전체 구조도 제작 (하루 대부분 소요) · 5계층: 01 Raw Data Ingestion · 02 Core Labeling Engine(YOLO I/O · BBox Engine · UI) · 03 Dual-Stage Inspection & Manifest Tracking · 04 QA & Team Collaboration(Team Merge · Validation · Auto Test · Statistics) · 05 Deliverables & Subject 08 Handoff · 데이터 흐름 · 기록 · QA 연결 표시 · 900 Images · 8 Error Checks · 12 Auto Tests,완료,포트폴리오용
+2026-10-13,김하민,Done,3일차 Daily Gate 대조,가이드 16.A · 16.8과 레포 대조 → 누락 3건 발견 (reports/dataset_summary.csv · 이미지 Prediction · reports/smoke_test.md) → A가 마무리,완료,Day3 Gate
+2026-10-13,김하민,Done,산출물 1 dataset_summary.csv,05a_dataset_summary.py 작성 · 검사 6개 PASS (네 역할 합 900 · BBox 4601 · 통계 짝 0 · 세션 섞임 0 · Bridge dataset.yaml 미포함) · 역할별 이미지 · 비율 · BBox · Class별 · 세션 · 날짜 · 장면 · yaml 포함 여부 → 산출물 1 (8개 파일) 완료,완료,Day3 · 산출물 1 · PR #83
+2026-10-13,김하민,Done,Smoke Test (A PC) · Prediction,YOLO11n 1 epoch 약 22초 · GPU_mem 1.25G · Val Prediction 74장 (conf 0.05 · 0.25 비교) · BBox · Class · Confidence 표시 확인 · Frozen Test · Bridge 미사용 · Smoke Weight는 Baseline 아님 · 오류/경고와 해결 기록,완료,Day3 · reports/smoke_test.md · PR #83
+2026-10-13,최용훈,Todo,Baseline 학습 설정 고정,Smoke Test에서 optimizer=auto가 AdamW(lr 0.000909)를 자동 선택 → 4일차 Baseline에서 optimizer · lr0 · batch · epochs 팀 공통으로 고정 (1 epoch 약 22초 · GPU_mem 1.25G 근거),예정,Day4
+2026-10-13,최용훈,Todo,Leakage 기대값 136 vs 135 결정,03 실행 시 정상 FAIL 1 반복 → 교과 8 코드(마이크로초) 기준 135로 개정할지 팀 결정 · 개정 시 audit v2와 같은 절차(근거 · 합의 · 개정 이력),예정,Day4
+2026-10-13,팀원 전원,Todo,Ultralytics 버전 고정 유지,8.4.176 업데이트 안내가 나와도 업데이트하지 않음 · 5명 8.4.175 유지,예정,Day4~
