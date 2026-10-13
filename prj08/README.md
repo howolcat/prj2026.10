@@ -2,7 +2,7 @@
 
 > 교과 7에서 검수한 정답 데이터로 YOLO11 객체검출 모델을 학습 · 평가 · 개선한다.
 >
-> **Dataset Version** `kimchi_v1` · **라벨 지문** `5c2b4fc2c3e6` · **진행 상황** 2일차 완료 (Split 정책 확정) · 3일차 Split Freeze 예정
+> **Dataset Version** `kimchi_v1` · **라벨 지문** `5c2b4fc2c3e6` · **진행 상황** 2일차 완료 (Split 정책 확정) · 3일차 진행 중 (Split Freeze · data/yolo 구성 · 검증 스크립트 추가)
 
 ---
 
@@ -100,7 +100,10 @@ LC_ALL=C cat data/subject7_final/labels/*.txt | sha256sum | cut -c1-12
 | 4 | `python scripts/02_audit_subject7_final.py` | PASS 19 / FAIL 0 (기대값 v2 · kimchi_v1 기준 · 이력은 `reports/audit_expected.md` 9장) |
 | 5 | `python scripts/03_split_analysis.py` | Leakage PASS 4 / FAIL 1 (136 vs 135 경계값 · 정상) |
 | 6 | `python scripts/04_make_split.py` | 합격 기준 8 / 8 PASS · Frozen Test 지문 `4f9291849fe6` |
-| 7 | `git status --short` | **아무것도 안 나오면** 내 결과 = 팀 기준 결과 (확인 후 `git restore reports/ splits/`) |
+| 7 | `python scripts/05_freeze_split.py` | 검사 13항목 전부 PASS 후 `manifests/` 생성 (이미 Freeze 되어 있고 같으면 확인만) |
+| 8 | `python scripts/06_build_yolo_dataset.py --overwrite` | `data/yolo` 구성 (train 600 / val 74 / test 80 · Bridge 제외 · Freeze 전 리허설은 `--from-split`) |
+| 9 | `python scripts/07_verify_yolo_dataset.py` | 19항목 모두 PASS · 종료 코드 0 |
+| 10 | `git status --short` | **아무것도 안 나오면** 내 결과 = 팀 기준 결과 (확인 후 `git restore reports/ splits/`) |
 
 ## 7. 폴더 구조
 
@@ -124,7 +127,10 @@ prj08/
 │   ├── 02a_make_audit_fixture.py      # 2일차 · 버그 9종을 심은 테스트 데이터 생성 (검사기 검증용)
 │   ├── 02_audit_subject7_final.py     # 2일차 · 900장 Audit + 기대값 19항목 대조 (--fixture: 테스트 모드)
 │   ├── 03_split_analysis.py           # 2일차 · Class 분포 · EXIF · 1/5/10분 세션 비교 · Leakage 재확인
-│   └── 04_make_split.py               # 3일차 선행 · 정책대로 전수 탐색 배정 + 합격 기준 8개 검증
+│   ├── 04_make_split.py               # 3일차 선행 · 정책대로 전수 탐색 배정 + 합격 기준 8개 검증
+│   ├── 05_freeze_split.py             # 3일차 · 검사 13항목 통과 시 split을 manifests/로 Freeze
+│   ├── 06_build_yolo_dataset.py       # 3일차 · Split 목록대로 data/yolo 학습 폴더 구성 (복사 · Bridge 제외)
+│   └── 07_verify_yolo_dataset.py      # 3일차 · data/yolo가 manifests와 같은지 19항목 검증 (읽기만)
 │
 ├── docs/
 │   ├── split_policy.md                # 산출물 1 · Split 정책 확정본 (5분 세션 · 600/75/75/150 · 예외 E1)
@@ -133,7 +139,7 @@ prj08/
 │       ├── README.md                  # 목차 · 읽는 순서 · 우선순위
 │       ├── configs/                   # dataset_yaml.md
 │       ├── src/                       # dataset_audit.md · capture_group.md
-│       └── scripts/                   # 01 · 02a · 02 · 03 · 04 리뷰
+│       └── scripts/                   # 01 · 02a · 02 · 03 · 04 · 05 · 06 · 07 리뷰
 │
 ├── reports/                           # 결과 · 기록 (파일명 · 숫자만 · Git에 올림)
 │   ├── figures/                       # (예정) 학습 그래프 · Confusion Matrix 등 산출물 5
@@ -148,15 +154,19 @@ prj08/
 │   ├── capture_group_summary.csv      # 5분 세션 G01~G18 상세 (시각 · 이미지 · Class 수)
 │   ├── split_check.csv                # 배정 합격 기준 8개 PASS / FAIL
 │   ├── split_summary.csv              # 역할별 이미지 · BBox · Class · 날짜 · 세션 (600 / 74 / 80 / 146)
+│   ├── freeze_check.csv               # 05 · Freeze 전 검사 13항목 (item · expected · actual · result)
+│   ├── yolo_build_summary.csv         # 06 · 역할별 이미지 · 라벨 · BBox 수 · Test 지문
+│   ├── yolo_verify_check.csv          # 07 · data/yolo 검증 19항목 PASS / FAIL
 │   └── issue_log.md                   # 문제 · 원인 · 해결 기록
 │
 ├── splits/
-│   └── kimchi_v1_split.csv            # 파일별 역할 (file_name · capture_group · role) · 3일차에 manifests/로 변환 예정
+│   └── kimchi_v1_split.csv            # 파일별 역할 (file_name · capture_group · role) · 05가 manifests/로 Freeze
 │
 ├── daily_csv/
-│   └── 10_12.csv                      # 일일 작업 기록
+│   ├── 10_12.csv                      # 일일 작업 기록
+│   └── 10_13.csv                      # 일일 작업 기록
 │
-├── manifests/                         # (3일차) split_manifest.csv · train · val · test · bridge_holdout.csv
+├── manifests/                         # (3일차 · 05가 생성) split_manifest.csv · train · val · test · bridge_holdout.csv
 ├── demo/                              # (6 · 8일차) 실패 사례 · Prediction · Auto Label 결과 (일부 Git 제외)
 ├── presentation/                      # (9일차) 발표 PDF · Q&A
 ├── models/                            # ⚠ Git 제외 · baseline/ · improved/ · final/
@@ -166,7 +176,8 @@ prj08/
     ├── subject7_final/                # 교과 7 FINAL 복사본 · 읽기 전용 · 라벨 지문 5c2b4fc2c3e6
     │   ├── images/*.jpg               # 900장 (파일명 = 촬영 시각 YYMMDD_HHMMSS + 마이크로초)
     │   └── labels/*.txt               # 900개 (class x y w h)
-    └── audit_test/                    # 02a가 만든 Fixture (8쌍 + 버그 9종) · 언제든 다시 생성 가능
+    ├── audit_test/                    # 02a가 만든 Fixture (8쌍 + 버그 9종) · 언제든 다시 생성 가능
+    └── yolo/                          # 06이 만든 학습 폴더 · images · labels / train · val · test · Bridge 미포함
 ```
 
 > Git은 빈 폴더를 저장하지 않습니다. `manifests/`, `demo/`, `presentation/`, `models/` 하위 폴더는 각자 PC에만 있고, 파일이 생기는 날 Git에 올라갑니다.
@@ -195,6 +206,19 @@ prj08/
          04_make_split.py ←── capture_groups.csv + audit_label_stats.csv + 정책 상수
               ▼
          splits/kimchi_v1_split.csv · reports/split_check.csv · split_summary.csv · Frozen Test 지문 4f9291849fe6
+
+[3일차]
+         05_freeze_split.py ←── splits/kimchi_v1_split.csv (검사 13항목 · 전부 PASS일 때만 Freeze)
+              ▼
+         manifests/split_manifest.csv · train · val · test · bridge_holdout.csv · reports/freeze_check.csv
+              ▼
+         06_build_yolo_dataset.py ←── manifests/ + data/subject7_final (복사만 · Bridge 제외)
+              ▼
+         data/yolo/{images,labels}/{train,val,test} · reports/yolo_build_summary.csv
+              ▼
+         07_verify_yolo_dataset.py ←── manifests/ + data/yolo + 원본 labels (읽기만)
+              ▼
+         reports/yolo_verify_check.csv (19항목 · 종료 코드 0 / 1)
 ```
 
 | 파일 | 입력 | 출력 | 의존 |
@@ -204,12 +228,15 @@ prj08/
 | `02_audit_subject7_final.py` | images · labels · 교과 7 Manifest · `EXPECTED` | `reports/audit_*.csv` | `src.dataset_audit` |
 | `03_split_analysis.py` | `audit_label_stats.csv` · images(EXIF) | `reports/` CSV 5개 | `src.capture_group` · PIL |
 | `04_make_split.py` | `capture_groups.csv` · `audit_label_stats.csv` | `splits/` · `reports/split_*.csv` | pandas만 (src 의존 없음) |
+| `05_freeze_split.py` | `splits/kimchi_v1_split.csv` · images · labels | `manifests/` · `reports/freeze_check.csv` | 표준 라이브러리만 (src 의존 없음) |
+| `06_build_yolo_dataset.py` | `manifests/split_manifest.csv` (`--from-split`이면 split CSV) · images · labels | `data/yolo/` · `reports/yolo_build_summary.csv` | 표준 라이브러리만 (src 의존 없음) |
+| `07_verify_yolo_dataset.py` | `manifests/split_manifest.csv` · `data/yolo` · 원본 labels | `reports/yolo_verify_check.csv` | 표준 라이브러리만 (06 import 안 함) |
 
 > 함수 단위 설명과 리뷰는 [`docs/code_review/README.md`](docs/code_review/README.md), 그림은 [`docs/code_flow.md`](docs/code_flow.md)를 참고합니다.
 
 ## 9. Dataset Split
 
-**상태**: 정책 확정 (2026-10-12 · 팀 회의) · 배정 선행 완료 · **3일차에 Freeze** (`manifests/` 생성)
+**상태**: 정책 확정 (2026-10-12 · 팀 회의) · 배정 선행 완료 · **3일차에 Freeze** (`05_freeze_split.py`가 `manifests/` 생성)
 
 | 역할 | 목표 | 현재 배정 | 용도 |
 |---|---:|---:|---|
@@ -222,6 +249,7 @@ prj08/
 - **object_only 150장(G18)**: 한 세션이라 전부 Train
 - **예외 E1**: 파·고추 252개 중 251개가 G01에만 있어 G01만 2분 하위 세션으로 분할 배정 (Class 6 점수는 참고값)
 - **검증**: 합격 기준 8 / 8 PASS (`reports/split_check.csv`) · Frozen Test 지문 `4f9291849fe6`
+- **data/yolo 구성 · 검증**: 06이 Train · Val · Test만 복사하고(Bridge는 `data/yolo`에 넣지 않음) 07이 `manifests/`와 같은지 확인 (이미지 600 / 74 / 80 · BBox 2,957 / 389 / 477)
 - 근거와 결정 기록: `docs/split_policy.md`
 
 ## 10. Baseline
