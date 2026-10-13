@@ -1,0 +1,14 @@
+﻿item,expected,actual,result
+columns,"file_name,capture_group,role","file_name,capture_group,role",PASS
+rows,900,900,PASS
+duplicate_file_name,0,0,PASS
+unknown_role,0,0,PASS
+count_train,600,600,PASS
+count_val,74,74,PASS
+count_test,80,80,PASS
+count_bridge,146,146,PASS
+test_fingerprint,4f9291849fe6,4f9291849fe6,PASS
+group_in_multiple_roles,0,0,PASS
+not_on_disk,0,0,PASS
+not_in_split,0,0,PASS
+label_fingerprint,5c2b4fc2c3e6,5c2b4fc2c3e6,PASS
