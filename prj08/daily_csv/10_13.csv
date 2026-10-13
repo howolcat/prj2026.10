@@ -1,0 +1,6 @@
+날짜,작성자,구분,항목,세부내용,상태,관련
+2026-10-13,최용훈,Fix,Audit 기대값 v2 개정,reports/audit_expected.md v1→v2 · 2장 Class별 BBox 5항목 kimchi_v1(4601) 기준으로 개정 (v1 값 보존) · 8장 규칙 0(라벨 지문 확인) · 규칙 4(기대값 개정 조건) 추가 · 9장 개정 이력 신설 · 02 EXPECTED 반영,완료,Day2 후속 · PR #79
+2026-10-13,최용훈,Done,Audit 재실행 (v2),라벨 지문 5c2b4fc2c3e6 확인 → PASS 19 / FAIL 0 · 발견된 문제 0건 · audit_issue · audit_label_stats 변경 없음 (데이터 그대로 · 기대값만 개정),완료,reports/audit_check.csv
+2026-10-13,팀원 전원,Done,팀원별 Audit v2 확인,PR #79 pull 후 각자 Audit 재실행 → PASS 19 / FAIL 0,완료,Day2 후속
+2026-10-13,최용훈,Docs,v1 결과 문구 갱신,README 6.2 · 7장 · code_review 02 · code_flow의 PASS 14 / FAIL 5 문구를 v2 기준(PASS 19 / FAIL 0)으로 갱신,완료,README.md
+2026-10-13,최용훈,Done,Split 재현성 확인,03 재실행 Leakage PASS 4 / FAIL 1 (136 vs 135 기존과 동일) · 04 재실행 합격 기준 8 / 8 PASS · Frozen Test 지문 4f9291849fe6 동일 · reports · splits 변경 없음,완료,Day3 Freeze 전 확인
