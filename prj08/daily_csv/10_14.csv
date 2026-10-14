@@ -1,0 +1,20 @@
+날짜,작성자,구분,항목,세부내용,상태,관련
+2026-10-14,팀원 전원,Done,회의 결정 · Baseline 학습 설정,epochs 50 · batch 16 · imgsz 640 · AdamW 0.000909 · 0.9 · seed 42,완료,Day4
+2026-10-14,팀원 전원,Done,Leakage 기대값 · 학습 스크립트 이름 결정,Leakage 135는 지금처럼 정상 FAIL 1 유지 · 학습 스크립트 이름 08 확정,완료,Day4
+2026-10-14,팀원 전원,Done,4일차 Baseline 학습,4일차 Baseline 학습 완료,완료,Day4
+2026-10-14,최용훈,Done,아침 체크리스트,학습 PC 9항목 확인 · venv · Ultralytics 8.4.175 · CUDA True · 라벨 지문 5c2b4fc2c3e6 · 07 검증 19/19 · yolo11n.pt · runs/models 비어 있음 · GPU 여유 · 디스크 934G,완료,Day4
+2026-10-14,최용훈,Done,4·5일차 코드 반영,configs/baseline.yaml(회의 확정값) · src/train_detector.py · src/evaluate_detector.py · scripts/08_train_baseline.py · scripts/09_evaluate_baseline.py · 08 --dry-run 11 PASS + WARN 1(커밋 전),완료,Day4 · PR #92
+2026-10-14,최용훈,Done,Baseline 학습 (baseline_v1),50/50 epoch · loss NaN 0 · 13.9분 · GPU_mem 2.48G · 학습 전 검사 12/12 · Weight sha 22f35d20a5ea · condition md · results.csv 사본 · 4일차 Gate 6/6,완료,Day4 · 산출물 2 · PR #93
+2026-10-14,최용훈,Done,학습곡선 확인,Val mAP50 0.556(10) → 0.482(20) → 0.600(30) → 0.621(40) → 0.578(50) · val loss 40 이후 반등 → 30~40에서 천장 · epochs 증가는 우선순위 낮음,완료,Day5
+2026-10-14,최용훈,Done,Baseline Validation 평가,09 평가 전 검사 10/10 · Val 74장 P 0.655 · R 0.595 · mAP50 0.622 · mAP50-95 0.462 · plastic R 0.465 · 갈변 0 · 작은 객체 FN 153/363 · 그래프 3장 · 5일차 Gate 8/8,완료,Day5 · 산출물 2 완료 · PR #94
+2026-10-14,최용훈,Done,실패 원인 분석 (상위 10장),FN 40(G06 plastic 33개 전부 640 기준 7~14px) · Class 혼동 7(plastic → insect · 갈변 · leaf) · 위치 어긋남 8 · 정답 없는 자리 18(branch 10),완료,Day5 → Day6
+2026-10-14,최용훈,Done,갈변 분석,Val 갈변 6/6 반응 없음(conf 0.05) · 갈변 FP는 작은 plastic 착각 · Train 갈변 391개(9개 세션) 중 표본 43개 재현율 49% → 갈변 자체 학습 부족 + 작은 크기,완료,Day5 → Day6
+2026-10-14,최용훈,Fix,Val 라벨 오류 발견,250411_140005265446 정답 박스 2개(4K 13×17 · 12×13px · 트레이 상단)에 실제 이물 없음 · 교과 7 도구로 사람 확인 · kimchi_v1 유지 · issue_log 기록,완료,reports/issue_log.md · PR #94
+2026-10-14,최용훈,Done,위장 이물 확인,같은 사진에서 투명 plastic 2개(김치 줄기와 비슷) · 초록 plastic 1개(김치 잎과 비슷) 놓침 → 크기와 무관한 실패 · H4 가설,완료,Day5 → Day6
+2026-10-14,심준형,Docs,6일차 failure_analysis 초안,가이드 19.4 컬럼 · 대표 사례 14행(갈변 6 · 상위 10장 5 · 140005 3) · 커밋은 6일차 PR,진행 중,Day6 · 산출물 3
+2026-10-14,심준형,Done,팀 진행 점검 · 4·5일차 체크업,브랜치 5개 점검 · sim 문서 작업(14파일) 검토 · main과 충돌 없음 · 4일차 Gate 6/6 · 17.1 필수 12/12 · 5일차 Gate 8/8 · 정정: 사전검사 13 → 12개,완료,Day4~5
+2026-10-14,김하민,Docs,4·5일차 요약 이미지,DAY 03 · 10.14 요약 이미지 5장(조건 확정 · 학습 · Val 평가 · 실패 원인 · 사람 확인/가설) · 회사 사진 없음,완료,Figma용
+2026-10-14,김하민,Todo,branch 오검출 확인,Val branch 예측이 다른 이물 위인지 · 정답 없는 자리인지 집계 → 라벨 누락 / 김치 줄기 착각 판단 → failure_analysis 행 추가,예정,Day6
+2026-10-14,김하민,Todo,README · 문서 마무리,README 머리말 5일차 완료 · 10장 성능 결과(P 0.655 · R 0.595 · mAP50 0.622 · mAP50-95 0.462) · 16장 한계(라벨 오류 2건) · Confusion Matrix conf 0.001 기준 주의 문구,예정,Day5 마무리
+2026-10-14,팀원 전원,Todo,7일차 후보 검토,1순위 imgsz 640 → 1280(한 변수) · 6일차 failure_hypothesis.md에서 확정 · 라벨 오류 kimchi_v2 여부 팀 결정,예정,Day6~7
+2026-10-14,김하민,Done,5일차 결과 이미지 사람 재검수 (라벨링 프로그램),Val 결과 이미지를 교과 7 라벨링 프로그램으로 사람이 다시 확인 · 250411_140005265446 정답 박스 2개에 실제 이물 없음(라벨 오류) · 같은 사진 위장 이물 3개(투명 plastic 2 · 초록 plastic 1) 놓침 확인 · 라벨링 프로그램 화면 이미지 정리(사진 영역 · 파일명 블러),완료,Day5 → Day6

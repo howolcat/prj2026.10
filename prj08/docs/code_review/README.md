@@ -13,7 +13,10 @@ docs/code_review/
 │   └── dataset_yaml.md                # configs/dataset.yaml
 ├── src/
 │   ├── dataset_audit.md               # src/dataset_audit.py
-│   └── capture_group.md               # src/capture_group.py
+│   ├── capture_group.md               # src/capture_group.py
+│   ├── manifest.md                    # src/manifest.py
+│   ├── train_detector.md              # src/train_detector.py
+│   └── evaluate_detector.md           # src/evaluate_detector.py
 └── scripts/
     ├── 01_check_environment.md        # scripts/01_check_environment.py
     ├── 02a_make_audit_fixture.md      # scripts/02a_make_audit_fixture.py
@@ -21,8 +24,12 @@ docs/code_review/
     ├── 03_split_analysis.md           # scripts/03_split_analysis.py
     ├── 04_make_split.md               # scripts/04_make_split.py
     ├── 05_freeze_split.md             # scripts/05_freeze_split.py
+    ├── 05a_dataset_summary.md         # scripts/05a_dataset_summary.py
+    ├── 05b_upgrade_manifest_schema.md # scripts/05b_upgrade_manifest_schema.py
     ├── 06_build_yolo_dataset.md       # scripts/06_build_yolo_dataset.py
-    └── 07_verify_yolo_dataset.md      # scripts/07_verify_yolo_dataset.py
+    ├── 07_verify_yolo_dataset.md      # scripts/07_verify_yolo_dataset.py
+    ├── 08_train_baseline.md           # scripts/08_train_baseline.py
+    └── 09_evaluate_baseline.md        # scripts/09_evaluate_baseline.py
 ```
 
 `src/__init__.py`는 내용이 없는 파일(“src를 패키지로 인식시키는 표시”)이라 별도 문서를 만들지 않았습니다.
@@ -34,14 +41,21 @@ docs/code_review/
 | `configs/dataset.yaml` | 1 | 14 | YOLO가 읽는 데이터 경로 · Class 이름 | [dataset_yaml.md](configs/dataset_yaml.md) |
 | `src/dataset_audit.py` | 2 | 216 | 데이터 "건강검진" 함수 모음 | [dataset_audit.md](src/dataset_audit.md) |
 | `src/capture_group.py` | 2 | 54 | 파일명 → 촬영 시각 · 촬영 세션 묶기 | [capture_group.md](src/capture_group.md) |
+| `src/manifest.py` | 3 | 103 | manifest v1 · v2 · split CSV를 같은 모양(`split` 키)으로 읽고 · 비교하고 · 쓰기 | [manifest.md](src/manifest.md) |
+| `src/train_detector.py` | 4 | 43 | YOLO 학습 공통 함수 (`TRAIN_KEYS` 12개만 전달) | [train_detector.md](src/train_detector.md) |
+| `src/evaluate_detector.py` | 5 | 94 | Val 평가 · 이미지 예측 · TP/FP/FN 짝짓기 (Frozen Test 보호) | [evaluate_detector.md](src/evaluate_detector.md) |
 | `scripts/01_check_environment.py` | 1 | 36 | 환경 · GPU · YOLO Load 확인 | [01_check_environment.md](scripts/01_check_environment.md) |
 | `scripts/02a_make_audit_fixture.py` | 2 | 76 | 버그 9종을 심은 테스트 데이터 | [02a_make_audit_fixture.md](scripts/02a_make_audit_fixture.md) |
 | `scripts/02_audit_subject7_final.py` | 2 | 118 | 900장 Audit + 기대값 대조 | [02_audit_subject7_final.md](scripts/02_audit_subject7_final.md) |
 | `scripts/03_split_analysis.py` | 2 | 202 | 분포 · EXIF · 세션 비교 · Leakage | [03_split_analysis.md](scripts/03_split_analysis.md) |
 | `scripts/04_make_split.py` | 3 선행 | 266 | 전수 탐색 배정 + 합격 기준 검증 | [04_make_split.md](scripts/04_make_split.md) |
-| `scripts/05_freeze_split.py` | 3 | 147 | 13항목 검사 후 `manifests/`로 Split Freeze | [05_freeze_split.md](scripts/05_freeze_split.md) |
-| `scripts/06_build_yolo_dataset.py` | 3 | 179 | Split 목록으로 `data/yolo` 학습 폴더 구성 (Bridge 제외) | [06_build_yolo_dataset.md](scripts/06_build_yolo_dataset.md) |
-| `scripts/07_verify_yolo_dataset.py` | 3 | 130 | `data/yolo`가 Freeze 본과 같은지 19항목 검증 | [07_verify_yolo_dataset.md](scripts/07_verify_yolo_dataset.md) |
+| `scripts/05_freeze_split.py` | 3 | 149 | 13항목 검사 후 `manifests/`(스키마 v2)로 Split Freeze | [05_freeze_split.md](scripts/05_freeze_split.md) |
+| `scripts/05a_dataset_summary.py` | 3 | 128 | 8항목 검사 후 Dataset Version 요약표(`dataset_summary.csv`) 작성 | [05a_dataset_summary.md](scripts/05a_dataset_summary.md) |
+| `scripts/05b_upgrade_manifest_schema.py` | 3 보완 | 117 | `manifests/` v1(3칸) → v2(9칸) 업그레이드 · 배정 변경 0 | [05b_upgrade_manifest_schema.md](scripts/05b_upgrade_manifest_schema.md) |
+| `scripts/06_build_yolo_dataset.py` | 3 | 182 | Split 목록으로 `data/yolo` 학습 폴더 구성 (Bridge 제외) | [06_build_yolo_dataset.md](scripts/06_build_yolo_dataset.md) |
+| `scripts/07_verify_yolo_dataset.py` | 3 | 134 | `data/yolo`가 Freeze 본과 같은지 19항목 검증 | [07_verify_yolo_dataset.md](scripts/07_verify_yolo_dataset.md) |
+| `scripts/08_train_baseline.py` | 4 | 300 | 학습 전 12항목 검사 → Baseline 학습 → 조건 문서 자동 기록 | [08_train_baseline.md](scripts/08_train_baseline.md) |
+| `scripts/09_evaluate_baseline.py` | 5 | 292 | Val 평가 · Class별 지표 · 이미지별 FP/FN (Test · Bridge 미사용) | [09_evaluate_baseline.md](scripts/09_evaluate_baseline.md) |
 
 ## 그림은 어디에?
 
@@ -65,11 +79,17 @@ capture_group (기능) → 03_split_analysis
       ↓  capture_groups.csv  +  docs/split_policy.md (사람의 결정)
 04_make_split
       ↓  splits/kimchi_v1_split.csv
-05_freeze_split
+05_freeze_split  ←→  manifest (기능: read_manifest · build_v2_rows · write_manifest_set)
       ↓  manifests/split_manifest.csv
+05b_upgrade_manifest_schema (v1 → v2) → 05a_dataset_summary
+      ↓  manifests/ (v2) · reports/dataset_summary.csv
 06_build_yolo_dataset
       ↓  data/yolo
 07_verify_yolo_dataset
+      ↓
+train_detector (기능) → 08_train_baseline
+      ↓  models/baseline/baseline_best.pt · reports/baseline_training_condition.md
+evaluate_detector (기능) → 09_evaluate_baseline
 ```
 
 ## 표기법

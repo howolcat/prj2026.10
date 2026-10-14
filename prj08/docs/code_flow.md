@@ -20,6 +20,7 @@ flowchart LR
 
     EXP(["reports/audit_expected.md<br/>기대값 · Test Oracle"])
     YAML[/"configs/dataset.yaml<br/>Class 0~6 · Bridge 제외"/]
+    BYAML[/"configs/baseline.yaml<br/>팀 확정 학습 조건"/]
 
     subgraph D1["① 1일차 · 환경"]
         S01["scripts/01_check_environment.py"]
@@ -51,8 +52,13 @@ flowchart LR
     end
 
     subgraph FRZ["⑦ 3일차 · Freeze · YOLO 폴더"]
+        MFT{{"src/manifest.py<br/>read_manifest · assignment<br/>build_v2_rows · write_manifest_set"}}
         S05["scripts/05_freeze_split.py"]
-        O05[/"manifests/split_manifest.csv<br/>train · val · test · bridge_holdout .csv<br/>reports/freeze_check.csv"/]
+        O05[/"manifests/split_manifest.csv (스키마 v2)<br/>train · val · test · bridge_holdout .csv<br/>reports/freeze_check.csv"/]
+        S05B["scripts/05b_upgrade_manifest_schema.py<br/>v1(3칸) → v2(9칸)"]
+        O05B[/"reports/manifest_schema_check.csv<br/>불변 조건 14항목"/]
+        S05A["scripts/05a_dataset_summary.py"]
+        O05A[/"reports/dataset_summary.csv<br/>역할 4개 + 합계 · 8항목 검사"/]
         S06["scripts/06_build_yolo_dataset.py"]
         YOLO[("data/yolo<br/>images · labels / train · val · test<br/>Bridge 제외 · Git 제외")]
         O06[/"reports/yolo_build_summary.csv"/]
@@ -60,7 +66,19 @@ flowchart LR
         O07[/"reports/yolo_verify_check.csv<br/>19항목 · 종료 코드 0 / 1"/]
     end
 
-    NEXT["3일차 <br/>Smoke Test <br/> 완료"]
+    SMK["3일차 Smoke Test<br/>yolo CLI · 1 epoch · 스크립트 없음<br/>runs/smoke_day3 (Git 제외)"]
+
+    subgraph TRAIN["⑧ 4일차 · Baseline 학습"]
+        TRN{{"src/train_detector.py<br/>train_detector · TRAIN_KEYS"}}
+        S08["scripts/08_train_baseline.py<br/>--dry-run · 학습 전 12항목"]
+        O08[/"models/baseline/baseline_best.pt<br/>runs/baseline_v1 · reports/baseline_results.csv<br/>reports/baseline_training_condition.md"/]
+    end
+
+    subgraph EVAL["⑨ 5일차 · Baseline 평가"]
+        EVL{{"src/evaluate_detector.py<br/>evaluate_detector · predict_images<br/>match_boxes"}}
+        S09["scripts/09_evaluate_baseline.py<br/>Val만 · 평가 전 10항목"]
+        O09[/"reports/baseline_metrics.csv<br/>reports/baseline_val_image_check.csv<br/>reports/figures/*.png"/]
+    end
 
     S01 --> ENV
 
@@ -89,6 +107,8 @@ flowchart LR
     S04 --> O04
 
     O04 -->|"split 목록"| S05
+    O02 -->|"audit_label_stats<br/>(v2 칸을 채울 값)"| S05
+    MFT -.->|import| S05
     IMG -->|"이미지 짝 확인"| S05
     LBL -->|"라벨 지문 확인"| S05
     POL -.->|"장수 · 지문 기준값"| S05
@@ -96,6 +116,7 @@ flowchart LR
 
     O04 -.->|"리허설 (from-split)"| S06
     O05 -->|"본 실행"| S06
+    MFT -.->|import| S06
     IMG -->|"복사"| S06
     LBL -->|"복사"| S06
     S06 --> YOLO
@@ -107,8 +128,45 @@ flowchart LR
     O04 -->|"split_summary BBox 합계"| S07
     S07 --> O07
 
-    O07 -.-> NEXT
-    YAML -.-> NEXT
+    MFT -.->|import| S07
+
+    O05 -->|"지금 manifest (v1)"| S05B
+    O04 -->|"배정 비교"| S05B
+    O02 -->|"audit_label_stats"| S05B
+    MFT -.->|import| S05B
+    S05B -->|"v2로 갱신 · 배정 변경 0"| O05
+    S05B --> O05B
+
+    O05 -->|"정답표 (v2)"| S05A
+    O02 -->|"이미지별 통계"| S05A
+    YAML -->|"Bridge 포함 여부"| S05A
+    MFT -.->|import| S05A
+    S05A --> O05A
+
+    O07 -.-> SMK
+    YAML -.-> SMK
+    YOLO -.->|"Train 600 · Val 74"| SMK
+    SMK -.->|"조건 확인용 · Weight는 쓰지 않음"| S08
+
+    BYAML -->|"학습 조건"| S08
+    YAML -->|"train · val"| S08
+    O05 -->|"manifest · train.csv · val.csv"| S08
+    YOLO -->|"학습 데이터"| S08
+    LBL -->|"라벨 지문"| S08
+    S07 -.->|"실행 · 종료 코드 0"| S08
+    MFT -.->|import| S08
+    TRN -.->|import| S08
+    S08 --> O08
+
+    O08 -->|"Weight · 조건 문서(상태 · sha)"| S09
+    BYAML -->|"imgsz · batch"| S09
+    YAML -->|"val 평가"| S09
+    O05 -->|"val.csv"| S09
+    YOLO -->|"val 이미지 · 라벨"| S09
+    S07 -.->|"실행 · 종료 코드 0"| S09
+    MFT -.->|import| S09
+    EVL -.->|import| S09
+    S09 --> O09
 
     classDef data fill:#E9ECE8,stroke:#9AA3AE,color:#1B2430
     classDef src fill:#FFFFFF,stroke:#2a78d6,stroke-width:2px,color:#1B2430
@@ -118,14 +176,16 @@ flowchart LR
     classDef next fill:#F3F4F1,stroke:#B8C2CF,stroke-dasharray:4 3,color:#6B7280
 
     class IMG,LBL,MAN,FIX,YOLO data
-    class SRC1,SRC2 src
-    class S01,S02A,S02,S03,S04,S05,S06,S07 script
-    class O02,O03,O04,O05,O06,O07,ENV,YAML out
+    class SRC1,SRC2,MFT,TRN,EVL src
+    class S01,S02A,S02,S03,S04,S05,S05A,S05B,S06,S07,S08,S09 script
+    class O02,O03,O04,O05,O05A,O05B,O06,O07,O08,O09,ENV,YAML,BYAML out
     class EXP,POL,LOG human
-    class NEXT next
+    class SMK next
 ```
 
 `data/yolo`는 원본(읽기 전용)이 아니라 **06이 만든 복사본**입니다. 같은 폴더를 06(만든 쪽)과 07(검사하는 쪽)이 따로 확인합니다.
+
+`src/manifest.py`는 05 · 05a · 05b · 06 · 07 · 08 · 09가 모두 `import`해서 manifest(v1 · v2 · split CSV)를 같은 모양으로 읽습니다. 08 · 09는 학습 전 · 평가 전에 **07을 그대로 실행**해(import가 아니라 별도 실행) 종료 코드 0을 확인합니다. 3일차 Smoke Test는 스크립트 없이 `yolo detect train` 명령으로 1 epoch만 돌려 파이프라인이 끝까지 이어지는지 확인한 것이고(기록: `smoke_test.md`), 그 Weight는 Baseline으로 쓰지 않습니다. `runs/` · `models/`(Smoke · 08 · 09 결과)는 Git에 올리지 않고(NDA), `reports/`의 CSV · 그래프 · 조건 문서만 올립니다.
 
 ---
 
@@ -138,14 +198,21 @@ flowchart LR
 | `configs/dataset.yaml` | path → images → labels 자동 치환 | [dataset_yaml.md](code_review/configs/dataset_yaml.md#흐름-그림) |
 | `src/dataset_audit.py` | 짝 맞추기 → 한 줄 검사 → issues · stats | [dataset_audit.md](code_review/src/dataset_audit.md#흐름-그림) |
 | `src/capture_group.py` | sort → diff → 비교 → cumsum | [capture_group.md](code_review/src/capture_group.md#흐름-그림) |
+| `src/manifest.py` | 칸 이름으로 v1 · v2 판단 → `split` 키로 맞춤 → v2 칸 채우기 → 5개 파일 쓰기 | [manifest.md](code_review/src/manifest.md#흐름-그림) |
+| `src/train_detector.py` | 절대경로 확인 → `TRAIN_KEYS`만 골라 `model.train()` → 실제 저장 폴더 | [train_detector.md](code_review/src/train_detector.md#흐름-그림) |
+| `src/evaluate_detector.py` | split 허용 확인 → `model.val()` · 예측 제너레이터 · TP/FP/FN 짝짓기 | [evaluate_detector.md](code_review/src/evaluate_detector.md#흐름-그림) |
 | `scripts/01_check_environment.py` | 버전 → CUDA → YOLO Load | [01_check_environment.md](code_review/scripts/01_check_environment.md#흐름-그림) |
 | `scripts/02a_make_audit_fixture.py` | 지우기 → 8쌍 복사 → 버그 9종 | [02a_make_audit_fixture.md](code_review/scripts/02a_make_audit_fixture.md#흐름-그림) |
 | `scripts/02_audit_subject7_final.py` | fixture 분기 → Audit → 기대값 대조 | [02_audit_subject7_final.md](code_review/scripts/02_audit_subject7_final.md#흐름-그림) |
 | `scripts/03_split_analysis.py` | main → 분석 5갈래 → CSV 5개 | [03_split_analysis.md](code_review/scripts/03_split_analysis.md#흐름-그림) |
 | `scripts/04_make_split.py` | E1 → 전수 탐색 → 재현성 → verify | [04_make_split.md](code_review/scripts/04_make_split.md#흐름-그림) |
-| `scripts/05_freeze_split.py` | 검사 13항목 → 전부 PASS면 Freeze · 이미 Freeze면 확인만 | [05_freeze_split.md](code_review/scripts/05_freeze_split.md#흐름-그림) |
+| `scripts/05_freeze_split.py` | 검사 13항목 → 전부 PASS면 Freeze(v2) · 이미 Freeze면 배정만 비교 | [05_freeze_split.md](code_review/scripts/05_freeze_split.md#흐름-그림) |
+| `scripts/05a_dataset_summary.py` | 입력 확인 → 역할별 집계 → 8항목 검사 → 저장 | [05a_dataset_summary.md](code_review/scripts/05a_dataset_summary.md#흐름-그림) |
+| `scripts/05b_upgrade_manifest_schema.py` | 새 manifest 만들기 → 14항목 검사 → 이미 v2면 확인만 · v1이면 쓰기 | [05b_upgrade_manifest_schema.md](code_review/scripts/05b_upgrade_manifest_schema.md#흐름-그림) |
 | `scripts/06_build_yolo_dataset.py` | 입력 고르기 → 검사 1 · 2 → 복사 → 검사 3 | [06_build_yolo_dataset.md](code_review/scripts/06_build_yolo_dataset.md#흐름-그림) |
 | `scripts/07_verify_yolo_dataset.py` | 전제 확인 → 검사 1~6 → 저장 · 종료 코드 | [07_verify_yolo_dataset.md](code_review/scripts/07_verify_yolo_dataset.md#흐름-그림) |
+| `scripts/08_train_baseline.py` | 검사 12항목 → (dry-run이면 종료) → 학습 → 결과 확인 · 보관 → 조건 문서 | [08_train_baseline.md](code_review/scripts/08_train_baseline.md#흐름-그림) |
+| `scripts/09_evaluate_baseline.py` | 검사 10항목 → ① Val 평가 → ② 그림 정리 → ③ 이미지별 FP/FN | [09_evaluate_baseline.md](code_review/scripts/09_evaluate_baseline.md#흐름-그림) |
 
 ---
 
@@ -156,6 +223,9 @@ flowchart LR
     subgraph SRC["src/ · 기능"]
         DA{{"dataset_audit.py"}}
         CG{{"capture_group.py"}}
+        MF{{"manifest.py"}}
+        TD{{"train_detector.py"}}
+        ED{{"evaluate_detector.py"}}
     end
     subgraph SCR["scripts/ · 실행"]
         S01["01_check_environment.py"]
@@ -164,14 +234,19 @@ flowchart LR
         S03["03_split_analysis.py"]
         S04["04_make_split.py"]
         S05["05_freeze_split.py"]
+        S05A["05a_dataset_summary.py"]
+        S05B["05b_upgrade_manifest_schema.py"]
         S06["06_build_yolo_dataset.py"]
         S07["07_verify_yolo_dataset.py"]
+        S08["08_train_baseline.py"]
+        S09["09_evaluate_baseline.py"]
     end
     subgraph LIB["외부 라이브러리"]
         T["torch · ultralytics"]
         PD["pandas · numpy"]
         PIL["Pillow"]
-        STD["pathlib · csv · shutil · hashlib · itertools"]
+        YML["PyYAML"]
+        STD["pathlib · csv · shutil · hashlib · itertools · subprocess · re"]
     end
 
     S01 --> T
@@ -187,8 +262,35 @@ flowchart LR
     S02A --> STD
     DA --> STD
     CG --> PD
+
+    S05 -.->|import| MF
+    S05A -.->|import| MF
+    S05B -.->|import| MF
+    S06 -.->|import| MF
+    S07 -.->|import| MF
+    S08 -.->|import| MF
+    S09 -.->|import| MF
+    S08 -.->|import| TD
+    S09 -.->|import| ED
+    S08 -.->|"실행 (subprocess)"| S07
+    S09 -.->|"실행 (subprocess)"| S07
+    MF --> STD
+    S05A --> YML
+    S08 --> YML
+    S09 --> YML
+    S08 --> T
+    TD --> T
+    ED --> T
+    S05A --> STD
+    S05B --> STD
+    S08 --> STD
+    S09 --> STD
 ```
 
 > `04_make_split.py`는 `src`를 import하지 않고 **결과 CSV 두 개만** 읽습니다. 그래서 앞 단계 코드가 바뀌어도 CSV가 같으면 배정 결과가 같습니다.
 
-> `05` · `06` · `07`도 `src`를 import하지 않고 CSV와 파일만 읽습니다. 특히 `07`은 `06`의 코드를 import하지 않습니다. 만든 쪽(B)과 검사하는 쪽(A)을 나눠서, 06에 실수가 있어도 07의 검사가 같이 틀리지 않게 하려는 설계입니다. 그래서 `fingerprint()`는 04 · 05 · 06 · 07에 **같은 계산으로 각각** 들어 있습니다.
+> `05` · `05a` · `05b` · `06` · `07` · `08` · `09`는 `src/manifest.py`를 import해서 `read_manifest()`로 manifest(v1 · v2 · split CSV)를 같은 모양(모든 행에 `split` 키, Bridge 값은 `bridge_holdout`)으로 읽습니다. 05는 ①~⑤ 검사에서만 04의 v1 split CSV를 `role` 칸 그대로 직접 읽고, ⑥ 이후는 `read_manifest()`를 씁니다. 05 · 05b가 manifest를 쓸 때는 `build_v2_rows()` · `write_manifest_set()`을 함께 씁니다. `08`은 `src/train_detector.py`를, `09`는 `src/evaluate_detector.py`를 import합니다.
+
+> `07`은 `06`의 코드를 import하지 않습니다. 07이 가져오는 것은 manifest를 읽는 `read_manifest()`뿐입니다. 만든 쪽(B)과 검사하는 쪽(A)을 나눠서, 06에 실수가 있어도 07의 검사가 같이 틀리지 않게 하려는 설계입니다. 그래서 `fingerprint()`는 04 · 05 · 06 · 07에 **같은 계산으로 각각** 들어 있고, `src/manifest.py`에도 같은 계산이 있어 05b · 08이 그쪽을 가져다 씁니다.
+
+> `08` · `09`는 `07`을 import하지 않고 **별도 프로세스로 실행**해서(`subprocess`) 종료 코드 0인지만 확인합니다. 07이 FAIL이면 학습 · 평가를 시작하지 않습니다.

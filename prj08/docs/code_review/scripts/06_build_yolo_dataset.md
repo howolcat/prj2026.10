@@ -1,6 +1,6 @@
 # `scripts/06_build_yolo_dataset.py` 코드 리뷰
 
-> 3일차 · 179줄 · split_policy.md 8장 · README 9장
+> 3일차 · 182줄 · split_policy.md 8장 · README 9장
 
 ## 1. 한 줄 요약
 
@@ -13,7 +13,7 @@ Split 목록(CSV)에 적힌 대로 원본 이미지 · 라벨을 **`data/yolo/{i
 | `--from-split` (① 리허설 · Freeze 전) | `splits/kimchi_v1_split.csv` | `data/yolo/` · `reports/yolo_build_summary.csv` |
 | `--overwrite` (② 본 실행 · Freeze 후) | `manifests/split_manifest.csv` | 같음 (`data/yolo/`가 이미 있으면 지우고 다시 만듦) |
 
-공통 입력은 원본 `data/subject7_final/images` · `labels`입니다. `data/yolo/`는 Git에 올라가지 않습니다(NDA).
+공통 입력은 원본 `data/subject7_final/images` · `labels`입니다. `data/yolo/`는 Git에 올라가지 않습니다(NDA). 입력 CSV는 `read_manifest()`로 읽기 때문에 split CSV(v1) · manifest v1 · v2 어느 쪽이든 같은 모양으로 다룹니다.
 
 ```bash
 python scripts/06_build_yolo_dataset.py --from-split    # ① 리허설 (Freeze 전)
@@ -25,10 +25,11 @@ python scripts/06_build_yolo_dataset.py --overwrite     # ② 본 실행 (Freeze
 | 줄 | 내용 |
 |--:|---|
 | 17~22 | `import` (`pathlib` · `argparse` · `csv` · `hashlib` · `shutil` · `sys`) |
-| 27~33 | 경로: `SRC_IMG` · `SRC_LBL` · `SPLIT_CSV` · `MANIFEST_CSV` · `OUT_DIR` · `SUMMARY_CSV` |
-| 38~40 | 기준값: `YOLO_ROLES` · `ALL_ROLES` · `FROZEN_TEST_FP` |
-| 43~71 | `fingerprint()` · `load_rows()` · `count_bbox()` |
-| 74~175 | `main()`: ① 입력 → ② 검사 1 → ③ 검사 2 → ④ 폴더 준비 → ⑤ 복사 → ⑥ 검사 3 → ⑦ 저장 · 출력 |
+| 24~28 | `PROJECT_ROOT` 경로 설정 + `from src.manifest import read_manifest, SPLITS` |
+| 33~38 | 경로: `SRC_IMG` · `SRC_LBL` · `SPLIT_CSV` · `MANIFEST_CSV` · `OUT_DIR` · `SUMMARY_CSV` |
+| 43~45 | 기준값: `YOLO_ROLES` · `ALL_ROLES` · `FROZEN_TEST_FP` |
+| 48~74 | `fingerprint()` · `load_rows()` · `count_bbox()` |
+| 77~178 | `main()`: ① 입력 → ② 검사 1 → ③ 검사 2 → ④ 폴더 준비 → ⑤ 복사 → ⑥ 검사 3 → ⑦ 저장 · 출력 |
 
 ### 흐름 그림
 
@@ -39,7 +40,7 @@ flowchart TD
     B -->|아니오| D{"manifests/split_manifest.csv 있음?"}
     D -->|없음| X["중단<br/>Freeze 전이면 --from-split"]
     D -->|있음| E["① manifests/split_manifest.csv<br/>(본 실행)"]
-    C --> F["load_rows()<br/>칸 이름 · 역할 · 중복 검사"]
+    C --> F["load_rows()<br/>read_manifest()로 읽기 → split 값 · 중복 검사"]
     E --> F
     F --> G{"② Frozen Test 지문 일치?"}
     G -->|불일치| X2["중단 · 복사 안 함"]
@@ -98,13 +99,16 @@ if missing:
 ### 4.3 Bridge는 아예 넣지 않는다
 
 ```python
-YOLO_ROLES = ["train", "val", "test"]       # data/yolo 에 넣는 역할 (bridge 제외)
-ALL_ROLES = set(YOLO_ROLES) | {"bridge"}
+YOLO_ROLES = ["train", "val", "test"]       # data/yolo 에 넣는 역할 (bridge_holdout 제외)
+ALL_ROLES = set(SPLITS)                     # train · val · test · bridge_holdout
+...
+by_role = {role: [r["file_name"] for r in rows if r["split"] == role] for role in ALL_ROLES}
 ```
 
-- 복사 반복문은 `YOLO_ROLES`만 돕니다. Bridge는 목록에서 읽기만 하고 복사하지 않습니다.
+- 복사 반복문은 `YOLO_ROLES`만 돕니다. Bridge Holdout은 `by_role["bridge_holdout"]`에 이름만 담아 두고 복사하지 않습니다.
+- `ALL_ROLES`는 역할 이름을 이 파일에 따로 적지 않고 `src/manifest.py`의 `SPLITS`에서 가져옵니다. 칸 이름은 `split`, Bridge 값은 `bridge_holdout`입니다(4.7). `src/manifest.py`에는 `data/yolo`에 들어가는 세 역할을 뜻하는 `YOLO_SPLITS`도 있지만, 06은 `YOLO_ROLES`를 자기 파일에 따로 적어 둡니다.
 - 교과 8에서 쓰면 안 되는 데이터를 **폴더에 두지 않아서 실수할 길을 막는** 설계입니다.
-- ⑥에서 `copied & set(by_role["bridge"])`로 Bridge가 섞여 들어갔는지 한 번 더 확인합니다.
+- ⑥에서 `copied & set(by_role["bridge_holdout"])`로 Bridge가 섞여 들어갔는지 한 번 더 확인합니다.
 
 ### 4.4 `--overwrite` — 지우기 전에 한 번 더 확인
 
@@ -147,17 +151,24 @@ if problems:
 - 검사 3은 역할별 **이미지 수 = 라벨 수 = 목록의 장수**, Bridge 미포함, **복사된 Test 폴더의 지문**을 확인합니다.
 - 결과(`yolo_build_summary.csv`: role · images · labels · bbox · fingerprint)는 **문제가 있어도 먼저 저장**하고, 그 뒤에 FAIL 목록과 종료 코드 `1`로 알립니다.
 - 이 파일은 만든 쪽(B)의 자체 확인이고, 같은 폴더를 별도로 검증하는 것은 `07_verify_yolo_dataset.py`(A)입니다.
+- 결과 CSV의 칸 이름 `role`은 `summary` 딕셔너리의 키이고, manifest의 `split` 칸과는 별개로 그대로입니다.
 
-### 4.7 입력 CSV 형식 검사
+### 4.7 입력 CSV 읽기와 형식 검사
 
 ```python
-need = {"file_name", "capture_group", "role"}
-if not rows or not need <= set(rows[0].keys()):
-    sys.exit(f"[중단] {csv_path.name} 칸 이름이 다릅니다. 필요: {sorted(need)}")
+try:
+    rows, _ = read_manifest(csv_path)       # 모든 행에 split 키 (v1 의 role · bridge 는 split · bridge_holdout 로)
+except (ValueError, KeyError) as e:
+    sys.exit(f"[중단] {csv_path.name} 칸 구성이 다릅니다: {e}")
+
+bad_roles = {r["split"] for r in rows} - ALL_ROLES
+if bad_roles:
+    sys.exit(f"[중단] 알 수 없는 split 값: {bad_roles}")
 ```
 
-- `load_rows()`는 칸 이름 3개 · 역할 이름(`train` · `val` · `test` · `bridge`) · 같은 `file_name`의 중복을 확인합니다.
-- `utf-8-sig`로 읽어서 CSV 맨 앞의 BOM을 제거합니다.
+- `read_manifest()`가 칸 이름으로 스키마를 판단해(v2: `MANIFEST_FIELDS`와 정확히 같음 · v1: 앞 3칸이 `file_name · capture_group · role`) split CSV(v1) · manifest v1 · v2를 **같은 모양(모든 행에 `split` 키)** 으로 읽어 줍니다. v1의 `role` 값은 `split`으로, `"bridge"`는 `bridge_holdout`으로 바뀝니다. 맨 앞 BOM도 여기서 제거합니다(`utf-8-sig`).
+- 어느 쪽도 아니면 `read_manifest()`가 `ValueError`(알 수 없는 칸 구성)를 내고, `load_rows()`가 이를 잡아 안내하고 멈춥니다. `KeyError`도 같이 잡지만 사실상 `ValueError`만 나옵니다. 예전처럼 이 파일에서 칸 이름 3개를 직접 확인하지 않습니다.
+- `load_rows()`는 그다음 `ALL_ROLES` 밖의 `split` 값과 같은 `file_name`의 중복을 확인합니다.
 
 ## 5. 연결된 파일
 
@@ -165,6 +176,7 @@ if not rows or not need <= set(rows[0].keys()):
 |---|---|
 | 입력 (Freeze 전 · 리허설) | `splits/kimchi_v1_split.csv` (04단계 결과) |
 | 입력 (Freeze 후 · 본 실행) | `manifests/split_manifest.csv` (`05_freeze_split.py`가 생성) |
+| manifest 읽기 | `src/manifest.py` (`read_manifest()` · `SPLITS`) |
 | 원본 데이터 | `data/subject7_final/images` · `labels` (읽기만) |
 | 기준값 출처 | `split_policy.md` 8장 · README 9장 |
 | 같은 지문 방식 | `04_make_split.py` (`fingerprint()`) |

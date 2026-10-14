@@ -2,7 +2,7 @@
 
 > 교과 7에서 검수한 정답 데이터로 YOLO11 객체검출 모델을 학습 · 평가 · 개선한다.
 >
-> **Dataset Version** `kimchi_v1` · **라벨 지문** `5c2b4fc2c3e6` · **진행 상황** 3일차 완료 (Split Freeze · data/yolo 구성 · Smoke Test) · 4일차 Baseline 준비
+> **Dataset Version** `kimchi_v1` · **라벨 지문** `5c2b4fc2c3e6` · **진행 상황** 3일차 완료 (Split Freeze · data/yolo 구성 · Smoke Test) · 4일차 완료 (Baseline 학습) · 5일차 완료 (Baseline 평가)
 
 ---
 
@@ -98,13 +98,16 @@ LC_ALL=C cat data/subject7_final/labels/*.txt | sha256sum | cut -c1-12
 | 2 | `python scripts/02a_make_audit_fixture.py` | `data/audit_test/` 생성 · 버그 9종 목록 |
 | 3 | `python scripts/02_audit_subject7_final.py --fixture` | 9종 각 1건 검출 |
 | 4 | `python scripts/02_audit_subject7_final.py` | PASS 19 / FAIL 0 (기대값 v2 · kimchi_v1 기준 · 이력은 `reports/audit_expected.md` 9장) |
-| 5 | `python scripts/03_split_analysis.py` | Leakage PASS 4 / FAIL 1 (136 vs 135 경계값 · 정상) |
+| 5 | `python scripts/03_split_analysis.py` | Leakage PASS 4 / FAIL 1 (136 vs 135 경계값 · 정상 · 10/14 팀 결정: 지금처럼 FAIL 1 유지) |
 | 6 | `python scripts/04_make_split.py` | 합격 기준 8 / 8 PASS · Frozen Test 지문 `4f9291849fe6` |
 | 7 | `python scripts/05_freeze_split.py` | 검사 13항목 전부 PASS 후 `manifests/` 생성 (이미 Freeze 되어 있고 같으면 확인만) |
-| 8 | `python scripts/05a_dataset_summary.py` | 검사 6항목 전부 PASS |
+| 8 | `python scripts/05a_dataset_summary.py` | 검사 8항목 전부 PASS (manifest 스키마 v2 · Dataset Version 포함) |
 | 9 | `python scripts/06_build_yolo_dataset.py --overwrite` | `data/yolo` 구성 (train 600 / val 74 / test 80 · Bridge 제외 · Freeze 전 리허설은 `--from-split`) · 검사 1~3 PASS |
 | 10 | `python scripts/07_verify_yolo_dataset.py` | 19항목 모두 PASS · FAIL 0 |
-| 11 | `git status --short` | **아무것도 안 나오면** 내 결과 = 팀 기준 결과 (확인 후 `git restore reports/ splits/`) |
+| 11 | `python scripts/08_train_baseline.py --dry-run` | 학습 전 검사 12항목 PASS (학습 안 함 · 몇 초 · `configs` · `src` · `scripts` · `manifests`가 커밋 전이면 WARN) · `reports/baseline_training_condition.md` 미리 작성 |
+| 12 | `python scripts/08_train_baseline.py` | 검사 12항목 PASS → Baseline 학습 → 완료 epoch · loss NaN/inf 0 확인 → `models/baseline/baseline_best.pt` 보관 · 조건 문서 상태 `완료` (`configs` · `src` · `scripts` · `manifests`가 커밋된 상태여야 시작) |
+| 13 | `python scripts/09_evaluate_baseline.py` | 평가 전 검사 10항목 PASS → Val 평가 · `reports/baseline_metrics.csv` · 그림 3장 · `reports/baseline_val_image_check.csv` (Val만 · Test · Bridge 미사용) |
+| 14 | `git status --short` | **아무것도 안 나오면** 내 결과 = 팀 기준 결과 (확인 후 `git restore reports/ splits/`) |
 | (참고) | Smoke Test 명령 | `reports/smoke_test.md` 2장 · 1 epoch · `runs/smoke_day3/` (Git 제외) · 재현용이 아니라 파이프라인 연결 확인용 |
 
 > `05b_upgrade_manifest_schema.py`는 10/13 `manifests/`를 v1(3칸) → v2(9칸)로 바꿀 때 **한 번** 쓴 스크립트입니다. 지금 main의 `manifests/`는 이미 v2라 실행할 필요가 없습니다. (실행해도 "이미 v2" 확인만 하고 아무것도 쓰지 않음)
@@ -119,13 +122,16 @@ prj08/
 ├── yolo11n.pt                         # ⚠ Git 제외 (*.pt) · YOLO Load 때 자동 다운로드된 COCO 사전학습 모델
 │
 ├── configs/
-│   └── dataset.yaml                   # 산출물 1 · path: data/yolo · Class ID 0~6 영문 이름 · Bridge 미포함
+│   ├── dataset.yaml                   # 산출물 1 · path: data/yolo · Class ID 0~6 영문 이름 · Bridge 미포함
+│   └── baseline.yaml                  # 4일차 · Baseline 학습 조건 (팀 확정값 · epochs 50 · batch 16 · imgsz 640 · AdamW 0.000909 · 0.9 · seed 42)
 │
 ├── src/                               # 재사용 "기능" (혼자 실행하지 않음)
 │   ├── __init__.py                    # src를 패키지로 인식시키는 빈 파일
 │   ├── dataset_audit.py               # Pair · YOLO 형식 · Class · 좌표 · Manifest 검사 함수
 │   ├── capture_group.py               # 파일명 → 촬영 시각 · 촬영 세션(capture_group) 묶기 · 시간 차 계산
-│   └── manifest.py                    # manifests/ 읽기 · 쓰기 공통 (v1 · v2 스키마 · split 이름 · 지문) → 05 · 05a · 05b · 06 · 07이 import
+│   ├── manifest.py                    # manifests/ 읽기 · 쓰기 공통 (v1 · v2 스키마 · split 이름 · 지문) → 05 · 05a · 05b · 06 · 07 · 08 · 09가 import
+│   ├── train_detector.py              # 4일차 · YOLO 학습 공통 함수 (TRAIN_KEYS 12개만 model.train()에 전달) → 08이 import
+│   └── evaluate_detector.py           # 5일차 · Val 평가 · 이미지 예측 · TP/FP/FN 짝짓기 (Frozen Test 보호) → 09가 import
 │
 ├── scripts/                           # 실제 "실행" 파일 (번호 = 실행 순서)
 │   ├── 01_check_environment.py        # 1일차 · Python / PyTorch / Ultralytics / GPU · YOLO11n Load
@@ -137,7 +143,9 @@ prj08/
 │   ├── 05a_dataset_summary.py         # 3일차 · 산출물 1 — reports/dataset_summary.csv (학습용 Dataset Version 요약표)
 │   ├── 05b_upgrade_manifest_schema.py # 3일차 보완 · manifests/ v1(3칸) → v2(9칸 · 가이드 16.1) · 배정은 그대로 (1회성)
 │   ├── 06_build_yolo_dataset.py       # 3일차 · Split 목록대로 data/yolo 학습 폴더 구성 (복사 · Bridge 제외)
-│   └── 07_verify_yolo_dataset.py      # 3일차 · data/yolo가 manifests와 같은지 19항목 검증 (읽기만)
+│   ├── 07_verify_yolo_dataset.py      # 3일차 · data/yolo가 manifests와 같은지 19항목 검증 (읽기만)
+│   ├── 08_train_baseline.py           # 4일차 · 학습 전 12항목 검사 → Baseline 학습 → 조건 문서 자동 기록 (--dry-run: 검사만)
+│   └── 09_evaluate_baseline.py        # 5일차 · Baseline Val 평가 · Class별 지표 · 이미지별 FP/FN (Test · Bridge 미사용)
 │
 ├── docs/
 │   ├── split_policy.md                # 산출물 1 · Split 정책 확정본 (5분 세션 · 600/75/75/150 · 예외 E1)
@@ -145,11 +153,11 @@ prj08/
 │   └── code_review/                   # 코드와 같은 구조의 파일별 리뷰
 │       ├── README.md                  # 목차 · 읽는 순서 · 우선순위
 │       ├── configs/                   # dataset_yaml.md
-│       ├── src/                       # dataset_audit.md · capture_group.md
-│       └── scripts/                   # 01 · 02a · 02 · 03 · 04 · 05 · 06 · 07 리뷰
+│       ├── src/                       # dataset_audit.md · capture_group.md · manifest.md · train_detector.md · evaluate_detector.md
+│       └── scripts/                   # 01 · 02a · 02 · 03 · 04 · 05 · 05a · 05b · 06 · 07 · 08 · 09 리뷰
 │
 ├── reports/                           # 결과 · 기록 (파일명 · 숫자만 · Git에 올림)
-│   ├── figures/                       # (예정) 학습 그래프 · Confusion Matrix 등 산출물 5
+│   ├── figures/                       # 09 · 학습곡선 · Confusion Matrix (baseline_results.png · baseline_confusion_matrix(_normalized).png · 그래프만)
 │   ├── audit_expected.md              # Audit 전에 고정한 기대값 (Test Oracle · 교과 7 문서 기준)
 │   ├── audit_issue.csv                # 900장 문제 목록 (0건 → 제목 줄만)
 │   ├── audit_check.csv                # 기대값 vs 실제 19항목 (v2 기준 PASS 19 / FAIL 0)
@@ -166,6 +174,10 @@ prj08/
 │   ├── manifest_schema_check.csv      # 05b · manifests v1 → v2 불변 조건 검사 (배정 변경 0)
 │   ├── yolo_build_summary.csv         # 06 · 역할별 이미지 · 라벨 · BBox 수 · Test 지문
 │   ├── yolo_verify_check.csv          # 07 · data/yolo 검증 19항목 PASS / FAIL
+│   ├── baseline_training_condition.md # 08 · 산출물 2 · 실제 학습 조건 · 학습 전 검사 · 실행 기록 · 4일차 Gate (자동 생성)
+│   ├── baseline_results.csv           # 08 · runs/baseline_v1/results.csv 사본 (숫자만)
+│   ├── baseline_metrics.csv           # 09 · 산출물 2 · Val 전체 + Class별 P · R · mAP50 · mAP50-95
+│   ├── baseline_val_image_check.csv   # 09 · 이미지별 GT · 예측 · TP · FP · FN · 작은 객체 FN → 6일차 Failure Analysis 입력
 │   ├── label_preview.md               # 가이드 16.4 · Split 복사 후 라벨 Preview 20장 (교과 7 도구 · 20/20 일치)
 │   ├── smoke_test.md                  # 가이드 16.5~16.7 · 1 epoch → Weight → Prediction 연결 확인 · 가이드와 다른 점 6장
 │   └── issue_log.md                   # 문제 · 원인 · 해결 기록
@@ -175,7 +187,8 @@ prj08/
 │
 ├── daily_csv/
 │   ├── 10_12.csv                      # 일일 작업 기록
-│   └── 10_13.csv                      # 일일 작업 기록
+│   ├── 10_13.csv                      # 일일 작업 기록
+│   └── 10_14.csv                      # 일일 작업 기록
 │
 ├── manifests/                         # 산출물 1 · 05가 Freeze · v2 9칸 (file_name · image_path · label_path · source_dataset ·
 │   │                                  #   original_split · scene_type · capture_group · split · dataset_version)
@@ -187,8 +200,8 @@ prj08/
 │
 ├── demo/                              # (6 · 8일차) 실패 사례 · Prediction · Auto Label 결과 (일부 Git 제외)
 ├── presentation/                      # (9일차) 발표 PDF · Q&A
-├── models/                            # ⚠ Git 제외 · baseline/ · improved/ · final/
-├── runs/                              # ⚠ Git 제외 · Ultralytics 학습 결과 (smoke_day3 · smoke_day3_predict*)
+├── models/                            # ⚠ Git 제외 · baseline/ (baseline_best.pt) · improved/ · final/
+├── runs/                              # ⚠ Git 제외 · Ultralytics 결과 (smoke_day3 · smoke_day3_predict* · baseline_v1 · baseline_v1_val · predict/baseline_val_images)
 │
 └── data/                              # ⚠ Git 제외 (NDA)
     ├── subject7_final/                # 교과 7 FINAL 복사본 · 읽기 전용 · 라벨 지문 5c2b4fc2c3e6
@@ -230,7 +243,7 @@ prj08/
               ▼
          manifests/split_manifest.csv · train · val · test · bridge_holdout.csv · reports/freeze_check.csv
               ▼
-         05a_dataset_summary.py ←── manifests/ + audit_label_stats.csv + configs/dataset.yaml (검사 6항목 · PASS일 때만 저장)
+         05a_dataset_summary.py ←── manifests/ + audit_label_stats.csv + configs/dataset.yaml (검사 8항목 · PASS일 때만 저장)
               ▼
          reports/dataset_summary.csv (산출물 1 · 네 역할 합 900)
               ▼
@@ -249,7 +262,23 @@ prj08/
          runs/smoke_day3/weights/best.pt (Git 제외 · Baseline 아님) · reports/smoke_test.md
 
 [3일차 보완]  05b_upgrade_manifest_schema.py : manifests/ v1 → v2 (1회 · reports/manifest_schema_check.csv)
-              (05 · 05a · 05b · 06 · 07은 manifest 읽기 · 쓰기를 src/manifest.py 하나로 공유)
+              (05 · 05a · 05b · 06 · 07 · 08 · 09는 manifest 읽기 · 쓰기를 src/manifest.py 하나로 공유)
+
+[4일차]
+         08_train_baseline.py ←── configs/baseline.yaml + configs/dataset.yaml + manifests/ + data/yolo
+              │  (import src.manifest · src.train_detector · 학습 전 07 실행 → 종료 코드 0 확인)
+              │  학습 전 검사 12항목 · 전부 PASS일 때만 학습 (--dry-run: 검사 + 조건 문서만)
+              ▼
+         runs/baseline_v1/ (results.csv · weights) · models/baseline/baseline_best.pt (Git 제외)
+         reports/baseline_training_condition.md · reports/baseline_results.csv (Git)
+
+[5일차]
+         09_evaluate_baseline.py ←── models/baseline/baseline_best.pt + baseline_training_condition.md (상태 · sha) + manifests/val.csv + data/yolo (val)
+              │  (import src.manifest · src.evaluate_detector · 평가 전 07 실행 → 종료 코드 0 확인)
+              │  평가 전 검사 10항목 · split = val 고정 (Frozen Test · Bridge 미사용)
+              ▼
+         reports/baseline_metrics.csv · reports/figures/baseline_*.png · reports/baseline_val_image_check.csv (Git)
+         runs/baseline_v1_val/ · runs/predict/baseline_val_images/ (Git 제외 · NDA · 박스 그린 Val 이미지는 사람이 눈으로 확인)
 ```
 
 | 파일 | 입력 | 출력 | 의존 |
@@ -265,6 +294,8 @@ prj08/
 | `06_build_yolo_dataset.py` | `manifests/split_manifest.csv` (`--from-split`이면 split CSV) · images · labels | `data/yolo/` · `reports/yolo_build_summary.csv` | `src.manifest` (읽기만) |
 | `07_verify_yolo_dataset.py` | `manifests/split_manifest.csv` · `data/yolo` · 원본 labels | `reports/yolo_verify_check.csv` | `src.manifest` (읽기만 · 06 import 안 함) |
 | Smoke Test (CLI) | `configs/dataset.yaml` → `data/yolo` train · val | `runs/smoke_day3/` · `reports/smoke_test.md` | ultralytics |
+| `08_train_baseline.py` | `configs/baseline.yaml` · `configs/dataset.yaml` · `manifests/` · `data/yolo` (07 검증 PASS) · 원본 labels (지문) | `runs/baseline_v1/` · `models/baseline/baseline_best.pt` · `reports/baseline_training_condition.md` · `reports/baseline_results.csv` | `src.manifest` · `src.train_detector` · PyYAML · torch · ultralytics · git |
+| `09_evaluate_baseline.py` | `models/baseline/baseline_best.pt` · `reports/baseline_training_condition.md` · `configs/baseline.yaml` · `manifests/val.csv` · `data/yolo` (val) | `reports/baseline_metrics.csv` · `reports/figures/` · `reports/baseline_val_image_check.csv` · `runs/baseline_v1_val/` · `runs/predict/baseline_val_images/` | `src.manifest` · `src.evaluate_detector` · PyYAML |
 
 > 함수 단위 설명과 리뷰는 [`docs/code_review/README.md`](docs/code_review/README.md), 그림은 [`docs/code_flow.md`](docs/code_flow.md)를 참고합니다.
 
@@ -284,11 +315,34 @@ prj08/
 - **예외 E1**: 파·고추 252개 중 251개가 G01에만 있어 G01만 2분 하위 세션으로 분할 배정 (Class 6 점수는 참고값)
 - **검증**: 합격 기준 8 / 8 PASS (`reports/split_check.csv`) · Frozen Test 지문 `4f9291849fe6`
 - **data/yolo 구성 · 검증**: 06이 Train · Val · Test만 복사하고(Bridge는 `data/yolo`에 넣지 않음) 07이 `manifests/`와 같은지 확인 (이미지 600 / 74 / 80 · BBox 2,957 / 389 / 477)
+- **Frozen Test 보호**: 08은 test 평가 코드가 없고, 09의 평가 함수는 `val`만 허용합니다 (`test`는 8일차에 `allow_test=True`를 명시해야 열림 · `bridge_holdout`은 막힘)
 - 근거와 결정 기록: `docs/split_policy.md`
 
 ## 10. Baseline
 
-TBD (4일차)
+**상태**: 4일차 학습 완료 · 5일차 Validation 평가 완료 (`scripts/09_evaluate_baseline.py`)
+
+팀 회의로 확정한 학습 조건 (`configs/baseline.yaml` · 2026-10-14):
+
+| 항목 | 값 |
+|---|---|
+| Model | YOLO11n |
+| Epochs | 50 |
+| Batch | 16 |
+| Image Size | 640 |
+| Optimizer · Learning Rate · Momentum | AdamW · 0.000909 · 0.9 (auto 대신 명시 고정) |
+| Seed | 42 |
+| 데이터 | Train 600 · Val 74 · Dataset Version `kimchi_v1` · 라벨 지문 `5c2b4fc2c3e6` |
+
+- **optimizer를 고정한 이유**: Smoke Test에서 `optimizer=auto`가 `lr0=0.01`을 무시하고 `AdamW(lr=0.000909)`를 자동으로 골랐고, epoch 수가 바뀌면 자동 선택도 바뀌기 때문 (`reports/smoke_test.md` 4장 ③)
+- **학습 스크립트**: `scripts/08_train_baseline.py` (이름 08 확정 · 가이드 이름은 06이지만 우리 06은 `06_build_yolo_dataset.py`) · 학습 전 검사 12항목을 모두 통과해야 시작
+- **산출물**: `reports/baseline_training_condition.md` (실제 학습 조건 · 실행 기록 · 4일차 Gate) · `reports/baseline_results.csv` (Git) · `models/baseline/baseline_best.pt` · `runs/baseline_v1/` (Git 제외)
+- **사용하지 않은 데이터**: Frozen Test · Bridge Holdout (학습 · 평가 모두 미사용)
+- **학습 결과**: 50 / 50 epoch 완료 · 13.9분 (10:18 → 10:32) · loss NaN 0 · GPU_mem 2.48G · Weight sha `22f35d20a5ea` (`reports/baseline_training_condition.md` 3장)
+- **학습곡선**: Val mAP50이 30~40 epoch에서 천장(0.600 → 0.621)에 닿고 50 epoch에서 0.578로 내려감 · val loss는 40 이후 다시 오름 → `best.pt`는 40 근처 가중치 · 학습량은 충분 (`reports/figures/baseline_results.png`)
+- **성능 결과** (Val 74장 · 전체): **P 0.655 · R 0.595 · mAP50 0.622 · mAP50-95 0.462** → 6일차 Failure Analysis의 출발점 (Class별 값은 `reports/baseline_metrics.csv` · 이미지별 FP/FN은 `reports/baseline_val_image_check.csv`)
+- **Val GT 라벨 오류 2건** 발견 → `reports/issue_log.md` 10/14 참고 (평가 해석 시 함께 확인)
+- **Confusion Matrix 읽는 법**: `reports/figures/baseline_confusion_matrix.png`는 Ultralytics 평가 기본값 **conf 0.001** 기준이라 background 칸에 저신뢰 예측 수천 개가 포함됨 → 실제 오검출(FP) 수는 conf 0.25 기준인 `reports/baseline_val_image_check.csv`로 확인
 
 ## 11. Failure Analysis
 
@@ -312,21 +366,26 @@ TBD (8일차)
 
 ## 16. 알려진 한계
 
-- **정상 김치(Negative) 0장** → 정상 김치를 이물로 잘못 찾는(FP) 경향을 평가할 수 없음 · 5~6일차 Prediction에서 확인
+- **정상 김치(Negative) 0장** → 정상 김치를 이물로 잘못 찾는(FP) 경향을 평가할 수 없음 · 5일차 확인 결과 Val에도 정상 김치 사진이 없어 측정 불가 → 대신 이물 장면 안의 배경 오검출(정답 없는 자리)로 일부 확인 (`reports/baseline_val_image_check.csv`)
 - **object_only 150장은 전부 Train** → "이물만 있는 장면"의 성능은 평가하지 않음
 - **Class 6(파·고추)은 G01 한 세션에만 존재** → 예외 E1로 분할 · Class 6 점수는 참고값
 - **Val이 Class 1 중심** (BBox 389개 중 351개) → 모델 비교 때 전체 mAP와 함께 Class별 AP 확인
 - **Frozen Test 80장** → 작아서 점수 변동이 클 수 있음
+- **Val GT 라벨 오류 2건** (`reports/issue_log.md` 10/14) → Baseline Val 점수에 영향을 줄 수 있어 Failure Analysis에서 함께 확인
 - **촬영 조건이 단조로움** (4일 · 같은 트레이 · 같은 조명) → 다른 환경에서의 성능은 이 데이터로 알 수 없음
 
 ## 17. 데이터 보안
 
 - 기업 제공 데이터(NDA)는 Git · 디스코드 · 외부 클라우드에 올리지 않는다. (`data/`, `*.jpg`, `*.pt`, `runs/`, `models/` 제외)
 - **보안정책이 `.gitignore`보다 우선**한다 (가이드 22.2) · Public 레포 사용 가능 여부는 선생님 확인 중
-- 커밋 전 확인 (아무것도 안 나와야 정상):
+- 커밋 전 확인 (`git add` 한 뒤 · 레포 최상위에서):
 
 ```bash
-git diff --cached --name-only | grep -iE '\.(jpe?g|png|pt)$|/data/'
+# ① 아무것도 안 나와야 정상 (회사 이미지 · 가중치 · data · runs · models)
+git diff --cached --name-only | grep -iE '\.(jpe?g|pt)$|/data/|/runs/|/models/'
+
+# ② png 가 나오면 reports/figures/ 의 그래프인지 눈으로 확인 (김치 사진이 보이는 그림은 올리지 않음)
+git diff --cached --name-only | grep -iE '\.png$'
 ```
 
 ## 18. 교과 14 Handoff
@@ -342,3 +401,5 @@ TBD (9일차 · `docs/handoff_subject14.md`)
 | [`docs/code_flow.md`](docs/code_flow.md) | Mermaid 코드 흐름도 |
 | `reports/audit_expected.md` | Audit 기대값 (Test Oracle) |
 | `reports/issue_log.md` | 문제 · 원인 · 해결 기록 |
+| `reports/smoke_test.md` | Smoke Test 기록 · 가이드와 다른 점 |
+| `reports/baseline_training_condition.md` | Baseline 실제 학습 조건 · 실행 기록 · 4일차 Gate (08이 자동 생성) |
