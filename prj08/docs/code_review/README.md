@@ -29,7 +29,8 @@ docs/code_review/
     ├── 06_build_yolo_dataset.md       # scripts/06_build_yolo_dataset.py
     ├── 07_verify_yolo_dataset.md      # scripts/07_verify_yolo_dataset.py
     ├── 08_train_baseline.md           # scripts/08_train_baseline.py
-    └── 09_evaluate_baseline.md        # scripts/09_evaluate_baseline.py
+    ├── 09_evaluate_baseline.md        # scripts/09_evaluate_baseline.py
+    └── 09a_branch_fp_check.md         # scripts/09a_branch_fp_check.py
 ```
 
 `src/__init__.py`는 내용이 없는 파일(“src를 패키지로 인식시키는 표시”)이라 별도 문서를 만들지 않았습니다.
@@ -55,7 +56,8 @@ docs/code_review/
 | `scripts/06_build_yolo_dataset.py` | 3 | 182 | Split 목록으로 `data/yolo` 학습 폴더 구성 (Bridge 제외) | [06_build_yolo_dataset.md](scripts/06_build_yolo_dataset.md) |
 | `scripts/07_verify_yolo_dataset.py` | 3 | 134 | `data/yolo`가 Freeze 본과 같은지 19항목 검증 | [07_verify_yolo_dataset.md](scripts/07_verify_yolo_dataset.md) |
 | `scripts/08_train_baseline.py` | 4 | 300 | 학습 전 12항목 검사 → Baseline 학습 → 조건 문서 자동 기록 | [08_train_baseline.md](scripts/08_train_baseline.md) |
-| `scripts/09_evaluate_baseline.py` | 5 | 292 | Val 평가 · Class별 지표 · 이미지별 FP/FN (Test · Bridge 미사용) | [09_evaluate_baseline.md](scripts/09_evaluate_baseline.md) |
+| `scripts/09_evaluate_baseline.py` | 5 | 323 | Val 평가 · Class별 지표 · 이미지별 FP/FN · Class별 TP/FN/FP (Test · Bridge 미사용) | [09_evaluate_baseline.md](scripts/09_evaluate_baseline.md) |
+| `scripts/09a_branch_fp_check.py` | 6 준비 | 275 | Val branch 예측을 5종으로 분류 · 사람 확인 칸 (가설 H3 · 오검출 확인) | [09a_branch_fp_check.md](scripts/09a_branch_fp_check.md) |
 
 ## 그림은 어디에?
 
@@ -90,6 +92,8 @@ capture_group (기능) → 03_split_analysis
 train_detector (기능) → 08_train_baseline
       ↓  models/baseline/baseline_best.pt · reports/baseline_training_condition.md
 evaluate_detector (기능) → 09_evaluate_baseline
+      ↓  reports/baseline_val_image_check.csv · baseline_class_check.csv
+09a_branch_fp_check  (6일차 · branch 오검출 확인 · reports/branch_pred_check.csv)
 ```
 
 ## 표기법
