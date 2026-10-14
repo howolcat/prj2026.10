@@ -2,7 +2,7 @@
 
 > 교과 7에서 검수한 정답 데이터로 YOLO11 객체검출 모델을 학습 · 평가 · 개선한다.
 >
-> **Dataset Version** `kimchi_v1` · **라벨 지문** `5c2b4fc2c3e6` · **진행 상황** 3일차 완료 (Split Freeze · data/yolo 구성 · Smoke Test) · 4일차 완료 (Baseline 학습) · 5일차 Baseline 평가 준비
+> **Dataset Version** `kimchi_v1` · **라벨 지문** `5c2b4fc2c3e6` · **진행 상황** 3일차 완료 (Split Freeze · data/yolo 구성 · Smoke Test) · 4일차 완료 (Baseline 학습) · 5일차 완료 (Baseline 평가)
 
 ---
 
@@ -320,7 +320,7 @@ prj08/
 
 ## 10. Baseline
 
-**상태**: 4일차 학습 완료 (2026-10-14) · Validation 평가는 5일차 (`scripts/09_evaluate_baseline.py`)
+**상태**: 4일차 학습 완료 · 5일차 Validation 평가 완료 (`scripts/09_evaluate_baseline.py`)
 
 팀 회의로 확정한 학습 조건 (`configs/baseline.yaml` · 2026-10-14):
 
@@ -338,7 +338,8 @@ prj08/
 - **학습 스크립트**: `scripts/08_train_baseline.py` (이름 08 확정 · 가이드 이름은 06이지만 우리 06은 `06_build_yolo_dataset.py`) · 학습 전 검사 12항목을 모두 통과해야 시작
 - **산출물**: `reports/baseline_training_condition.md` (실제 학습 조건 · 실행 기록 · 4일차 Gate) · `reports/baseline_results.csv` (Git) · `models/baseline/baseline_best.pt` · `runs/baseline_v1/` (Git 제외)
 - **사용하지 않은 데이터**: Frozen Test · Bridge Holdout (학습 · 평가 모두 미사용)
-- **성능 결과**: TBD (5일차 · `reports/baseline_metrics.csv` · Val 전체 + Class별 P · R · mAP50 · mAP50-95)
+- **성능 결과** (Val 74장 · 전체): **P 0.655 · R 0.595 · mAP50 0.622 · mAP50-95 0.462** → 6일차 Failure Analysis의 출발점 (Class별 값은 `reports/baseline_metrics.csv` · 이미지별 FP/FN은 `reports/baseline_val_image_check.csv`)
+- **Val GT 라벨 오류 2건** 발견 → `reports/issue_log.md` 10/14 참고 (평가 해석 시 함께 확인)
 
 ## 11. Failure Analysis
 
@@ -367,6 +368,7 @@ TBD (8일차)
 - **Class 6(파·고추)은 G01 한 세션에만 존재** → 예외 E1로 분할 · Class 6 점수는 참고값
 - **Val이 Class 1 중심** (BBox 389개 중 351개) → 모델 비교 때 전체 mAP와 함께 Class별 AP 확인
 - **Frozen Test 80장** → 작아서 점수 변동이 클 수 있음
+- **Val GT 라벨 오류 2건** (`reports/issue_log.md` 10/14) → Baseline Val 점수에 영향을 줄 수 있어 Failure Analysis에서 함께 확인
 - **촬영 조건이 단조로움** (4일 · 같은 트레이 · 같은 조명) → 다른 환경에서의 성능은 이 데이터로 알 수 없음
 
 ## 17. 데이터 보안
