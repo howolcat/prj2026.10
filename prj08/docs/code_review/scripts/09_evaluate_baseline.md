@@ -1,17 +1,17 @@
 # `scripts/09_evaluate_baseline.py` 코드 리뷰
 
-> 5일차 · 292줄 · 가이드 18장 · 18.5 Daily Gate · 산출물 2 · 5
+> 5일차 · 323줄 · 가이드 18장 · 18.5 Daily Gate · 산출물 2 · 5
 
 ## 1. 한 줄 요약
 
-4일차 Baseline(`baseline_best.pt`)을 **Validation에서만 평가**해 전체 · Class별 P · R · mAP50 · mAP50-95를 `reports/baseline_metrics.csv`에 남기고, 학습곡선 · Confusion Matrix 그래프를 정리합니다. 이어서 Val 이미지를 예측해 **이미지별 TP · FP · FN**(`baseline_val_image_check.csv`)을 만들어 6일차 Failure Analysis의 입력으로 넘깁니다. Frozen Test와 Bridge Holdout은 쓰지 않습니다.
+4일차 Baseline(`baseline_best.pt`)을 **Validation에서만 평가**해 전체 · Class별 P · R · mAP50 · mAP50-95를 `reports/baseline_metrics.csv`에 남기고, 학습곡선 · Confusion Matrix 그래프를 정리합니다. 이어서 Val 이미지를 예측해 **이미지별 TP · FP · FN**(`baseline_val_image_check.csv`)을 만들어 6일차 Failure Analysis의 입력으로 넘기고, 같은 예측으로 **Class별 TP · FN · FP · 현장 기준 Recall · Precision**(`baseline_class_check.csv`)도 남겨 7일차 비교 기준으로 씁니다. Frozen Test와 Bridge Holdout은 쓰지 않습니다.
 
 ## 2. 입력 · 출력 · 실행
 
 | 구분 | 파일 |
 |---|---|
 | 입력 | `models/baseline/baseline_best.pt` · `reports/baseline_training_condition.md` (상태 · sha) · `configs/baseline.yaml` · `configs/dataset.yaml` · `manifests/split_manifest.csv` · `val.csv` · `data/yolo/{images,labels}/val` · `runs/baseline_v1/results.png` |
-| 출력 (Git) | `reports/baseline_metrics.csv` · `reports/figures/baseline_results.png` · `baseline_confusion_matrix.png` · `baseline_confusion_matrix_normalized.png` · `reports/baseline_val_image_check.csv` |
+| 출력 (Git) | `reports/baseline_metrics.csv` · `reports/figures/baseline_results.png` · `baseline_confusion_matrix.png` · `baseline_confusion_matrix_normalized.png` · `reports/baseline_val_image_check.csv` · `reports/baseline_class_check.csv` |
 | 출력 (Git 제외 · NDA) | `runs/baseline_v1_val/` (Ultralytics 평가 결과) · `runs/predict/baseline_val_images/` (박스를 그린 Val 이미지) |
 
 | 옵션 | 기본값 | 쓰이는 곳 |
@@ -19,7 +19,7 @@
 | `--conf` | 0.25 | 예측 이미지 · 이미지별 FP/FN 집계 (평가 지표는 이 값과 무관) |
 
 ```bash
-python scripts/09_evaluate_baseline.py              # 검사 → Val 평가 → 그림 정리 → Val 예측 · FP/FN
+python scripts/09_evaluate_baseline.py              # 검사 → Val 평가 → 그림 정리 → Val 예측 · FP/FN · Class별 TP/FN/FP
 python scripts/09_evaluate_baseline.py --conf 0.25  # 예측 conf 지정 (기본값과 같음)
 ```
 
@@ -29,18 +29,19 @@ python scripts/09_evaluate_baseline.py --conf 0.25  # 예측 conf 지정 (기본
 
 | 줄 | 내용 |
 |--:|---|
-| 27~34 | `import` (`pathlib` · `argparse` · `csv` · `hashlib` · `re` · `shutil` · `subprocess` · `sys`) |
-| 36~38 | `PROJECT_ROOT` 경로 설정 |
-| 40~42 | `import yaml` · `from src.manifest import read_manifest` · `from src.evaluate_detector import evaluate_detector, predict_images, match_boxes` |
-| 47~58 | 경로: `BEST_PT` · `CONDITION_MD` · `BASELINE_YAML` · `DATASET_YAML` · `MANIFEST_DIR` · `VAL_IMAGES` · `VAL_LABELS` · `VERIFY_SCRIPT` · `RUNS_DIR` · `FIG_DIR` · `METRICS_CSV` · `IMAGE_CHECK_CSV` |
-| 60~65 | 기준값: `SPLIT` · `VAL_RUN_NAME` · `PRED_RUN_NAME` · `IOU_MATCH` · `SMALL_PX` · `UNUSED_CLASSES` |
-| 68~81 | `sha12()` · `condition_info()` (4일차 조건 문서에서 상태 · sha 읽기) |
-| 84~118 | `pre_checks()`: 평가 전 검사 10항목 |
-| 121~149 | `write_metrics()` (`baseline_metrics.csv`) |
-| 152~164 | `copy_figures()` (그래프만 `reports/figures/`로 복사) |
-| 167~181 | `read_gt()` · `is_small()` |
-| 184~212 | `image_check()` (Val 예측 → 이미지별 TP · FP · FN) |
-| 215~288 | `main()`: 검사 → ① Val 평가 → ② 그림 정리 → ③ 이미지별 FP/FN → 출력 → Daily Gate |
+| 28~35 | `import` (`pathlib` · `argparse` · `csv` · `hashlib` · `re` · `shutil` · `subprocess` · `sys`) |
+| 37~39 | `PROJECT_ROOT` 경로 설정 |
+| 41~43 | `import yaml` · `from src.manifest import read_manifest` · `from src.evaluate_detector import evaluate_detector, predict_images, match_boxes` |
+| 48~60 | 경로: `BEST_PT` · `CONDITION_MD` · `BASELINE_YAML` · `DATASET_YAML` · `MANIFEST_DIR` · `VAL_IMAGES` · `VAL_LABELS` · `VERIFY_SCRIPT` · `RUNS_DIR` · `FIG_DIR` · `METRICS_CSV` · `IMAGE_CHECK_CSV` · `CLASS_CHECK_CSV` |
+| 62~67 | 기준값: `SPLIT` · `VAL_RUN_NAME` · `PRED_RUN_NAME` · `IOU_MATCH` · `SMALL_PX` · `UNUSED_CLASSES` |
+| 70~83 | `sha12()` · `condition_info()` (4일차 조건 문서에서 상태 · sha 읽기) |
+| 86~120 | `pre_checks()`: 평가 전 검사 10항목 |
+| 123~151 | `write_metrics()` (`baseline_metrics.csv`) |
+| 154~166 | `copy_figures()` (그래프만 `reports/figures/`로 복사) |
+| 169~183 | `read_gt()` · `is_small()` |
+| 186~214 | `image_check()` (Val 예측 → 이미지별 TP · FP · FN · Class별 개수) |
+| 217~242 | `write_class_check()` (Class별 TP · FN · FP → `baseline_class_check.csv`) |
+| 245~319 | `main()`: 검사 → ① Val 평가 → ② 그림 정리 → ③ 이미지별 FP/FN · Class별 개수 → 출력 → Daily Gate |
 
 ### 흐름 그림
 
@@ -56,14 +57,16 @@ flowchart TD
     G --> H[/"reports/figures/*.png"/]
     H --> I["③ image_check(conf)<br/>predict_images → match_boxes"]
     I --> J[/"reports/baseline_val_image_check.csv<br/>FP+FN 많은 순"/]
-    J --> K["표 출력<br/>지표 · Class별 TP/FN/FP · 실패 의심 이미지"]
+    J --> J2["write_class_check()<br/>Class별 TP · FN · FP"]
+    J2 --> J3[/"reports/baseline_class_check.csv<br/>conf 0.25 기준 Recall · Precision"/]
+    J3 --> K["표 출력<br/>지표 · Class별 TP/FN/FP · 실패 의심 이미지"]
     K --> L["5일차 Daily Gate 출력"]
     L --> M{"그래프 없음?"}
     M -->|있음| N["종료 코드 1"]
     M -->|없음| O["끝"]
 ```
 
-평가 지표(①)와 이미지별 FP/FN(③)은 **서로 다른 예측 설정**으로 계산됩니다. 4.5에서 그 차이를 설명합니다.
+평가 지표(①)와 이미지별 FP/FN(③)은 **서로 다른 예측 설정**으로 계산됩니다. 4.5에서 그 차이를 설명하고, 4.8에서 현장 기준 Class별 표를 설명합니다.
 
 ## 4. 핵심 코드 읽기
 
@@ -162,7 +165,7 @@ for name, size, preds in predict_images(str(BEST_PT), VAL_IMAGES, conf, imgsz, R
 - `read_gt()`는 정답 라벨(YOLO TXT)을 `(cls, x, y, w, h)` 목록으로 읽습니다. `match_boxes()`는 **점수 높은 예측부터** 같은 Class의 아직 안 쓰인 정답 중 IoU가 가장 높은 것(0.5 이상)과 짝짓고, 한 정답은 한 번만 씁니다. 짝이 있으면 TP, 짝이 없는 예측은 FP, 짝이 없는 정답은 FN입니다.
 - `class_err`는 FP 중에서 **위치는 맞는데(IoU ≥ 0.5) Class만 틀린** 예측 개수입니다. FP 개수에 이미 들어 있으므로, `fp` 중 일부가 `class_err`입니다.
 - `match_boxes()`는 계산만 하는 함수라 GPU나 화면 없이 테스트할 수 있습니다.
-- 표의 `conf`는 **0.25**입니다. 반면 4.4의 지표(P · R · mAP)는 Ultralytics 평가 기본값 **conf 0.001**로 계산됩니다. 그래서 Class별 TP · FN · FP 개수로 P · R을 다시 계산해도 `baseline_metrics.csv`의 값과 **같지 않은 것이 정상**입니다.
+- 표의 `conf`는 **0.25**입니다. 반면 4.4의 지표(P · R · mAP)는 Ultralytics 평가 기본값 **conf 0.001**로 계산됩니다. 그래서 Class별 TP · FN · FP 개수로 P · R을 다시 계산해도 `baseline_metrics.csv`의 값과 **같지 않은 것이 정상**입니다. 이 개수를 파일로 남긴 것이 4.8의 `baseline_class_check.csv`입니다.
 - `val_rows`는 `read_manifest(MANIFEST_DIR / "val.csv")[0]`로 읽어 `scene_type` · `capture_group`을 붙입니다. 6일차에 "어느 세션 · 어떤 장면에서 틀리는가"를 보기 위해서입니다.
 - 결과는 FP+FN이 **많은 이미지부터** 정렬해 `baseline_val_image_check.csv`에 저장합니다. 열은 `gt` · `pred` · `tp` · `fp` · `fn` · `class_err` · `small_gt` · `small_fn` · `class4_pred` · `max_conf` · `suspect`입니다.
 - `suspect`는 FP나 FN이 하나라도 있으면 `yes`입니다. 화면에는 이 중 상위 10장만 출력합니다.
@@ -199,7 +202,27 @@ if missing:
 - `reports/figures/`에는 **그래프 3장만** 복사합니다. 회사 이미지가 들어간 그림(`val_batch*.jpg` · 예측 이미지)은 NDA 때문에 `runs/`에만 남깁니다.
 - 5일차 Daily Gate(가이드 18.5)를 화면에 출력합니다. 대부분은 파일이 있는지로 ✅ · ☐를 정하지만, **"실제 Val Prediction 이미지 확인"은 항상 ☐**입니다. 사람이 박스 그린 이미지를 열어 본 뒤 직접 체크해야 하는 항목이기 때문입니다.
 - 그 외 몇 줄(Class별 성능 · 정상 김치 FP · Test/Bridge 미사용)은 코드에서 ✅로 고정되어 있어 **파일이 있는지 같은 확인은 하지 않습니다.** 종료 코드 1은 그래프가 없을 때만 나옵니다.
+- 마지막 줄 **"산출물 2 네 파일"**은 `baseline_best.pt` · `baseline_metrics.csv` · `baseline_training_condition.md` · `reports/baseline_results.csv`(08이 만든 `results.csv` 사본)가 **모두 있을 때만 ✅**입니다. 네 파일이 모두 준비되었는지 한눈에 보는 줄이고, 하나라도 없으면 ☐로 나옵니다(종료 코드에는 영향이 없습니다).
 - 정상 김치(`normal_kimchi`)는 이 데이터에 0장이라, 정상 김치 FP는 확인할 수 없는 **한계로 출력해서 기록**합니다(README 16장). Class 4 예측은 데이터가 0건이므로 있으면 전부 FP 후보로 셉니다.
+
+### 4.8 Class별 TP · FN · FP 표 — 현장 기준(conf 0.25)
+
+```python
+rows.append({
+    "model": "baseline_v1", "weight_sha": weight_sha, "split": SPLIT, "conf": conf, "iou": IOU_MATCH,
+    "class_id": c, "class_name": names.get(c, "?"), "gt": v["gt"], "tp": v["tp"], "fn": v["fn"], "fp": v["fp"],
+    "recall_at_conf": f"{v['tp'] / v['gt']:.4f}" if v["gt"] else "",
+    "precision_at_conf": f"{v['tp'] / (v['tp'] + v['fp']):.4f}" if (v["tp"] + v["fp"]) else "",
+    "note": UNUSED_CLASSES.get(c, "") if not v["gt"] else "",
+})
+```
+
+- `baseline_metrics.csv`의 P · R은 Ultralytics 평가 기본값(conf 0.001)이라 **공장에서 실제로 쓸 문턱(conf 0.25)에서 몇 개를 놓쳤나**를 말해 주지 않습니다. 이 표는 4.5의 `per_class` 개수(`image_check()`가 이미지마다 더한 값)를 conf 0.25 · IoU ≥ 0.5 기준으로 그대로 저장한 것입니다.
+- 첫 줄 `all`은 Class별 줄의 `gt · tp · fn · fp`를 **합한 값**이고(`insert(0, ...)`), 그 줄의 `note`에 기준(conf · IoU · 같은 Class 짝짓기)을 적습니다. 모든 줄에 `weight_sha` · `conf` · `iou`가 들어가서 **어느 가중치 · 어느 문턱의 숫자인지** 파일만 보고 알 수 있습니다.
+- `recall_at_conf`는 `tp / gt`(정답 중 찾은 비율), `precision_at_conf`는 `tp / (tp + fp)`(예측 중 맞은 비율)입니다. 분모가 0이면 **0이 아니라 빈 칸**으로 둡니다. 그래서 Instance가 없는 Class 4(미사용)는 숫자가 비고 `note`에 이유가 적힙니다. 반대로 `disease_browning`처럼 GT는 있는데 하나도 못 찾으면 `0.0000`으로 적혀 **"없음"과 "0점"이 구분**됩니다.
+- Val 정답에 없는 Class의 FP도 세기 위해 `per_class.setdefault(c, ...)`로 줄을 만들어 둡니다. 그래서 Class 줄은 `names`에 없는 번호가 와도 빠지지 않습니다.
+- 5일차 실행 결과(`all`): GT 389 · TP 230 · FN 159 · FP 92 → Recall 0.5913 · Precision 0.7143. `baseline_metrics.csv`의 Recall 0.595 · Precision 0.655와 다른 것이 정상입니다(문턱이 다릅니다).
+- 7일차 Improved 모델도 **같은 열의 같은 표**를 만들어 Baseline 줄과 나란히 비교합니다. 6일차 `09a_branch_fp_check.py`는 이 표의 branch 줄(`tp` · `fp`)을 교차 확인에 씁니다.
 
 ## 5. 연결된 파일
 
@@ -213,5 +236,5 @@ if missing:
 | manifest 읽기 | `src/manifest.py` (`read_manifest()`) |
 | 데이터 검증 | `07_verify_yolo_dataset.py` (종료 코드 0이어야 함) |
 | 기준값 출처 | 가이드 18장 (18.5 Daily Gate) · README 16장 (알려진 한계) |
-| 결과를 쓰는 곳 | `reports/baseline_metrics.csv` · `reports/figures/` · `reports/baseline_val_image_check.csv` · `runs/baseline_v1_val/` · `runs/predict/baseline_val_images/` |
-| 결과를 읽는 곳 | 6일차 Failure Analysis (`baseline_val_image_check.csv`) |
+| 결과를 쓰는 곳 | `reports/baseline_metrics.csv` · `reports/figures/` · `reports/baseline_val_image_check.csv` · `reports/baseline_class_check.csv` · `runs/baseline_v1_val/` · `runs/predict/baseline_val_images/` |
+| 결과를 읽는 곳 | 6일차 Failure Analysis (`baseline_val_image_check.csv`) · `09a_branch_fp_check.py` (이미지별 결과 비교 · `baseline_class_check.csv` branch 줄 교차 확인) · 7일차 Improved 비교 기준 (`baseline_class_check.csv`) |

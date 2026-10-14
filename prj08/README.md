@@ -2,7 +2,7 @@
 
 > 교과 7에서 검수한 정답 데이터로 YOLO11 객체검출 모델을 학습 · 평가 · 개선한다.
 >
-> **Dataset Version** `kimchi_v1` · **라벨 지문** `5c2b4fc2c3e6` · **진행 상황** 3일차 완료 (Split Freeze · data/yolo 구성 · Smoke Test) · 4일차 완료 (Baseline 학습) · 5일차 완료 (Baseline 평가)
+> **Dataset Version** `kimchi_v1` · **라벨 지문** `5c2b4fc2c3e6` · **진행 상황** 3일차 완료 (Split Freeze · data/yolo 구성 · Smoke Test) · 4일차 완료 (Baseline 학습) · 5일차 완료 (Baseline 평가) · 6일차 진행 중 (H3 확인 완료)
 
 ---
 
@@ -106,8 +106,9 @@ LC_ALL=C cat data/subject7_final/labels/*.txt | sha256sum | cut -c1-12
 | 10 | `python scripts/07_verify_yolo_dataset.py` | 19항목 모두 PASS · FAIL 0 |
 | 11 | `python scripts/08_train_baseline.py --dry-run` | 학습 전 검사 12항목 PASS (학습 안 함 · 몇 초 · `configs` · `src` · `scripts` · `manifests`가 커밋 전이면 WARN) · `reports/baseline_training_condition.md` 미리 작성 |
 | 12 | `python scripts/08_train_baseline.py` | 검사 12항목 PASS → Baseline 학습 → 완료 epoch · loss NaN/inf 0 확인 → `models/baseline/baseline_best.pt` 보관 · 조건 문서 상태 `완료` (`configs` · `src` · `scripts` · `manifests`가 커밋된 상태여야 시작) |
-| 13 | `python scripts/09_evaluate_baseline.py` | 평가 전 검사 10항목 PASS → Val 평가 · `reports/baseline_metrics.csv` · 그림 3장 · `reports/baseline_val_image_check.csv` (Val만 · Test · Bridge 미사용) |
+| 13 | `python scripts/09_evaluate_baseline.py` | 평가 전 검사 10항목 PASS → Val 평가 · `reports/baseline_metrics.csv` · 그림 3장 · `reports/baseline_val_image_check.csv` · `reports/baseline_class_check.csv` (Val만 · Test · Bridge 미사용) |
 | 14 | `git status --short` | **아무것도 안 나오면** 내 결과 = 팀 기준 결과 (확인 후 `git restore reports/ splits/`) |
+| 15 | `python scripts/09a_branch_fp_check.py` | 6일차 · 실행 전 검사 6항목 PASS → Val branch 예측 5종 분류 · 용훈 PC 결과와 비교 `다름 0` · `reports/branch_pred_check.csv` (사람 확인 칸은 비어 있음 · **확인을 채운 뒤에는 다시 돌리지 않기** · 덮어씀 · Val만 · Test · Bridge 미사용) |
 | (참고) | Smoke Test 명령 | `reports/smoke_test.md` 2장 · 1 epoch · `runs/smoke_day3/` (Git 제외) · 재현용이 아니라 파이프라인 연결 확인용 |
 
 > `05b_upgrade_manifest_schema.py`는 10/13 `manifests/`를 v1(3칸) → v2(9칸)로 바꿀 때 **한 번** 쓴 스크립트입니다. 지금 main의 `manifests/`는 이미 v2라 실행할 필요가 없습니다. (실행해도 "이미 v2" 확인만 하고 아무것도 쓰지 않음)
@@ -145,16 +146,17 @@ prj08/
 │   ├── 06_build_yolo_dataset.py       # 3일차 · Split 목록대로 data/yolo 학습 폴더 구성 (복사 · Bridge 제외)
 │   ├── 07_verify_yolo_dataset.py      # 3일차 · data/yolo가 manifests와 같은지 19항목 검증 (읽기만)
 │   ├── 08_train_baseline.py           # 4일차 · 학습 전 12항목 검사 → Baseline 학습 → 조건 문서 자동 기록 (--dry-run: 검사만)
-│   └── 09_evaluate_baseline.py        # 5일차 · Baseline Val 평가 · Class별 지표 · 이미지별 FP/FN (Test · Bridge 미사용)
+│   ├── 09_evaluate_baseline.py        # 5일차 · Baseline Val 평가 · Class별 지표 · 이미지별 FP/FN · Class별 TP/FN/FP (Test · Bridge 미사용)
+│   └── 09a_branch_fp_check.py         # 6일차 · Val branch 예측 5종 분류 (H3 · 오검출 확인) · 사람 확인 칸 (Test · Bridge 미사용)
 │
 ├── docs/
 │   ├── split_policy.md                # 산출물 1 · Split 정책 확정본 (5분 세션 · 600/75/75/150 · 예외 E1)
-│   ├── code_flow.md                   # 코드 흐름 Mermaid 6개
+│   ├── code_flow.md                   # 코드 흐름 Mermaid 2개
 │   └── code_review/                   # 코드와 같은 구조의 파일별 리뷰
 │       ├── README.md                  # 목차 · 읽는 순서 · 우선순위
 │       ├── configs/                   # dataset_yaml.md
 │       ├── src/                       # dataset_audit.md · capture_group.md · manifest.md · train_detector.md · evaluate_detector.md
-│       └── scripts/                   # 01 · 02a · 02 · 03 · 04 · 05 · 05a · 05b · 06 · 07 · 08 · 09 리뷰
+│       └── scripts/                   # 01 · 02a · 02 · 03 · 04 · 05 · 05a · 05b · 06 · 07 · 08 · 09 · 09a 리뷰
 │
 ├── reports/                           # 결과 · 기록 (파일명 · 숫자만 · Git에 올림)
 │   ├── figures/                       # 09 · 학습곡선 · Confusion Matrix (baseline_results.png · baseline_confusion_matrix(_normalized).png · 그래프만)
@@ -178,6 +180,9 @@ prj08/
 │   ├── baseline_results.csv           # 08 · runs/baseline_v1/results.csv 사본 (숫자만)
 │   ├── baseline_metrics.csv           # 09 · 산출물 2 · Val 전체 + Class별 P · R · mAP50 · mAP50-95
 │   ├── baseline_val_image_check.csv   # 09 · 이미지별 GT · 예측 · TP · FP · FN · 작은 객체 FN → 6일차 Failure Analysis 입력
+│   ├── baseline_class_check.csv       # 09 · Class별 GT · TP · FN · FP · conf 0.25 기준 Recall · Precision → 7일차 비교 기준
+│   ├── branch_pred_check.csv          # 09a · branch 예측 1개 = 1행 · 분류 5종 · 원본 좌표 · 사람 확인(human_check · memo) → H3 근거
+│   ├── failure_analysis.csv           # 6일차 · 실패 대표 사례 (원인 · 증거 · 다음 행동) · H3 행은 branch_pred_check.csv 근거
 │   ├── label_preview.md               # 가이드 16.4 · Split 복사 후 라벨 Preview 20장 (교과 7 도구 · 20/20 일치)
 │   ├── smoke_test.md                  # 가이드 16.5~16.7 · 1 epoch → Weight → Prediction 연결 확인 · 가이드와 다른 점 6장
 │   └── issue_log.md                   # 문제 · 원인 · 해결 기록
@@ -201,7 +206,7 @@ prj08/
 ├── demo/                              # (6 · 8일차) 실패 사례 · Prediction · Auto Label 결과 (일부 Git 제외)
 ├── presentation/                      # (9일차) 발표 PDF · Q&A
 ├── models/                            # ⚠ Git 제외 · baseline/ (baseline_best.pt) · improved/ · final/
-├── runs/                              # ⚠ Git 제외 · Ultralytics 결과 (smoke_day3 · smoke_day3_predict* · baseline_v1 · baseline_v1_val · predict/baseline_val_images)
+├── runs/                              # ⚠ Git 제외 · Ultralytics 결과 (smoke_day3 · smoke_day3_predict* · baseline_v1 · baseline_v1_val · predict/baseline_val_images · predict/branch_check)
 │
 └── data/                              # ⚠ Git 제외 (NDA)
     ├── subject7_final/                # 교과 7 FINAL 복사본 · 읽기 전용 · 라벨 지문 5c2b4fc2c3e6
@@ -277,8 +282,17 @@ prj08/
               │  (import src.manifest · src.evaluate_detector · 평가 전 07 실행 → 종료 코드 0 확인)
               │  평가 전 검사 10항목 · split = val 고정 (Frozen Test · Bridge 미사용)
               ▼
-         reports/baseline_metrics.csv · reports/figures/baseline_*.png · reports/baseline_val_image_check.csv (Git)
+         reports/baseline_metrics.csv · reports/figures/baseline_*.png · reports/baseline_val_image_check.csv · reports/baseline_class_check.csv (Git)
          runs/baseline_v1_val/ · runs/predict/baseline_val_images/ (Git 제외 · NDA · 박스 그린 Val 이미지는 사람이 눈으로 확인)
+
+[6일차]
+         09a_branch_fp_check.py ←── models/baseline/baseline_best.pt + baseline_training_condition.md (sha) + manifests/val.csv + data/yolo (val) + reports/baseline_val_image_check.csv (비교용)
+              │  (import src.manifest · src.evaluate_detector · 실행 전 07 실행 → 종료 코드 0 확인)
+              │  실행 전 검사 6항목 · Val branch 예측을 정답과 대조해 5종으로 분류 (TP · 중복 · 다른 이물 위 · 위치 어긋남 · 정답 없는 자리)
+              ▼
+         reports/branch_pred_check.csv (Git · human_check · memo는 사람이 채움) · runs/predict/branch_check/ (Git 제외 · NDA)
+              ▼
+         [사람] branch 박스 확인 (라벨 누락 · 김치 줄기 착각 · 다른 이물) ──→ reports/failure_analysis.csv H3 행 · (라벨 누락이면) reports/issue_log.md
 ```
 
 | 파일 | 입력 | 출력 | 의존 |
@@ -295,7 +309,8 @@ prj08/
 | `07_verify_yolo_dataset.py` | `manifests/split_manifest.csv` · `data/yolo` · 원본 labels | `reports/yolo_verify_check.csv` | `src.manifest` (읽기만 · 06 import 안 함) |
 | Smoke Test (CLI) | `configs/dataset.yaml` → `data/yolo` train · val | `runs/smoke_day3/` · `reports/smoke_test.md` | ultralytics |
 | `08_train_baseline.py` | `configs/baseline.yaml` · `configs/dataset.yaml` · `manifests/` · `data/yolo` (07 검증 PASS) · 원본 labels (지문) | `runs/baseline_v1/` · `models/baseline/baseline_best.pt` · `reports/baseline_training_condition.md` · `reports/baseline_results.csv` | `src.manifest` · `src.train_detector` · PyYAML · torch · ultralytics · git |
-| `09_evaluate_baseline.py` | `models/baseline/baseline_best.pt` · `reports/baseline_training_condition.md` · `configs/baseline.yaml` · `manifests/val.csv` · `data/yolo` (val) | `reports/baseline_metrics.csv` · `reports/figures/` · `reports/baseline_val_image_check.csv` · `runs/baseline_v1_val/` · `runs/predict/baseline_val_images/` | `src.manifest` · `src.evaluate_detector` · PyYAML |
+| `09_evaluate_baseline.py` | `models/baseline/baseline_best.pt` · `reports/baseline_training_condition.md` · `configs/baseline.yaml` · `manifests/val.csv` · `data/yolo` (val) | `reports/baseline_metrics.csv` · `reports/figures/` · `reports/baseline_val_image_check.csv` · `reports/baseline_class_check.csv` · `runs/baseline_v1_val/` · `runs/predict/baseline_val_images/` | `src.manifest` · `src.evaluate_detector` · PyYAML |
+| `09a_branch_fp_check.py` | `models/baseline/baseline_best.pt` · `reports/baseline_training_condition.md` (sha) · `configs/dataset.yaml` · `manifests/val.csv` · `data/yolo` (val) · `reports/baseline_val_image_check.csv` (비교용) | `reports/branch_pred_check.csv` · `runs/predict/branch_check/` | `src.manifest` · `src.evaluate_detector` · PyYAML |
 
 > 함수 단위 설명과 리뷰는 [`docs/code_review/README.md`](docs/code_review/README.md), 그림은 [`docs/code_flow.md`](docs/code_flow.md)를 참고합니다.
 
