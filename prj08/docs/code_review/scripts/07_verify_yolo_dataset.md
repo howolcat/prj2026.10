@@ -1,6 +1,6 @@
 # `scripts/07_verify_yolo_dataset.py` 코드 리뷰
 
-> 3일차 · 130줄 · manifests/ · split_policy.md 8장 · reports/split_summary.csv
+> 3일차 · 134줄 · manifests/ · split_policy.md 8장 · reports/split_summary.csv
 
 ## 1. 한 줄 요약
 
@@ -23,10 +23,11 @@ python scripts/07_verify_yolo_dataset.py   # prj08 폴더에서 실행 · 옵션
 | 줄 | 내용 |
 |--:|---|
 | 15~18 | `import` (`pathlib` · `csv` · `hashlib` · `sys`) |
-| 23~27 | 경로: `MANIFEST_CSV` · `SRC_LBL` · `YOLO_DIR` · `CHECK_CSV` |
-| 32~35 | 기준값: `YOLO_ROLES` · `EXPECTED_IMAGES` · `EXPECTED_BBOX` · `FROZEN_TEST_FP` |
-| 38~50 | `fingerprint()` · `file_hash()` · `count_bbox()` |
-| 53~126 | `main()`: 0 전제 조건 → 1~6 검사 → 저장 · 출력 → 종료 코드 |
+| 20~24 | `PROJECT_ROOT` 경로 설정 + `from src.manifest import read_manifest` |
+| 29~32 | 경로: `MANIFEST_CSV` · `SRC_LBL` · `YOLO_DIR` · `CHECK_CSV` |
+| 37~40 | 기준값: `YOLO_ROLES` · `EXPECTED_IMAGES` · `EXPECTED_BBOX` · `FROZEN_TEST_FP` |
+| 43~55 | `fingerprint()` · `file_hash()` · `count_bbox()` |
+| 58~130 | `main()`: 0 전제 조건 → 1~6 검사 → 저장 · 출력 → 종료 코드 |
 
 ### 흐름 그림
 
@@ -34,7 +35,7 @@ python scripts/07_verify_yolo_dataset.py   # prj08 폴더에서 실행 · 옵션
 flowchart TD
     A["main()"] --> B{"manifests/ · data/yolo 있음?"}
     B -->|없음| X["중단 (sys.exit)<br/>Freeze 전 · 06 실행 전"]
-    B -->|있음| C["manifest 읽기<br/>role_of · bridge 목록 (정답표)"]
+    B -->|있음| C["read_manifest()<br/>role_of · bridge_holdout 목록 (정답표)"]
     C --> D["data/yolo 이미지 · 라벨 이름 읽기<br/>(train · val · test)"]
     D --> E["1 장수 · 짝 → 2 Frozen Test 지문<br/>→ 3 Bridge 미포함 · 폴더 위치"]
     E --> F["4 라벨 바이트 비교<br/>→ 5 BBox 합계 → 6 세션 1역할"]
@@ -58,7 +59,7 @@ def fingerprint(names) -> str:
     return hashlib.sha256(text).hexdigest()[:12]
 ```
 
-- 06(B)과 07(A)을 나눠서, 07은 **06의 코드를 import 하지 않습니다.**
+- 06(B)과 07(A)을 나눠서, 07은 **06의 코드를 import 하지 않습니다.** 공유하는 것은 manifest를 읽는 `read_manifest()`(`src/manifest.py`)뿐입니다.
 - 그래서 같은 계산이어도 `fingerprint()`를 07 안에 **다시 적어 둡니다.** 06에 실수가 있어도 검사가 같이 틀리지 않게 하기 위해서입니다.
 - 문제가 있으면 `data/yolo`를 직접 고치지 않고 **원인을 찾아 06을 다시 돌립니다.**
 
@@ -72,17 +73,19 @@ FROZEN_TEST_FP = "4f9291849fe6"                              # split_policy.md 8
 ```
 
 - 이미지 수와 지문은 `split_policy.md` 8장, BBox 합계는 2일차 `split_summary.csv`에서 옮겨 적은 값입니다.
-- `YOLO_ROLES`에 `bridge`가 없는 것 자체가 기준입니다. Bridge는 학습 폴더에 **들어가면 안 됩니다.**
+- `YOLO_ROLES`에 `bridge`가 없는 것 자체가 기준입니다. Bridge는 학습 폴더에 **들어가면 안 됩니다.** 같은 뜻의 `YOLO_SPLITS`가 `src/manifest.py`에도 있지만, 07은 자기 파일에 따로 적어 둡니다.
 - BBox 합계 2957 + 389 + 477 = 3823은 Bridge를 뺀 값입니다.
 
 ### 4.3 manifest로 정답표 만들기
 
 ```python
-role_of = {r["file_name"]: r["role"] for r in manifest}          # 파일명 → 역할 (정답표)
+manifest, _ = read_manifest(MANIFEST_CSV)                        # 항상 split 키 · bridge_holdout 값
+role_of = {r["file_name"]: r["split"] for r in manifest}         # 파일명 → 역할 (정답표)
 stem_role = {Path(k).stem: v for k, v in role_of.items()}
-bridge = {k for k, v in role_of.items() if v == "bridge"}
+bridge = {k for k, v in role_of.items() if v == "bridge_holdout"}
 ```
 
+- `read_manifest()`는 manifest가 v1이든 v2든 **같은 모양(모든 행에 `split` 키, Bridge 값은 `bridge_holdout`)** 으로 돌려줍니다. 07은 스키마를 따로 신경 쓰지 않아도 됩니다. v1의 `bridge` 값은 `read_manifest()`가 `bridge_holdout`으로 바꿔 주고, 칸 구성을 알 수 없으면 `ValueError`를 내는데 07은 이를 잡지 않아 오류로 종료됩니다.
 - `role_of`는 "이 이미지는 어느 역할 폴더에 있어야 하는가"를 알려 주는 **정답표**입니다.
 - `bridge`는 `data/yolo`에 있으면 안 되는 파일 이름 집합입니다. 항목 3에서 사용합니다.
 - `stem_role`(확장자 뺀 이름 → 역할)은 이 파일 안에서는 아직 쓰이지 않습니다.
@@ -104,7 +107,7 @@ def add(no, item, expected, actual):
 | 3 | `bridge_in_yolo` · `not_in_manifest` · `wrong_role_folder` · `extra_role_dirs` | Bridge 미포함 · manifest에 없는 이미지 · 엉뚱한 폴더 · 추가 폴더 | 4 |
 | 4 | `label_changed_vs_source` | 원본 라벨과 바이트 단위 비교 | 1 |
 | 5 | `*_bbox` | 역할별 BBox 합계 | 3 |
-| 6 | `group_in_multiple_roles` | 한 세션이 두 역할에 걸친 개수 0 | 1 |
+| 6 | `group_in_multiple_roles` | manifest의 `split`을 `capture_group`별로 모아, 두 역할에 걸친 세션 개수 0 | 1 |
 
 ### 4.5 짝 맞추기와 폴더 위치 검사
 
@@ -154,6 +157,7 @@ sys.exit(1 if n_fail else 0)
 | 관계 | 파일 |
 |---|---|
 | 검사 기준 (정답표) | `manifests/split_manifest.csv` (05가 Freeze) |
+| manifest 읽기 | `src/manifest.py` (`read_manifest()` · 05 · 06과 공유) |
 | 검사 대상 | `data/yolo/` (06이 만든 YOLO 학습 폴더) |
 | 원본 라벨 | `data/subject7_final/labels` |
 | 기준값 출처 | `split_policy.md` 8장 · `reports/split_summary.csv` (2일차) |
