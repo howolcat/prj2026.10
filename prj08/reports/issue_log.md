@@ -15,3 +15,4 @@
 | 10/13 | `manifests/`가 3칸(file_name · capture_group · role) · 값 `bridge` → 가이드 16.1 최소 컬럼 · `bridge_holdout`과 다름 | 05가 split CSV 칸을 그대로 옮김 | `src/manifest.py` + `05b`로 v2 9칸 · 배정 변경 0 · 불변 조건 검사 PASS (`manifest_schema_check.csv`) · 다른 검사 결과 변화 없음 · PR #87 |
 | 10/13 | 라벨 Preview 때 교과 7 도구로 `data/yolo`를 바로 열면 그 안에 `manifests/`가 생길 위험 | 교과 7 도구는 연 폴더 아래 `manifests/`를 만듦 | 레포 밖 `~/preview_ws/raw/yolo`에 하드 링크(`cp -al`) 작업 공간 · 저장 · QA 버튼 안 누름 · 확인 후 삭제 · 20/20 일치 (`label_preview.md`) |
 | 10/13 | Smoke Test 경고 · 이상 결과 6건 (mAP≈0 · Prediction 박스 과다 · `optimizer=auto` · 8.4.176 안내 등) | 1 epoch · 기본 설정 | 모두 정상이거나 4일차에 조치 (optimizer · lr0 고정 · 버전 유지) · 상세 `reports/smoke_test.md` 4장 |
+| 10/14 | Val `250411_140005265446` plastic 정답 박스 2개(4K 13×17 · 12×13px · 트레이 위쪽 가장자리 y0.09~0.12)에 실제 이물 없음 | 교과 7 라벨링 때 클릭 실수로 생긴 빈 박스로 추정 | kimchi_v1 유지(Baseline 비교 기준 보존) · 수정은 팀 결정 후 kimchi_v2 · 영향 Val GT 389개 중 2개(0.5%) · 같은 사진 1개(4K 17×13px)는 실제 작은 흰 조각 → 정상 |
