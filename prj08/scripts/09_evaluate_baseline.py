@@ -17,6 +17,7 @@
     reports/figures/baseline_results.png          산출물 5 · 학습곡선 (runs/baseline_v1/results.png 사본)   (Git · 그래프)
     reports/figures/baseline_confusion_matrix.png 산출물 5 · Val Confusion Matrix (+ _normalized)        (Git · 그래프)
     reports/baseline_val_image_check.csv          진행용 · 이미지별 GT · 예측 · TP · FP · FN · 작은 객체 FN  (Git · 6일차 입력)
+    reports/baseline_class_check.csv              진행용 · Class별 GT · TP · FN · FP · 현장 기준(conf) Recall · Precision (Git · 7일차 비교 기준)
     runs/baseline_v1_val/                         Ultralytics 평가 결과 (Git 제외)
     runs/predict/baseline_val_images/             박스 그린 Val 이미지 (Git 제외 · NDA · 6일차 작업자료)
 
@@ -56,6 +57,7 @@ RUNS_DIR = PROJECT_ROOT / "runs"
 FIG_DIR = PROJECT_ROOT / "reports" / "figures"
 METRICS_CSV = PROJECT_ROOT / "reports" / "baseline_metrics.csv"
 IMAGE_CHECK_CSV = PROJECT_ROOT / "reports" / "baseline_val_image_check.csv"
+CLASS_CHECK_CSV = PROJECT_ROOT / "reports" / "baseline_class_check.csv"
 
 SPLIT = "val"                     # 이 스크립트는 val 만 평가한다
 VAL_RUN_NAME = "baseline_v1_val"
@@ -212,6 +214,34 @@ def image_check(conf: float, imgsz: int, names: dict) -> tuple[list[dict], dict]
     return rows, per_class
 
 
+def write_class_check(per_class: dict, names: dict, weight_sha: str, conf: float) -> None:
+    """reports/baseline_class_check.csv : conf 기준(현장에서 실제로 쓸 문턱)의 Class별 TP · FN · FP.
+
+    baseline_metrics.csv 의 P · R 은 Ultralytics 가 고른 문턱 기준이라, 공장에서 쓸 conf 0.25 기준
+    "몇 개 놓쳤나(FN)" 는 이 표로 본다. 7일차 Improved 모델도 같은 표를 만들어 나란히 비교한다.
+    """
+    rows = []
+    for c in sorted(per_class):
+        v = per_class[c]
+        rows.append({
+            "model": "baseline_v1", "weight_sha": weight_sha, "split": SPLIT, "conf": conf, "iou": IOU_MATCH,
+            "class_id": c, "class_name": names.get(c, "?"), "gt": v["gt"], "tp": v["tp"], "fn": v["fn"], "fp": v["fp"],
+            "recall_at_conf": f"{v['tp'] / v['gt']:.4f}" if v["gt"] else "",            # 정답 중 찾은 비율
+            "precision_at_conf": f"{v['tp'] / (v['tp'] + v['fp']):.4f}" if (v["tp"] + v["fp"]) else "",
+            "note": UNUSED_CLASSES.get(c, "") if not v["gt"] else "",
+        })
+    tot = {k: sum(r[k] for r in rows) for k in ("gt", "tp", "fn", "fp")}
+    rows.insert(0, {**{k: rows[0][k] for k in ("model", "weight_sha", "split", "conf", "iou")},
+                    "class_id": "all", "class_name": "all", **tot,
+                    "recall_at_conf": f"{tot['tp'] / tot['gt']:.4f}" if tot["gt"] else "",
+                    "precision_at_conf": f"{tot['tp'] / (tot['tp'] + tot['fp']):.4f}" if (tot["tp"] + tot["fp"]) else "",
+                    "note": f"conf {conf} · IoU ≥ {IOU_MATCH} · 같은 Class 짝짓기 (match_boxes)"})
+    with open(CLASS_CHECK_CSV, "w", encoding="utf-8-sig", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=list(rows[0]), lineterminator="\n")
+        w.writeheader()
+        w.writerows(rows)
+
+
 def main():
     parser = argparse.ArgumentParser(description="5일차 Baseline Validation 평가 · 이미지 Detection")
     parser.add_argument("--conf", type=float, default=0.25, help="예측 이미지 · FP/FN 집계용 conf (기본 0.25)")
@@ -243,6 +273,7 @@ def main():
     # ③ Val 예측 · 이미지별 FP / FN ────────────────────────────────────────────
     print(f"\n=== ③ Val 예측 (conf {args.conf}) · 이미지별 FP / FN ===")
     img_rows, per_class = image_check(args.conf, imgsz, names)
+    write_class_check(per_class, names, sha12(BEST_PT), args.conf)
 
     # ── 출력 ────────────────────────────────────────────────────────────────
     print("\n=== Baseline Validation 지표 (reports/baseline_metrics.csv) ===")
@@ -269,7 +300,7 @@ def main():
 
     print("\n=== 저장 ===")
     for p in (METRICS_CSV, FIG_DIR / "baseline_results.png", FIG_DIR / "baseline_confusion_matrix.png",
-              FIG_DIR / "baseline_confusion_matrix_normalized.png", IMAGE_CHECK_CSV):
+              FIG_DIR / "baseline_confusion_matrix_normalized.png", IMAGE_CHECK_CSV, CLASS_CHECK_CSV):
         print(f"  {'OK ' if p.exists() else '없음'} {p.relative_to(PROJECT_ROOT)}")
     print(f"  (Git 제외) {val_dir.relative_to(PROJECT_ROOT)}/ · runs/predict/{PRED_RUN_NAME}/  ← 박스 그린 Val 이미지는 여기서 눈으로 확인")
 

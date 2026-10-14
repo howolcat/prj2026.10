@@ -16,3 +16,8 @@
 | 10/13 | 라벨 Preview 때 교과 7 도구로 `data/yolo`를 바로 열면 그 안에 `manifests/`가 생길 위험 | 교과 7 도구는 연 폴더 아래 `manifests/`를 만듦 | 레포 밖 `~/preview_ws/raw/yolo`에 하드 링크(`cp -al`) 작업 공간 · 저장 · QA 버튼 안 누름 · 확인 후 삭제 · 20/20 일치 (`label_preview.md`) |
 | 10/13 | Smoke Test 경고 · 이상 결과 6건 (mAP≈0 · Prediction 박스 과다 · `optimizer=auto` · 8.4.176 안내 등) | 1 epoch · 기본 설정 | 모두 정상이거나 4일차에 조치 (optimizer · lr0 고정 · 버전 유지) · 상세 `reports/smoke_test.md` 4장 |
 | 10/14 | Val `250411_140005265446` plastic 정답 박스 2개(4K 13×17 · 12×13px · 트레이 위쪽 가장자리 y0.09~0.12)에 실제 이물 없음 | 교과 7 라벨링 때 클릭 실수로 생긴 빈 박스로 추정 | kimchi_v1 유지(Baseline 비교 기준 보존) · 수정은 팀 결정 후 kimchi_v2 · 영향 Val GT 389개 중 2개(0.5%) · 같은 사진 1개(4K 17×13px)는 실제 작은 흰 조각 → 정상 |
+| 10/14 | 학습 전 `python: command not found` | venv를 켜지 않고 실행 (WSL에는 `python3`만 있음) | `source .venv/bin/activate` 후 실행 · `python-is-python3` 설치는 하지 않음 (venv 밖에서 실수로 돌아가는 것을 막기 위해) |
+| 10/14 | 실행 직후 `KeyboardInterrupt` | 첫 `import torch`가 1~2분 걸려 멈춘 줄 알고 Ctrl+C | 다시 실행하고 기다림 · 두 번째부터는 빠름 |
+| 10/14 | `git status`에 `ahead of 'origin/ch' by 76 commits` | `git pull origin main`으로 받은 main 커밋이 아직 내 원격 브랜치(origin/ch)에 없음 | 정상 · `git push origin ch` 하면 사라짐 (local main은 따로 업데이트하지 않아도 됨) |
+| 10/14 | Confusion Matrix background 칸 숫자가 수천 개 | Ultralytics가 conf 0.001 이상 예측을 모두 세서 그림 | 그림은 Class 혼동 방향만 참고 · FP 개수는 conf 0.25 기준 `baseline_val_image_check.csv` · `baseline_class_check.csv`로 확인 |
+| 10/14 | Val branch 오검출 확인 중 정답 없는 자리에 이물이 보이는 곳 2곳 (`250411_092158458691` 4K (465,888)-(721,983) · `250411_094548003041` 4K (1599,1628)-(1738,1852)) | 교과 7 라벨링 때 작은 이물(돌 · 갈변)을 놓친 것으로 추정 (라벨 누락 후보) · 진짜 나뭇가지 라벨 누락은 0건 | kimchi_v1 유지 · 위 라벨 오류 2건과 함께 kimchi_v2 여부 팀 결정 · 근거 `reports/branch_pred_check.csv` no 4 · 5 · 10 (no 4 · 10은 같은 자리 · 메모 갈변/돌 엇갈림 → 재확인) |

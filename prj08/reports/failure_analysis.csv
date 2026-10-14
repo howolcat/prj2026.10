@@ -14,5 +14,5 @@ image,source_dataset,scene_type,failure_type,ground_truth,prediction,confidence,
 250411_140005265446.jpg,dataset1,kimchi_with_target,FN,plastic 15x20 (640 기준),none,-,초록 플라스틱이 김치 잎과 비슷 (위장),사람 확인: 초록색,재질별 사례 수집 (6일차)
 250411_140005265446.jpg,dataset1,kimchi_with_target,Label,plastic 2x3 · 2x2 (4K 13x17 · 12x13),none,-,GT 오류 (빈 자리에 박스),사람 확인: 박스 안에 아무것도 없음 (트레이 상단),issue_log 기록 · kimchi_v2 후보
 250411_094117478009.jpg,dataset1,kimchi_with_target,FP,none,branch 0.401 (정답 없는 자리),0.401,H3 · 김치 줄기를 branch로 착각 (배추 그림자),branch_pred_check.csv no 1 · 사람 확인: 배추 그림자 · 정답 박스 없음 · 같은 사진 plastic 5개 놓침,H1 과 영향 크기 비교 후 7일차 변수 결정
-250411_092158458691.jpg,dataset2,kimchi_with_target,FP,none,branch 0.391 (정답 없는 자리),0.391,H3 · 병해·갈변 이물을 branch로 혼동,branch_pred_check.csv no 4 · 사람 확인: 다른 이물(병해·갈변) · 정답 박스 없음,갈변 학습 부족과 함께 검토 · H4 와 연결
-250411_092511506342.jpg,dataset1,kimchi_with_target,Class,none (plastic_stone_metal 정답과 IoU 0.33),branch 0.405 (위치 어긋남),0.405,H3 · 병해·갈변 이물을 branch로 혼동 · 위치도 어긋남,branch_pred_check.csv no 20 · 사람 확인: 다른 이물(병해·갈변),H1 · H4 와 함께 검토
+250411_092158458691.jpg,dataset2,kimchi_with_target,FP,none,branch 0.391 (정답 없는 자리),0.391,H3 · 정답 없는 작은 이물을 branch로 혼동 (라벨 누락 후보),branch_pred_check.csv no 4 · 10 (같은 자리 중복 박스) · 사람 확인: 이물 있음 · 메모 갈변/돌 엇갈림 → 재확인 · 정답 박스 없음,issue_log 10/14 라벨 누락 후보 · kimchi_v2 팀 결정
+250411_092511506342.jpg,dataset1,kimchi_with_target,BBox+Class,plastic_stone_metal (IoU 0.33 · 640 기준 10x18),branch 0.405 (위치 어긋남),0.405,H3 · 근처 작은 이물을 branch로 혼동 · 위치도 어긋남 (H1과 같은 뿌리),branch_pred_check.csv no 20 · 사람 확인: 다른 이물(병해·갈변),H1 · H4 와 함께 검토
