@@ -224,7 +224,7 @@ prj08/
          02_audit_subject7_final.py --fixture ──→ 9종 각 1건 검출 확인   (검사기부터 검사)
          02_audit_subject7_final.py           ──→ reports/audit_issue · audit_check · audit_label_stats.csv
               │  (import src.dataset_audit)            │
-              │                                         ▼
+              │                                        ▼
          03_split_analysis.py ←──────────── audit_label_stats.csv
               │  (import src.capture_group)
               ▼
