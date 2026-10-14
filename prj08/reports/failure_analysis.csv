@@ -1,0 +1,15 @@
+image,source_dataset,scene_type,failure_type,ground_truth,prediction,confidence,suspected_cause,evidence,next_action
+250411_093901909722.jpg,dataset1,kimchi_with_target,FN,disease_browning (640 기준 19x26px),none,-,갈변 학습 부족 · 작은 크기,conf 0.05까지 반응 없음 · Train 갈변 재현율 49%,GT 눈 확인 · imgsz 실험 후보
+250411_094259430445.jpg,dataset2,kimchi_with_target,FN+Class,disease_browning (12x14px),disease_browning 0.46 (정답 plastic 근처 IoU 0.22),0.46,작은 plastic을 갈변으로 혼동 · 갈변 정답은 놓침,갈변 예측이 plastic 정답 위치에 겹침 · 상위 10장에서 같은 패턴 4건,imgsz 실험 후보
+250411_095845387065.jpg,dataset1,kimchi_with_target,FN,disease_browning (42x44px),none,-,크기 아님 → 외형 차이 또는 라벨 기준,640 기준으로도 작지 않은데 반응 없음,GT 눈 확인 · Train 갈변과 외형 비교
+250411_100114230398.jpg,dataset1,kimchi_with_target,FN,disease_browning (11x7px),none,-,매우 작은 객체 · 갈변 학습 부족,conf 0.05까지 반응 없음,imgsz 실험 후보
+250411_100413893857.jpg,dataset1,kimchi_with_target,FN,disease_browning (12x13px),none,-,매우 작은 객체 · 갈변 학습 부족,conf 0.05까지 반응 없음,imgsz 실험 후보
+250411_140956814957.jpg,dataset1,kimchi_with_target,FN,disease_browning (10x27px),none,-,가늘고 작은 객체 · 갈변 학습 부족,conf 0.05까지 반응 없음 (G09),imgsz 실험 후보
+250411_093947029472.jpg,dataset1,kimchi_with_target,FN,plastic x5 (640 기준 7~13px),leaf 0.72 · insect 0.35,0.72,매우 작은 객체 · 640 축소로 형태 소실,정답 5개 전부 놓침 · 근처 예측은 다른 Class,imgsz 640→1280
+250411_094117478009.jpg,dataset1,kimchi_with_target,FN+FP,plastic x5 (9~14px),leaf 0.52 · branch 0.40 · insect 0.34 (정답 없는 자리),0.52,매우 작은 객체 + 배경 오검출,정답 5개 전부 놓침 · 엉뚱한 자리 3개,imgsz 640→1280
+250411_093743680890.jpg,dataset2,kimchi_with_target,Class,plastic,insect 0.42 · browning 0.26,0.42,작은 plastic의 Class 구분 실패,plastic 정답 위에서 다른 Class 예측,imgsz 640→1280
+250411_092851295826.jpg,dataset1,kimchi_with_target,Class,plastic,browning 0.37 · 0.28,0.37,작은 plastic을 갈변으로 혼동,갈변 FP의 정체 (plastic 정답 위),imgsz 640→1280
+250411_093439164001.jpg,dataset1,kimchi_with_target,BBox+Class,plastic (8~9px),branch 0.39 · 0.38 (IoU 0.36 · 0.15),0.39,작은 객체 위치 · Class 동시 실패,정답 근처지만 IoU 미달 + branch로 혼동,imgsz 640→1280
+250411_140005265446.jpg,dataset1,kimchi_with_target,FN,plastic 45x85 · 21x61 (640 기준 · 큰 객체),none,-,투명 플라스틱이 김치 줄기와 비슷 (위장),크기가 충분한데 놓침 · 사람 확인: 투명,재질별 사례 수집 (6일차)
+250411_140005265446.jpg,dataset1,kimchi_with_target,FN,plastic 15x20 (640 기준),none,-,초록 플라스틱이 김치 잎과 비슷 (위장),사람 확인: 초록색,재질별 사례 수집 (6일차)
+250411_140005265446.jpg,dataset1,kimchi_with_target,Label,plastic 2x3 · 2x2 (4K 13x17 · 12x13),none,-,GT 오류 (빈 자리에 박스),사람 확인: 박스 안에 아무것도 없음 (트레이 상단),issue_log 기록 · kimchi_v2 후보
