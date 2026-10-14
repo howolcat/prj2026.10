@@ -338,8 +338,11 @@ prj08/
 - **학습 스크립트**: `scripts/08_train_baseline.py` (이름 08 확정 · 가이드 이름은 06이지만 우리 06은 `06_build_yolo_dataset.py`) · 학습 전 검사 12항목을 모두 통과해야 시작
 - **산출물**: `reports/baseline_training_condition.md` (실제 학습 조건 · 실행 기록 · 4일차 Gate) · `reports/baseline_results.csv` (Git) · `models/baseline/baseline_best.pt` · `runs/baseline_v1/` (Git 제외)
 - **사용하지 않은 데이터**: Frozen Test · Bridge Holdout (학습 · 평가 모두 미사용)
+- **학습 결과**: 50 / 50 epoch 완료 · 13.9분 (10:18 → 10:32) · loss NaN 0 · GPU_mem 2.48G · Weight sha `22f35d20a5ea` (`reports/baseline_training_condition.md` 3장)
+- **학습곡선**: Val mAP50이 30~40 epoch에서 천장(0.600 → 0.621)에 닿고 50 epoch에서 0.578로 내려감 · val loss는 40 이후 다시 오름 → `best.pt`는 40 근처 가중치 · 학습량은 충분 (`reports/figures/baseline_results.png`)
 - **성능 결과** (Val 74장 · 전체): **P 0.655 · R 0.595 · mAP50 0.622 · mAP50-95 0.462** → 6일차 Failure Analysis의 출발점 (Class별 값은 `reports/baseline_metrics.csv` · 이미지별 FP/FN은 `reports/baseline_val_image_check.csv`)
 - **Val GT 라벨 오류 2건** 발견 → `reports/issue_log.md` 10/14 참고 (평가 해석 시 함께 확인)
+- **Confusion Matrix 읽는 법**: `reports/figures/baseline_confusion_matrix.png`는 Ultralytics 평가 기본값 **conf 0.001** 기준이라 background 칸에 저신뢰 예측 수천 개가 포함됨 → 실제 오검출(FP) 수는 conf 0.25 기준인 `reports/baseline_val_image_check.csv`로 확인
 
 ## 11. Failure Analysis
 
@@ -363,7 +366,7 @@ TBD (8일차)
 
 ## 16. 알려진 한계
 
-- **정상 김치(Negative) 0장** → 정상 김치를 이물로 잘못 찾는(FP) 경향을 평가할 수 없음 · 5~6일차 Prediction에서 확인
+- **정상 김치(Negative) 0장** → 정상 김치를 이물로 잘못 찾는(FP) 경향을 평가할 수 없음 · 5일차 확인 결과 Val에도 정상 김치 사진이 없어 측정 불가 → 대신 이물 장면 안의 배경 오검출(정답 없는 자리)로 일부 확인 (`reports/baseline_val_image_check.csv`)
 - **object_only 150장은 전부 Train** → "이물만 있는 장면"의 성능은 평가하지 않음
 - **Class 6(파·고추)은 G01 한 세션에만 존재** → 예외 E1로 분할 · Class 6 점수는 참고값
 - **Val이 Class 1 중심** (BBox 389개 중 351개) → 모델 비교 때 전체 mAP와 함께 Class별 AP 확인
@@ -375,10 +378,14 @@ TBD (8일차)
 
 - 기업 제공 데이터(NDA)는 Git · 디스코드 · 외부 클라우드에 올리지 않는다. (`data/`, `*.jpg`, `*.pt`, `runs/`, `models/` 제외)
 - **보안정책이 `.gitignore`보다 우선**한다 (가이드 22.2) · Public 레포 사용 가능 여부는 선생님 확인 중
-- 커밋 전 확인 (아무것도 안 나와야 정상):
+- 커밋 전 확인 (`git add` 한 뒤 · 레포 최상위에서):
 
 ```bash
-git diff --cached --name-only | grep -iE '\.(jpe?g|png|pt)$|/data/'
+# ① 아무것도 안 나와야 정상 (회사 이미지 · 가중치 · data · runs · models)
+git diff --cached --name-only | grep -iE '\.(jpe?g|pt)$|/data/|/runs/|/models/'
+
+# ② png 가 나오면 reports/figures/ 의 그래프인지 눈으로 확인 (김치 사진이 보이는 그림은 올리지 않음)
+git diff --cached --name-only | grep -iE '\.png$'
 ```
 
 ## 18. 교과 14 Handoff
