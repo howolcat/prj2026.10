@@ -78,6 +78,10 @@ cd ~/exe_01/prj07/prj07_team01/prj08        # 각자 레포 위치
 # 가상환경
 python3 -m venv .venv
 source .venv/bin/activate
+
+# ① torch 먼저: CUDA 13.0용 전용 주소에서 받기 (1일차 환경표 2.14.1+cu130과 맞춤)
+pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cu130
+# ② 나머지 패키지 (ultralytics는 이미 깔린 torch를 그대로 사용)
 pip install -r requirements.txt
 
 # 교과 7 FINAL 복사 (Git에 없음 · FINAL 위치는 각자 PC 기준으로 바꾸기)
