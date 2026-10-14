@@ -1,0 +1,39 @@
+﻿no,file_name,source_dataset,scene_type,capture_group,conf,kind,best_iou,overlap_gt_class,gt_found_by_other,x1,y1,x2,y2,size_640,human_check,memo
+1,250411_094117478009.jpg,dataset1,kimchi_with_target,G06,0.401,정답 없는 자리,0.00,-,-,2294,1613,2397,1798,14x24,김치 줄기 착각, 배추 그림자
+2,250411_095401865132.jpg,dataset2,kimchi_with_target,G06,0.395,정답 없는 자리,0.00,-,-,2307,1873,2396,2011,12x18,김치 줄기 착각, 배추 그림자
+3,250411_092352338943.jpg,dataset2,kimchi_with_target,G06,0.393,정답 없는 자리,0.00,-,-,2815,1091,3013,1265,26x23,김치 줄기 착각, 배추 그림자
+4,250411_092158458691.jpg,dataset2,kimchi_with_target,G06,0.391,정답 없는 자리,0.00,-,-,465,888,721,983,34x12,다른 이물, 병해.갈변
+5,250411_094548003041.jpg,dataset1,kimchi_with_target,G06,0.368,정답 없는 자리,0.00,-,-,1599,1628,1738,1852,18x30,다른 이물,돌
+6,250411_094214912155.jpg,dataset1,kimchi_with_target,G06,0.360,정답 없는 자리,0.00,-,-,2979,1465,3066,1758,12x39,김치 줄기 착각, 배추 그림자
+7,250411_093234406905.jpg,dataset2,kimchi_with_target,G06,0.356,정답 없는 자리,0.00,-,-,1056,816,1258,912,27x13,김치 줄기 착각, 배추 그림자
+8,250411_093234406905.jpg,dataset2,kimchi_with_target,G06,0.351,정답 없는 자리,0.00,-,-,1273,1110,1514,1192,32x11,김치 줄기 착각, 배추 그림자
+9,250411_093947029472.jpg,dataset1,kimchi_with_target,G06,0.334,정답 없는 자리,0.00,-,-,2830,1065,2953,1146,16x11,김치 줄기 착각, 배추 그림자
+10,250411_092158458691.jpg,dataset2,kimchi_with_target,G06,0.328,정답 없는 자리,0.00,-,-,475,891,718,960,32x9,다른 이물,돌
+11,250411_092511506342.jpg,dataset1,kimchi_with_target,G06,0.328,정답 없는 자리,0.00,-,-,2309,1203,2473,1325,22x16,김치 줄기 착각, 배추 그림자
+12,250411_093519741399.jpg,dataset2,kimchi_with_target,G06,0.326,정답 없는 자리,0.00,-,-,3301,478,3457,568,21x12,김치 줄기 착각, 배추 그림자
+13,250411_140956814957.jpg,dataset1,kimchi_with_target,G09,0.322,정답 없는 자리,0.00,-,-,2260,1000,2495,1087,31x11,김치 줄기 착각, 배추 초록잎
+14,250411_140314154941.jpg,dataset1,kimchi_with_target,G09,0.320,정답 없는 자리,0.00,-,-,3473,769,3715,819,32x7,김치 줄기 착각, 배추 그림자
+15,250411_092158458691.jpg,dataset2,kimchi_with_target,G06,0.313,정답 없는 자리,0.00,-,-,2071,878,2232,1052,21x23,김치 줄기 착각, 배추 그림자
+16,250411_092158458691.jpg,dataset2,kimchi_with_target,G06,0.299,정답 없는 자리,0.00,-,-,3474,605,3786,770,41x22,김치 줄기 착각, 배추 그림자
+17,250411_094027390387.jpg,dataset1,kimchi_with_target,G06,0.294,정답 없는 자리,0.00,-,-,1764,1666,1869,1912,14x32,김치 줄기 착각, 배추 그림자
+18,250411_141127764893.jpg,dataset2,kimchi_with_target,G09,0.269,정답 없는 자리,0.00,-,-,926,1383,1213,1465,38x11,김치 줄기 착각, 배추 그림자
+19,250411_093743680890.jpg,dataset2,kimchi_with_target,G06,0.251,정답 없는 자리,0.00,-,-,874,2153,922,2273,6x16,김치 줄기 착각,배추
+20,250411_092511506342.jpg,dataset1,kimchi_with_target,G06,0.405,위치 어긋남,0.33,plastic_stone_metal,no,2696,499,2768,636,10x18,다른 이물, 병해.갈변
+21,250411_093439164001.jpg,dataset1,kimchi_with_target,G06,0.391,위치 어긋남,0.36,plastic_stone_metal,no,1493,1453,1627,1539,18x11,다른 이물, 돌
+22,250411_093439164001.jpg,dataset1,kimchi_with_target,G06,0.382,위치 어긋남,0.15,plastic_stone_metal,no,1465,1369,1629,1538,22x22,다른 이물, 돌
+23,250411_093901909722.jpg,dataset1,kimchi_with_target,G06,0.367,위치 어긋남,0.49,plastic_stone_metal,no,1732,1665,1894,1770,21x14,다른 이물, 돌
+24,250411_094214912155.jpg,dataset1,kimchi_with_target,G06,0.363,위치 어긋남,0.17,plastic_stone_metal,no,2185,1664,2281,1894,13x30,다른 이물, 돌
+25,250411_094548003041.jpg,dataset1,kimchi_with_target,G06,0.338,위치 어긋남,0.41,plastic_stone_metal,no,1849,1410,2013,1517,22x14,다른 이물, 돌
+26,250411_093234406905.jpg,dataset2,kimchi_with_target,G06,0.306,위치 어긋남,0.40,plastic_stone_metal,no,1625,1639,1748,1812,16x23,다른 이물, 돌
+27,250411_100709985238.jpg,dataset1,kimchi_with_target,G06,0.477,다른 이물 위,0.81,insect,no,1752,706,1851,852,13x19,다른 이물, 벌레
+28,250411_093616913584.jpg,dataset1,kimchi_with_target,G06,0.362,다른 이물 위,0.58,plastic_stone_metal,no,3367,1694,3484,1808,15x15,다른 이물, 돌
+29,250411_100327766278.jpg,dataset1,kimchi_with_target,G06,0.328,다른 이물 위,0.63,plastic_stone_metal,no,3487,1781,3618,1872,17x12,다른 이물, 돌
+30,250411_100456783421.jpg,dataset1,kimchi_with_target,G06,0.266,다른 이물 위,0.83,insect,yes,2309,986,2399,1108,12x16,다른 이물, 벌레
+31,250411_100024779062.jpg,dataset1,kimchi_with_target,G06,0.889,TP,1.00,branch,-,2389,1414,2527,1627,18x28,,
+32,250411_095020396284.jpg,dataset1,kimchi_with_target,G06,0.875,TP,1.00,branch,-,2313,1174,2503,1504,25x43,,
+33,250411_100243218238.jpg,dataset1,kimchi_with_target,G06,0.866,TP,1.00,branch,-,2227,541,2556,706,43x22,,
+34,250411_100456783421.jpg,dataset1,kimchi_with_target,G06,0.863,TP,1.00,branch,-,3158,1763,3368,1881,28x16,,
+35,250411_095401865132.jpg,dataset2,kimchi_with_target,G06,0.854,TP,1.00,branch,-,2576,1872,2841,2113,35x32,,
+36,250411_100841614300.jpg,dataset1,kimchi_with_target,G06,0.850,TP,1.00,branch,-,3201,1703,3388,1863,25x21,,
+37,250411_100709985238.jpg,dataset1,kimchi_with_target,G06,0.814,TP,1.00,branch,-,3499,1543,3603,1748,14x27,,
+38,250411_095211804856.jpg,dataset1,kimchi_with_target,G06,0.737,TP,1.00,branch,-,3239,804,3591,964,47x21,,
