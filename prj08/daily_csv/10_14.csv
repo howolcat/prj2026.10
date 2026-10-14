@@ -1,0 +1,4 @@
+날짜,작성자,구분,항목,세부내용,상태,관련
+2026-10-14,팀원 전원,Done,회의 결정 · Baseline 학습 설정,epochs 50 · batch 16 · imgsz 640 · AdamW 0.000909 · 0.9 · seed 42,완료,Day4
+2026-10-14,팀원 전원,Done,Leakage 기대값 · 학습 스크립트 이름 결정,Leakage 135는 지금처럼 정상 FAIL 1 유지 · 학습 스크립트 이름 08 확정,완료,Day4
+2026-10-14,팀원 전원,Done,4일차 Baseline 학습,4일차 Baseline 학습 완료,완료,Day4
