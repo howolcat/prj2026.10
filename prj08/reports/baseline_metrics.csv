@@ -1,0 +1,9 @@
+﻿model,weight_sha,dataset_version,split,imgsz,class_id,class_name,images,instances,precision,recall,map50,map50_95,note
+baseline_v1,22f35d20a5ea,kimchi_v1,val,640,all,all,74,389,0.6554,0.5951,0.6216,0.4621,Val 전체 (Ultralytics 기본 conf 0.001 · iou 0.7)
+baseline_v1,22f35d20a5ea,kimchi_v1,val,640,0,leaf_paper,6,7,0.7016,0.8571,0.7997,0.6950,
+baseline_v1,22f35d20a5ea,kimchi_v1,val,640,1,plastic_stone_metal,73,351,0.9533,0.4652,0.7140,0.4308,
+baseline_v1,22f35d20a5ea,kimchi_v1,val,640,2,branch,8,8,0.8897,1.0000,0.9950,0.8249,
+baseline_v1,22f35d20a5ea,kimchi_v1,val,640,3,insect,9,11,0.6729,0.8182,0.7641,0.4605,
+baseline_v1,22f35d20a5ea,kimchi_v1,val,640,4,rubber_glove_unused,0,0,,,,,미사용 Class (교과 7 enabled: false)
+baseline_v1,22f35d20a5ea,kimchi_v1,val,640,5,disease_browning,6,6,0.0000,0.0000,0.0000,0.0000,
+baseline_v1,22f35d20a5ea,kimchi_v1,val,640,6,green_onion_pepper,2,6,0.7150,0.4300,0.4565,0.3612,
