@@ -120,9 +120,11 @@ def pre_checks(cfg: dict, train_name: str) -> list[dict]:
     return checks
 
 
-def write_metrics(metrics, names: dict, n_images: int, weight_sha: str, cfg: dict) -> list[dict]:
-    """reports/baseline_metrics.csv : all 1행 + Class 0~6 (Instance 0 Class 는 값 비우고 이유 기록)."""
-    base = {"model": "baseline_v1", "weight_sha": weight_sha, "dataset_version": cfg.get("dataset_version", "kimchi_v1"),
+def write_metrics(metrics, names: dict, n_images: int, weight_sha: str, cfg: dict,
+                  model_name: str = "baseline_v1", out_csv: Path = METRICS_CSV) -> list[dict]:
+    """reports/baseline_metrics.csv : all 1행 + Class 0~6 (Instance 0 Class 는 값 비우고 이유 기록).
+    7일차 11_evaluate_experiment.py 가 model_name · out_csv 만 바꿔 같은 함수로 Improved 를 기록한다 (같은 채점 코드)."""
+    base = {"model": model_name, "weight_sha": weight_sha, "dataset_version": cfg.get("dataset_version", "kimchi_v1"),
             "split": SPLIT, "imgsz": cfg.get("imgsz", 640)}
     p, r, m50, m = metrics.box.mean_results()
     rows = [{**base, "class_id": "all", "class_name": "all", "images": n_images,
@@ -143,20 +145,20 @@ def write_metrics(metrics, names: dict, n_images: int, weight_sha: str, cfg: dic
         for k in ("precision", "recall", "map50", "map50_95"):
             if row[k] != "":
                 row[k] = f"{float(row[k]):.4f}"
-    METRICS_CSV.parent.mkdir(exist_ok=True)
-    with open(METRICS_CSV, "w", encoding="utf-8-sig", newline="") as f:
+    out_csv.parent.mkdir(exist_ok=True)
+    with open(out_csv, "w", encoding="utf-8-sig", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0]), lineterminator="\n")
         w.writeheader()
         w.writerows(rows)
     return rows
 
 
-def copy_figures(train_dir: Path, val_dir: Path) -> list[str]:
-    """그래프만 reports/figures/ 로 복사 (회사 이미지가 들어간 그림은 복사하지 않음)."""
+def copy_figures(train_dir: Path, val_dir: Path, prefix: str = "baseline") -> list[str]:
+    """그래프만 reports/figures/ 로 복사 (회사 이미지가 들어간 그림은 복사하지 않음). prefix: baseline / exp001"""
     FIG_DIR.mkdir(parents=True, exist_ok=True)
-    pairs = [(train_dir / "results.png", "baseline_results.png"),
-             (val_dir / "confusion_matrix.png", "baseline_confusion_matrix.png"),
-             (val_dir / "confusion_matrix_normalized.png", "baseline_confusion_matrix_normalized.png")]
+    pairs = [(train_dir / "results.png", f"{prefix}_results.png"),
+             (val_dir / "confusion_matrix.png", f"{prefix}_confusion_matrix.png"),
+             (val_dir / "confusion_matrix_normalized.png", f"{prefix}_confusion_matrix_normalized.png")]
     missing = []
     for src, dst in pairs:
         if src.exists():
@@ -183,12 +185,14 @@ def is_small(box, size) -> bool:
     return (box[3] * w_img * scale) * (box[4] * h_img * scale) < SMALL_PX * SMALL_PX
 
 
-def image_check(conf: float, imgsz: int, names: dict) -> tuple[list[dict], dict]:
-    """Val 예측 → 이미지별 TP · FP · FN (6일차 Failure Analysis 후보 목록)."""
+def image_check(conf: float, imgsz: int, names: dict, best_pt: Path = BEST_PT,
+                run_name: str = PRED_RUN_NAME, out_csv: Path = IMAGE_CHECK_CSV) -> tuple[list[dict], dict]:
+    """Val 예측 → 이미지별 TP · FP · FN (6일차 Failure Analysis 후보 목록).
+    작은 객체 기준(is_small)은 모델 imgsz 와 상관없이 640 기준으로 고정 → Baseline · Improved 가 같은 GT 묶음으로 비교된다."""
     val_rows = {r["file_name"]: r for r in read_manifest(MANIFEST_DIR / "val.csv")[0]}
     per_class = {c: {"gt": 0, "tp": 0, "fn": 0, "fp": 0} for c in names}
     rows = []
-    for name, size, preds in predict_images(str(BEST_PT), VAL_IMAGES, conf, imgsz, RUNS_DIR / "predict", PRED_RUN_NAME):
+    for name, size, preds in predict_images(str(best_pt), VAL_IMAGES, conf, imgsz, RUNS_DIR / "predict", run_name):
         gts = read_gt(Path(name).stem)
         m = match_boxes(gts, preds, IOU_MATCH)
         small = [i for i, g in enumerate(gts) if is_small(g, size)]
@@ -207,14 +211,15 @@ def image_check(conf: float, imgsz: int, names: dict) -> tuple[list[dict], dict]
             "suspect": "yes" if (m["fp"] or m["fn"]) else "no",
         })
     rows.sort(key=lambda r: (-(r["fn"] + r["fp"]), r["file_name"]))
-    with open(IMAGE_CHECK_CSV, "w", encoding="utf-8-sig", newline="") as f:
+    with open(out_csv, "w", encoding="utf-8-sig", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0]), lineterminator="\n")
         w.writeheader()
         w.writerows(rows)
     return rows, per_class
 
 
-def write_class_check(per_class: dict, names: dict, weight_sha: str, conf: float) -> None:
+def write_class_check(per_class: dict, names: dict, weight_sha: str, conf: float,
+                      model_name: str = "baseline_v1", out_csv: Path = CLASS_CHECK_CSV) -> None:
     """reports/baseline_class_check.csv : conf 기준(현장에서 실제로 쓸 문턱)의 Class별 TP · FN · FP.
 
     baseline_metrics.csv 의 P · R 은 Ultralytics 가 고른 문턱 기준이라, 공장에서 쓸 conf 0.25 기준
@@ -224,7 +229,7 @@ def write_class_check(per_class: dict, names: dict, weight_sha: str, conf: float
     for c in sorted(per_class):
         v = per_class[c]
         rows.append({
-            "model": "baseline_v1", "weight_sha": weight_sha, "split": SPLIT, "conf": conf, "iou": IOU_MATCH,
+            "model": model_name, "weight_sha": weight_sha, "split": SPLIT, "conf": conf, "iou": IOU_MATCH,
             "class_id": c, "class_name": names.get(c, "?"), "gt": v["gt"], "tp": v["tp"], "fn": v["fn"], "fp": v["fp"],
             "recall_at_conf": f"{v['tp'] / v['gt']:.4f}" if v["gt"] else "",            # 정답 중 찾은 비율
             "precision_at_conf": f"{v['tp'] / (v['tp'] + v['fp']):.4f}" if (v["tp"] + v["fp"]) else "",
@@ -236,7 +241,7 @@ def write_class_check(per_class: dict, names: dict, weight_sha: str, conf: float
                     "recall_at_conf": f"{tot['tp'] / tot['gt']:.4f}" if tot["gt"] else "",
                     "precision_at_conf": f"{tot['tp'] / (tot['tp'] + tot['fp']):.4f}" if (tot["tp"] + tot["fp"]) else "",
                     "note": f"conf {conf} · IoU ≥ {IOU_MATCH} · 같은 Class 짝짓기 (match_boxes)"})
-    with open(CLASS_CHECK_CSV, "w", encoding="utf-8-sig", newline="") as f:
+    with open(out_csv, "w", encoding="utf-8-sig", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0]), lineterminator="\n")
         w.writeheader()
         w.writerows(rows)
