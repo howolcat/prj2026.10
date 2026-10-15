@@ -1,0 +1,9 @@
+﻿model,weight_sha,split,conf,iou,class_id,class_name,gt,tp,fn,fp,recall_at_conf,precision_at_conf,note
+exp001,029c0e92e594,val,0.25,0.5,all,all,389,329,60,41,0.8458,0.8892,conf 0.25 · IoU ≥ 0.5 · 같은 Class 짝짓기 (match_boxes)
+exp001,029c0e92e594,val,0.25,0.5,0,leaf_paper,7,7,0,5,1.0000,0.5833,
+exp001,029c0e92e594,val,0.25,0.5,1,plastic_stone_metal,351,299,52,16,0.8519,0.9492,
+exp001,029c0e92e594,val,0.25,0.5,2,branch,8,8,0,1,1.0000,0.8889,
+exp001,029c0e92e594,val,0.25,0.5,3,insect,11,11,0,1,1.0000,0.9167,
+exp001,029c0e92e594,val,0.25,0.5,4,rubber_glove_unused,0,0,0,0,,,미사용 Class (교과 7 enabled: false)
+exp001,029c0e92e594,val,0.25,0.5,5,disease_browning,6,0,6,15,0.0000,0.0000,
+exp001,029c0e92e594,val,0.25,0.5,6,green_onion_pepper,6,4,2,3,0.6667,0.5714,
