@@ -33,7 +33,10 @@ docs/code_review/
     ├── 09a_branch_fp_check.md         # scripts/09a_branch_fp_check.py
     ├── 09b_failure_images.md          # scripts/09b_failure_images.py
     ├── 10_train_experiment.md         # scripts/10_train_experiment.py
-    └── 11_evaluate_experiment.md      # scripts/11_evaluate_experiment.py
+    ├── 11_evaluate_experiment.md      # scripts/11_evaluate_experiment.py
+    ├── 12_evaluate_final_test.md      # scripts/12_evaluate_final_test.py
+    ├── 13_auto_label.md               # scripts/13_auto_label.py
+    └── 14_auto_label_review.md        # scripts/14_auto_label_review.py
 ```
 
 `src/__init__.py`는 내용이 없는 파일(“src를 패키지로 인식시키는 표시”)이라 별도 문서를 만들지 않았습니다.
@@ -64,6 +67,9 @@ docs/code_review/
 | `scripts/09b_failure_images.py` | 6 | 184 | 대표 실패 사례 Val 사진에 정답(초록 · 노랑) + 예측(빨강)을 겹친 비교 그림 (`demo/` · Git 제외) | [09b_failure_images.md](scripts/09b_failure_images.md) |
 | `scripts/10_train_experiment.py` | 7 | 245 | 한 변수 원칙 검사 → Smoke · Dry-run · 개선 실험 학습 → Improved Weight 보관 · 조건 문서 | [10_train_experiment.md](scripts/10_train_experiment.md) |
 | `scripts/11_evaluate_experiment.py` | 7 | 252 | 09 채점 함수 그대로 개선 모델 Val 평가 → Baseline 비교 · `experiment_log.csv` · 비교 md 초안 (Test 미사용) | [11_evaluate_experiment.md](scripts/11_evaluate_experiment.md) |
+| `scripts/12_evaluate_final_test.py` | 8 | 285 | 선택 문서 커밋 · Final sha · Test 지문 등 15항목 검사 → Frozen Test **1회** 평가 (09 채점 함수 그대로 · 1회 잠금) | [12_evaluate_final_test.md](scripts/12_evaluate_final_test.md) |
+| `scripts/13_auto_label.py` | 8 | 215 | Frozen Test 평가 뒤 Test 사진 8장으로 Detection 이미지 · Auto Label 후보 TXT · 교과 7 검수 폴더 준비 (정답은 숨김) | [13_auto_label.md](scripts/13_auto_label.md) |
+| `scripts/14_auto_label_review.py` | 8 | 172 | AI 후보 vs 사람 검수 1:1 비교 → 승인 · Class 수정 · BBox 수정 · 삭제 · 누락 추가 집계 | [14_auto_label_review.md](scripts/14_auto_label_review.md) |
 
 ## 그림은 어디에?
 
@@ -107,6 +113,12 @@ evaluate_detector (기능) → 09_evaluate_baseline
       ↓  models/improved/exp001_best.pt · reports/exp001_training_condition.md
 11_evaluate_experiment  (7일차 · 09 채점 함수 그대로 · Baseline 비교)
       ↓  reports/experiment_log.csv · reports/baseline_vs_improved.md (해석 · 결정은 팀)
+      ↓  reports/final_model_selection.md (사람의 결정 · Final = exp001 · Test 전에 커밋)
+12_evaluate_final_test  (8일차 · Frozen Test 1회 · 09 채점 함수 그대로 · 1회 잠금)
+      ↓  reports/final_metrics.csv (= Test 사진을 써도 된다는 신호)
+13_auto_label  (8일차 · Test 8장 · Detection · 후보 TXT · 검수 폴더 · 정답 숨김)
+      ↓  교과 7 라벨링 프로그램 (사람 검수 → review_workspace/work · final)
+14_auto_label_review  (8일차 · 후보 vs 검수 집계 · reports/auto_label_review.csv)
 ```
 
 ## 표기법

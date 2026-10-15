@@ -148,9 +148,9 @@ prj08/
 │   ├── __init__.py                    # src를 패키지로 인식시키는 빈 파일
 │   ├── dataset_audit.py               # Pair · YOLO 형식 · Class · 좌표 · Manifest 검사 함수
 │   ├── capture_group.py               # 파일명 → 촬영 시각 · 촬영 세션(capture_group) 묶기 · 시간 차 계산
-│   ├── manifest.py                    # manifests/ 읽기 · 쓰기 공통 (v1 · v2 스키마 · split 이름 · 지문) → 05 · 05a · 05b · 06 · 07 · 08 · 09 · 09a · 09b · 10 · 11이 import
+│   ├── manifest.py                    # manifests/ 읽기 · 쓰기 공통 (v1 · v2 스키마 · split 이름 · 지문) → 05 · 05a · 05b · 06 · 07 · 08 · 09 · 09a · 09b · 10 · 11 · 12 · 13이 import
 │   ├── train_detector.py              # 4일차 · YOLO 학습 공통 함수 (TRAIN_KEYS 12개만 model.train()에 전달) → 08 · 10이 import (11은 TRAIN_KEYS만)
-│   └── evaluate_detector.py           # 5일차 · Val 평가 · 이미지 예측 · TP/FP/FN 짝짓기 (Frozen Test 보호) → 09 · 09a · 09b · 11이 import
+│   └── evaluate_detector.py           # 5일차 · Val 평가 · 이미지 예측 · TP/FP/FN 짝짓기 (Frozen Test 보호) → 09 · 09a · 09b · 11 · 12 · 13 · 14가 import
 │
 ├── scripts/                           # 실제 "실행" 파일 (번호 = 실행 순서)
 │   ├── 01_check_environment.py        # 1일차 · Python / PyTorch / Ultralytics / GPU · YOLO11n Load
@@ -180,10 +180,10 @@ prj08/
 │       ├── README.md                  # 목차 · 읽는 순서 · 우선순위
 │       ├── configs/                   # dataset_yaml.md
 │       ├── src/                       # dataset_audit.md · capture_group.md · manifest.md · train_detector.md · evaluate_detector.md
-│       └── scripts/                   # 01 · 02a · 02 · 03 · 04 · 05 · 05a · 05b · 06 · 07 · 08 · 09 · 09a · 09b · 10 · 11 리뷰
+│       └── scripts/                   # 01 · 02a · 02 · 03 · 04 · 05 · 05a · 05b · 06 · 07 · 08 · 09 · 09a · 09b · 10 · 11 · 12 · 13 · 14 리뷰
 │
 ├── reports/                           # 결과 · 기록 (파일명 · 숫자만 · Git에 올림)
-│   ├── figures/                       # 09 · 11 · 학습곡선 · Confusion Matrix (baseline_* · exp001_* · results.png · confusion_matrix(_normalized).png · 그래프만)
+│   ├── figures/                       # 09 · 11 · 12 · 학습곡선 · Confusion Matrix · PR (baseline_* · exp001_* · final_test_* · 그래프만)
 │   ├── audit_expected.md              # Audit 전에 고정한 기대값 (Test Oracle · 교과 7 문서 기준)
 │   ├── audit_issue.csv                # 900장 문제 목록 (0건 → 제목 줄만)
 │   ├── audit_check.csv                # 기대값 vs 실제 19항목 (v2 기준 PASS 19 / FAIL 0)
@@ -245,7 +245,7 @@ prj08/
 │   ├── test.csv                       # 80 · Frozen Test (지문 4f9291849fe6 · 8일차 전 사용 금지)
 │   └── bridge_holdout.csv             # 146 · 교과 14 보존 · 교과 8 사용 금지
 │
-├── demo/                              # (6 · 8일차) 실패 사례 · Prediction · Auto Label 결과 (일부 Git 제외 · failure_analysis/ = 09b 비교 그림 · Git 제외)
+├── demo/                              # (6 · 8일차) ⚠ Git 제외 · failure_analysis/ (09b 비교 그림) · prediction_images/ (13 Detection) · auto_label/ (13 후보 · 검수 폴더 · 숨긴 정답 · 14 reviewed_labels)
 ├── presentation/                      # (9일차) 발표 PDF · Q&A
 ├── models/                            # ⚠ Git 제외 · baseline/ (baseline_best.pt) · improved/ (exp001_best.pt) · final/ (final_best.pt = exp001)
 ├── runs/                              # ⚠ Git 제외 · Ultralytics 결과 (smoke_day3 · smoke_day3_predict* · baseline_v1 · baseline_v1_val · predict/baseline_val_images · predict/branch_check · exp001_smoke · exp001 · exp001_val · predict/exp001_val_images · final_test · predict/final_test_images)
@@ -309,7 +309,7 @@ prj08/
          runs/smoke_day3/weights/best.pt (Git 제외 · Baseline 아님) · reports/smoke_test.md
 
 [3일차 보완]  05b_upgrade_manifest_schema.py : manifests/ v1 → v2 (1회 · reports/manifest_schema_check.csv)
-              (05 · 05a · 05b · 06 · 07 · 08 · 09 · 09a · 09b · 10 · 11은 manifest 읽기 · 쓰기를 src/manifest.py 하나로 공유)
+              (05 · 05a · 05b · 06 · 07 · 08 · 09 · 09a · 09b · 10 · 11 · 12 · 13은 manifest 읽기 · 쓰기를 src/manifest.py 하나로 공유)
 
 [4일차]
          08_train_baseline.py ←── configs/baseline.yaml + configs/dataset.yaml + manifests/ + data/yolo
@@ -370,6 +370,20 @@ prj08/
               ▼
          reports/final_metrics · final_class_check · final_test_image_check · final_test_runs.csv · reports/figures/final_test_*.png (Git)
          runs/final_test/ · runs/predict/final_test_images/ (Git 제외)
+              ▼
+         13_auto_label.py ←── models/final/final_best.pt + final_model_selection.md (sha) + reports/final_metrics.csv (12가 끝났다는 증거) + manifests/test.csv + data/yolo (test)
+              │  (12 를 모듈로 불러 Final 경로 · sha 규칙 공유 · import src.manifest · src.evaluate_detector.predict_images)
+              │  준비 검사 8항목 · Test 사진 8장 (Class · 세션 골고루 · 같은 입력이면 같은 목록) · Bridge · Train · Val 사진 거부
+              ▼
+         demo/prediction_images/ (Detection) · demo/auto_label/candidate_labels/ (후보 TXT) · review_workspace/ (검수 폴더) · gt_hidden/ (정답 · 비공개) (Git 제외)
+         reports/auto_label_candidates.csv (Git)
+              ▼
+         [사람] 교과 7 라벨링 프로그램 v4.1 (cd ../prj07 && python main.py) → review_workspace 열기 → 승인 · 수정 · 삭제 · 추가 → work/ · final/ 저장
+              ▼
+         14_auto_label_review.py ←── candidate_labels/ + review_workspace/{final,work}/labels + 작업대장 dataset_manifest.csv + gt_hidden/ (참고 비교만)
+              │  (import src.evaluate_detector.iou_xywh · match_boxes · 후보 ↔ 검수 1:1 짝짓기 · 승인 IoU ≥ 0.95)
+              ▼
+         demo/auto_label/reviewed_labels/ (Git 제외) · reports/auto_label_review.csv (Git · 승인 31 / 43)
 ```
 
 | 파일 | 입력 | 출력 | 의존 |
@@ -392,6 +406,8 @@ prj08/
 | `10_train_experiment.py` | `configs/exp001.yaml` · `configs/baseline.yaml` · `reports/improvement_experiment.md` · `configs/dataset.yaml` · `manifests/` · `data/yolo` (07 검증 PASS) · 원본 labels (지문) | `runs/exp001/` (`--smoke`: `runs/exp001_smoke/`) · `models/improved/exp001_best.pt` · `reports/exp001_training_condition.md` · `reports/exp001_results.csv` | `src.manifest` · `src.train_detector` · `08_train_baseline.py` (importlib) · PyYAML · torch · git |
 | `11_evaluate_experiment.py` | `models/improved/exp001_best.pt` · `reports/exp001_training_condition.md` · `configs/exp001.yaml` · `configs/baseline.yaml` · `reports/baseline_*.csv` 3개 · `reports/failure_analysis.csv` · `data/yolo` (val) | `reports/exp001_metrics.csv` · `reports/exp001_class_check.csv` · `reports/exp001_val_image_check.csv` · `reports/figures/exp001_*.png` · `reports/experiment_log.csv` · `reports/baseline_vs_improved.md` (없을 때만) · `runs/exp001_val/` · `runs/predict/exp001_val_images/` | `src.manifest` · `src.evaluate_detector` · `src.train_detector` (`TRAIN_KEYS`) · `09_evaluate_baseline.py` (importlib) · PyYAML |
 | `12_evaluate_final_test.py` | `models/final/final_best.pt` · `reports/final_model_selection.md` (확정 · 커밋 · sha) · `reports/exp001_training_condition.md` (sha) · `configs/exp001.yaml` · `configs/dataset.yaml` · `manifests/` · `data/yolo` (test) | `reports/final_metrics.csv` · `reports/final_class_check.csv` · `reports/final_test_image_check.csv` · `reports/final_test_runs.csv` · `reports/figures/final_test_*.png` · `runs/final_test/` · `runs/predict/final_test_images/` | `src.manifest` · `src.evaluate_detector` (`allow_test=True`) · `08` · `09` (importlib) · PyYAML · git |
+| `13_auto_label.py` | `models/final/final_best.pt` · `reports/final_model_selection.md` (sha) · `reports/final_metrics.csv` (12 완료 증거) · `configs/exp001.yaml` (imgsz) · `manifests/` (4개 역할 확인) · `data/yolo` (test) | `demo/prediction_images/` · `demo/auto_label/candidate_labels/` · `demo/auto_label/review_workspace/` · `demo/auto_label/gt_hidden/` · `reports/auto_label_candidates.csv` | `src.manifest` · `src.evaluate_detector` (`predict_images`) · `12` (importlib) · PyYAML |
+| `14_auto_label_review.py` | `demo/auto_label/candidate_labels/` · `demo/auto_label/review_workspace/{final,work}/labels/` · `review_workspace/manifests/dataset_manifest.csv` · `demo/auto_label/gt_hidden/` | `demo/auto_label/reviewed_labels/` · `reports/auto_label_review.csv` | `src.evaluate_detector` (`iou_xywh` · `match_boxes`) |
 
 > 함수 단위 설명과 리뷰는 [`docs/code_review/README.md`](docs/code_review/README.md), 그림은 [`docs/code_flow.md`](docs/code_flow.md)를 참고합니다.
 
@@ -411,7 +427,7 @@ prj08/
 - **예외 E1**: 파·고추 252개 중 251개가 G01에만 있어 G01만 2분 하위 세션으로 분할 배정 (Class 6 점수는 참고값)
 - **검증**: 합격 기준 8 / 8 PASS (`reports/split_check.csv`) · Frozen Test 지문 `4f9291849fe6`
 - **data/yolo 구성 · 검증**: 06이 Train · Val · Test만 복사하고(Bridge는 `data/yolo`에 넣지 않음) 07이 `manifests/`와 같은지 확인 (이미지 600 / 74 / 80 · BBox 2,957 / 389 / 477)
-- **Frozen Test 보호**: 08 · 10은 test 평가 코드가 없고, 09 · 11의 평가 함수는 `val`만 허용하며, 09a · 09b는 Val 사진만 씁니다 (`test`는 8일차에 `allow_test=True`를 명시해야 열림 · 12만 사용 · 1회 · `bridge_holdout`은 막힘)
+- **Frozen Test 보호**: 08 · 10은 test 평가 코드가 없고, 09 · 11의 평가 함수는 `val`만 허용하며, 09a · 09b는 Val 사진만 씁니다 (`test`는 8일차에 `allow_test=True`를 명시해야 열림 · 12만 사용 · 1회 · 13은 12가 끝난 뒤 Test 사진 8장만 시연에 사용 · `bridge_holdout`은 막힘)
 - 근거와 결정 기록: `docs/split_policy.md`
 
 ## 10. Baseline
