@@ -2,7 +2,7 @@
 
 > 교과 7에서 검수한 정답 데이터로 YOLO11 객체검출 모델을 학습 · 평가 · 개선한다.
 >
-> **Dataset Version** `kimchi_v1` · **라벨 지문** `5c2b4fc2c3e6` · **진행 상황** 3일차 완료 (Split Freeze · data/yolo 구성 · Smoke Test) · 4일차 완료 (Baseline 학습) · 5일차 완료 (Baseline 평가) · 6일차 완료 (실패 분석 · H1 확정) · 7일차 완료 (exp001 imgsz 1280 · Final 후보)
+> **Dataset Version** `kimchi_v1` · **라벨 지문** `5c2b4fc2c3e6` · **진행 상황** 3일차 완료 (Split Freeze · data/yolo 구성 · Smoke Test) · 4일차 완료 (Baseline 학습) · 5일차 완료 (Baseline 평가) · 6일차 완료 (실패 분석 · H1 확정) · 7일차 완료 (exp001 imgsz 1280 · Final 후보) · 8일차 진행 중 (Final Model 확정 · Frozen Test 1회 완료)
 
 ---
 
@@ -118,6 +118,8 @@ LC_ALL=C cat data/subject7_final/labels/*.txt | sha256sum | cut -c1-12
 | 18 | `python scripts/10_train_experiment.py --config configs/exp001.yaml --dry-run` | 학습 전 검사 PASS (Baseline과 다른 학습 설정 **정확히 1개** · `reports/improvement_experiment.md` **상태: 확정** · 덮어쓰기 방지) · `reports/exp001_training_condition.md` 초안 |
 | 19 | `python scripts/10_train_experiment.py --config configs/exp001.yaml` | 검사 PASS → exp001 학습 50 / 50 epoch · loss NaN/inf 0 → `models/improved/exp001_best.pt` 보관 · 조건 문서 상태 `완료` (`configs` · `src` · `scripts` · `manifests`가 커밋된 상태여야 시작) |
 | 20 | `python scripts/11_evaluate_experiment.py --config configs/exp001.yaml` | 평가 전 검사 10항목 PASS → 09 채점 함수 그대로 Val 평가 · `reports/exp001_metrics.csv` · `exp001_class_check.csv` · `exp001_val_image_check.csv` · 그림 3장 · `reports/experiment_log.csv` 갱신 (decision 칸은 보존) · `reports/baseline_vs_improved.md`는 없을 때만 초안 (Val만 · Test · Bridge 미사용) |
+| 21 | `python scripts/12_evaluate_final_test.py --dry-run` | 8일차 · Frozen Test 평가 전 검사 15항목 (`reports/final_model_selection.md` **상태: 확정 · 커밋됨** · `final_best.pt` sha = 선택 문서 = exp001 기록 · Test 지문 `4f9291849fe6` · 1회 잠금) · Test는 열지 않음 |
+| 22 | `python scripts/12_evaluate_final_test.py` | **딱 1회** · Final Model(imgsz 1280)로 Frozen Test 80장 평가 → `reports/final_metrics.csv` · `final_class_check.csv` · `final_test_image_check.csv` · `final_test_runs.csv` · 그림 `reports/figures/final_test_*.png` (`final_metrics.csv`가 있으면 다시 실행 거부 · Bridge 미사용) |
 | (참고) | Smoke Test 명령 | `reports/smoke_test.md` 2장 · 1 epoch · `runs/smoke_day3/` (Git 제외) · 재현용이 아니라 파이프라인 연결 확인용 |
 
 > `05b_upgrade_manifest_schema.py`는 10/13 `manifests/`를 v1(3칸) → v2(9칸)로 바꿀 때 **한 번** 쓴 스크립트입니다. 지금 main의 `manifests/`는 이미 v2라 실행할 필요가 없습니다. (실행해도 "이미 v2" 확인만 하고 아무것도 쓰지 않음)
@@ -162,7 +164,8 @@ prj08/
 │   ├── 09a_branch_fp_check.py         # 6일차 · Val branch 예측 5종 분류 (H3 · 오검출 확인) · 사람 확인 칸 (Test · Bridge 미사용)
 │   ├── 09b_failure_images.py          # 6일차 · 대표 실패 사례 Val 사진에 정답(초록 · 놓침 노랑) + 예측(빨강)을 겹친 비교 그림 (demo/ · Git 제외)
 │   ├── 10_train_experiment.py         # 7일차 · 한 변수 원칙 검사 → 개선 실험 학습 (--smoke: 1 epoch 시험 · --dry-run: 검사만) · 08 도우미 재사용
-│   └── 11_evaluate_experiment.py      # 7일차 · 09 채점 함수 그대로 개선 모델 Val 평가 → Baseline 비교 · experiment_log.csv (Test · Bridge 미사용)
+│   ├── 11_evaluate_experiment.py      # 7일차 · 09 채점 함수 그대로 개선 모델 Val 평가 → Baseline 비교 · experiment_log.csv (Test · Bridge 미사용)
+│   └── 12_evaluate_final_test.py      # 8일차 · Final Model Frozen Test 1회 평가 (선택 문서 커밋 확인 · 1회 잠금 · 09 채점 함수 그대로 · 가이드 이름 11_evaluate_final_test.py)
 │
 ├── docs/
 │   ├── split_policy.md                # 산출물 1 · Split 정책 확정본 (5분 세션 · 600/75/75/150 · 예외 E1)
@@ -208,6 +211,11 @@ prj08/
 │   ├── exp001_class_check.csv         # 11 · exp001 Class별 GT · TP · FN · FP · conf 0.25 기준 Recall · Precision
 │   ├── experiment_log.csv             # 11 · 산출물 5 · 실험 1개 = 1행 (조건 · 바꾼 변수 · Val 지표 · sha · decision은 팀이 작성)
 │   ├── baseline_vs_improved.md        # 11 초안 + 팀 작성 · 같은 Val 비교 · 핵심 FP/FN 변화 · Final Model 후보 (Frozen Test 안 봄)
+│   ├── final_model_selection.md       # 8일차 · 산출물 4 · Final Model = exp001 · 원본 Weight · sha · 선택 이유 (Test 전에 커밋)
+│   ├── final_metrics.csv              # 12 · 산출물 5 · Frozen Test 전체 + Class별 P · R · mAP50 · mAP50-95
+│   ├── final_class_check.csv          # 12 · Frozen Test Class별 GT · TP · FN · FP (conf 0.25)
+│   ├── final_test_image_check.csv     # 12 · Frozen Test 이미지별 TP · FP · FN · 작은 객체 FN (교과 14 대표 FP/FN 근거)
+│   ├── final_test_runs.csv            # 12 · Frozen Test 실행 기록 (1회 증거)
 │   ├── label_preview.md               # 가이드 16.4 · Split 복사 후 라벨 Preview 20장 (교과 7 도구 · 20/20 일치)
 │   ├── smoke_test.md                  # 가이드 16.5~16.7 · 1 epoch → Weight → Prediction 연결 확인 · 가이드와 다른 점 6장
 │   └── issue_log.md                   # 문제 · 원인 · 해결 기록
@@ -231,8 +239,8 @@ prj08/
 │
 ├── demo/                              # (6 · 8일차) 실패 사례 · Prediction · Auto Label 결과 (일부 Git 제외 · failure_analysis/ = 09b 비교 그림 · Git 제외)
 ├── presentation/                      # (9일차) 발표 PDF · Q&A
-├── models/                            # ⚠ Git 제외 · baseline/ (baseline_best.pt) · improved/ (exp001_best.pt) · final/
-├── runs/                              # ⚠ Git 제외 · Ultralytics 결과 (smoke_day3 · smoke_day3_predict* · baseline_v1 · baseline_v1_val · predict/baseline_val_images · predict/branch_check · exp001_smoke · exp001 · exp001_val · predict/exp001_val_images)
+├── models/                            # ⚠ Git 제외 · baseline/ (baseline_best.pt) · improved/ (exp001_best.pt) · final/ (final_best.pt = exp001)
+├── runs/                              # ⚠ Git 제외 · Ultralytics 결과 (smoke_day3 · smoke_day3_predict* · baseline_v1 · baseline_v1_val · predict/baseline_val_images · predict/branch_check · exp001_smoke · exp001 · exp001_val · predict/exp001_val_images · final_test · predict/final_test_images)
 │
 └── data/                              # ⚠ Git 제외 (NDA)
     ├── subject7_final/                # 교과 7 FINAL 복사본 · 읽기 전용 · 라벨 지문 5c2b4fc2c3e6
@@ -345,6 +353,15 @@ prj08/
          runs/exp001_val/ · runs/predict/exp001_val_images/ (Git 제외)
               ▼
          [사람] reports/baseline_vs_improved.md 해석 · experiment_log.csv decision 작성 ──→ Frozen Test 를 보지 않고 exp001 을 Final Model 후보로
+
+[8일차]
+         [사람] reports/final_model_selection.md (상태: 확정) · models/improved/exp001_best.pt → models/final/final_best.pt ──→ 커밋 · 푸시 (Test 보다 먼저)
+              ▼
+         12_evaluate_final_test.py ←── models/final/final_best.pt + final_model_selection.md (확정 · 커밋 · sha) + configs/exp001.yaml (imgsz 1280) + data/yolo (test)
+              │  (09 · 08 을 모듈로 불러 채점 함수 · git 도우미 재사용 · allow_test=True · Test 지문 확인 · 1회 잠금)
+              ▼
+         reports/final_metrics · final_class_check · final_test_image_check · final_test_runs.csv · reports/figures/final_test_*.png (Git)
+         runs/final_test/ · runs/predict/final_test_images/ (Git 제외)
 ```
 
 | 파일 | 입력 | 출력 | 의존 |
@@ -366,6 +383,7 @@ prj08/
 | `09b_failure_images.py` | `reports/failure_analysis.csv` · `models/baseline/baseline_best.pt` · `reports/baseline_training_condition.md` (sha) · `manifests/val.csv` · `data/yolo` (val) | `demo/failure_analysis/*_compare.jpg` · `reports/failure_image_list.csv` | `src.manifest` · `src.evaluate_detector` (`match_boxes`) · Pillow · ultralytics |
 | `10_train_experiment.py` | `configs/exp001.yaml` · `configs/baseline.yaml` · `reports/improvement_experiment.md` · `configs/dataset.yaml` · `manifests/` · `data/yolo` (07 검증 PASS) · 원본 labels (지문) | `runs/exp001/` (`--smoke`: `runs/exp001_smoke/`) · `models/improved/exp001_best.pt` · `reports/exp001_training_condition.md` · `reports/exp001_results.csv` | `src.manifest` · `src.train_detector` · `08_train_baseline.py` (importlib) · PyYAML · torch · git |
 | `11_evaluate_experiment.py` | `models/improved/exp001_best.pt` · `reports/exp001_training_condition.md` · `configs/exp001.yaml` · `configs/baseline.yaml` · `reports/baseline_*.csv` 3개 · `reports/failure_analysis.csv` · `data/yolo` (val) | `reports/exp001_metrics.csv` · `reports/exp001_class_check.csv` · `reports/exp001_val_image_check.csv` · `reports/figures/exp001_*.png` · `reports/experiment_log.csv` · `reports/baseline_vs_improved.md` (없을 때만) · `runs/exp001_val/` · `runs/predict/exp001_val_images/` | `src.manifest` · `src.evaluate_detector` · `src.train_detector` (`TRAIN_KEYS`) · `09_evaluate_baseline.py` (importlib) · PyYAML |
+| `12_evaluate_final_test.py` | `models/final/final_best.pt` · `reports/final_model_selection.md` (확정 · 커밋 · sha) · `reports/exp001_training_condition.md` (sha) · `configs/exp001.yaml` · `configs/dataset.yaml` · `manifests/` · `data/yolo` (test) | `reports/final_metrics.csv` · `reports/final_class_check.csv` · `reports/final_test_image_check.csv` · `reports/final_test_runs.csv` · `reports/figures/final_test_*.png` · `runs/final_test/` · `runs/predict/final_test_images/` | `src.manifest` · `src.evaluate_detector` (`allow_test=True`) · `08` · `09` (importlib) · PyYAML · git |
 
 > 함수 단위 설명과 리뷰는 [`docs/code_review/README.md`](docs/code_review/README.md), 그림은 [`docs/code_flow.md`](docs/code_flow.md)를 참고합니다.
 
@@ -385,7 +403,7 @@ prj08/
 - **예외 E1**: 파·고추 252개 중 251개가 G01에만 있어 G01만 2분 하위 세션으로 분할 배정 (Class 6 점수는 참고값)
 - **검증**: 합격 기준 8 / 8 PASS (`reports/split_check.csv`) · Frozen Test 지문 `4f9291849fe6`
 - **data/yolo 구성 · 검증**: 06이 Train · Val · Test만 복사하고(Bridge는 `data/yolo`에 넣지 않음) 07이 `manifests/`와 같은지 확인 (이미지 600 / 74 / 80 · BBox 2,957 / 389 / 477)
-- **Frozen Test 보호**: 08 · 10은 test 평가 코드가 없고, 09 · 11의 평가 함수는 `val`만 허용하며, 09a · 09b는 Val 사진만 씁니다 (`test`는 8일차에 `allow_test=True`를 명시해야 열림 · `bridge_holdout`은 막힘)
+- **Frozen Test 보호**: 08 · 10은 test 평가 코드가 없고, 09 · 11의 평가 함수는 `val`만 허용하며, 09a · 09b는 Val 사진만 씁니다 (`test`는 8일차에 `allow_test=True`를 명시해야 열림 · 12만 사용 · 1회 · `bridge_holdout`은 막힘)
 - 근거와 결정 기록: `docs/split_policy.md`
 
 ## 10. Baseline
@@ -459,9 +477,31 @@ Frozen Test 를 보기 **전에** 같은 Val 74장 결과만으로 baseline_v1 �
 - 알려진 약점: 갈변(disease_browning) 6개는 두 모델 모두 0개 검출 · 입력 1280 이라 메모리 · 처리 시간이 더 든다.
 - Frozen Test 는 Final Model 과 같은 **imgsz 1280** 으로 **1회만** 평가한다 (`scripts/12_evaluate_final_test.py` · 두 번째 실행 거부).
 
-## 14. Frozen Test
+## 14. Frozen Test (8일차)
 
-TBD (8일차 · Final Model 선택 후 한 번만)
+Final Model(exp001 · sha `029c0e92e594`)을 확정 · 커밋한 **뒤** Frozen Test 80장(지문 `4f9291849fe6`)을 imgsz 1280 으로 **1회** 평가했다 (`scripts/12_evaluate_final_test.py` · 실행 기록 `reports/final_test_runs.csv`).
+
+| 지표 | Val 74장 | **Frozen Test 80장** |
+|---|---|---|
+| P · R (Ultralytics) | 0.729 · 0.732 | **0.844 · 0.560** |
+| mAP50 · mAP50-95 | 0.756 · 0.641 | **0.606 · 0.478** |
+| Recall (conf 0.25) | 0.846 | **0.683** |
+| 정답 · FN · FP (conf 0.25) | 389 · 60 · 41 | **477 · 151 · 168** |
+| 작은 객체 FN | 57 / 363 | **124 / 315** |
+
+| Class (Test · conf 0.25) | 정답 | FN | FP | Recall |
+|---|---:|---:|---:|---:|
+| leaf_paper | 143 | 33 | 86 | 0.77 |
+| plastic_stone_metal | 147 | 39 | 9 | 0.73 |
+| branch | 122 | 51 | 40 | 0.58 |
+| insect | 24 | 2 | 17 | 0.92 |
+| disease_browning | 21 | 18 | 14 | 0.14 |
+| green_onion_pepper | 20 | 8 | 2 | 0.60 |
+
+- **Val 보다 낮은 주된 이유 = Class 구성 차이**: Val 정답의 90% 가 플라스틱(351/389)이었지만 Test 는 플라스틱 31% · 나뭇잎 30% · 나뭇가지 26%. Val 에 7~8개뿐이던 leaf · branch 를 Test 에서 처음 제대로 측정했다.
+- **Confusion Matrix** (`reports/figures/final_test_confusion_matrix_normalized.png` · 비율만 참고): branch 의 39% → leaf · leaf 의 29% → branch (서로 혼동) · plastic 의 27% → leaf · 갈변의 43% 놓침 · 정답 없는 자리 오검출의 54% 가 갈변.
+- 갈변은 21개 중 3개 검출 (Val 0개) — 여전히 가장 약한 Class.
+- **결과를 보고 모델을 바꾸거나 다시 학습하지 않았다** (가이드 21.2). 한계로 기록하고 교과 14 로 넘긴다.
 
 ## 15. Detection / Auto Label
 
@@ -474,6 +514,9 @@ TBD (8일차)
 - **Class 6(파·고추)은 G01 한 세션에만 존재** → 예외 E1로 분할 · Class 6 점수는 참고값
 - **Val이 Class 1 중심** (BBox 389개 중 351개) → 모델 비교 때 전체 mAP와 함께 Class별 AP 확인
 - **Frozen Test 80장** → 작아서 점수 변동이 클 수 있음
+- **Val 이 Test 분포를 대표하지 못함** → Val 은 플라스틱 90% · Test 는 leaf · branch 56% → Val 로 고른 Final 이 Test 에서 mAP50 0.756 → 0.606 · Split 때 'Class별 20개 이상' 기준을 Test · Bridge 에만 두고 Val 에는 두지 않았음 → 교과 14 에서는 Class 균형을 맞춘 검증 세트 필요
+- **leaf_paper ↔ branch 혼동** (Test: branch 의 39% → leaf · leaf 의 29% → branch) · plastic 의 27% 도 leaf 로 예측 → 두 Class 기준 재확인 필요
+- **갈변 ↔ 김치 배경 양방향 혼동** (Test: 갈변 43% 놓침 · 정답 없는 자리 오검출의 54% 가 갈변) · Val 0/6 · Test 3/21
 - **Val GT 라벨 오류 2건** (`reports/issue_log.md` 10/14) → Baseline Val 점수에 영향을 줄 수 있어 Failure Analysis에서 함께 확인
 - **촬영 조건이 단조로움** (4일 · 같은 트레이 · 같은 조명) → 다른 환경에서의 성능은 이 데이터로 알 수 없음
 
@@ -510,3 +553,4 @@ TBD (9일차 · `docs/handoff_subject14.md`)
 | `reports/improvement_experiment.md` | 7일차 개선 실험 계획 (변수 하나 · 상태: 확정) |
 | `reports/exp001_training_condition.md` | exp001 실제 학습 조건 · 실행 기록 (10이 자동 생성) |
 | `reports/baseline_vs_improved.md` | Baseline vs exp001 같은 Val 비교 · Final Model 후보 |
+| `reports/final_model_selection.md` | 8일차 Final Model 선택 이유 · 원본 Weight · Frozen Test 조건 (Test 전에 커밋) |
