@@ -393,9 +393,20 @@ FN · FP 가 많은 사진 14장을 골라 정답(초록) · 놓친 정답(노�
 **Frozen Test 를 보지 않고** exp001 을 Final Model 후보로 정했으며, 8일차에 확정한 뒤 Frozen Test 를 imgsz 1280 으로 1회 평가한다.
 자세한 내용: `reports/baseline_vs_improved.md` · `reports/experiment_log.csv`
 
-## 13. Final Model
+## 13. Final Model (8일차)
 
-TBD (8일차)
+**Final Model = exp001** (`models/final/final_best.pt` · sha `029c0e92e594` = `models/improved/exp001_best.pt` · Git 제외).
+Frozen Test 를 보기 **전에** 같은 Val 74장 결과만으로 baseline_v1 과 exp001 중에서 골랐다 (`reports/final_model_selection.md` · 상태: 확정 · 커밋 후 Test).
+
+| 근거 (Val · conf 0.25) | baseline_v1 (640) | **exp001 (1280)** |
+|---|---|---|
+| mAP50 · mAP50-95 | 0.622 · 0.462 | **0.756 · 0.641** |
+| FN · FP | 159 · 92 | **60 · 41** |
+| 작은 객체 FN (/363) | 153 | **57** |
+
+- 선택 이유: 6일차 반복 문제(H1 작은 이물 놓침)가 가설대로 줄었고, FN · FP 가 함께 줄었다.
+- 알려진 약점: 갈변(disease_browning) 6개는 두 모델 모두 0개 검출 · 입력 1280 이라 메모리 · 처리 시간이 더 든다.
+- Frozen Test 는 Final Model 과 같은 **imgsz 1280** 으로 **1회만** 평가한다 (`scripts/12_evaluate_final_test.py` · 두 번째 실행 거부).
 
 ## 14. Frozen Test
 
