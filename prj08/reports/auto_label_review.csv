@@ -1,0 +1,10 @@
+﻿image,reviewer,status,qa_status,review_reason,saved_from,candidate_boxes,reviewed_boxes,approved,class_changed,bbox_changed,deleted,added,gt_boxes,ai_tp,human_tp
+250410_144403911987.jpg,심준형,EDITED,WAIT,,work,3,5,3,0,0,0,2,5,3,4
+250410_144834943618.jpg,심준형,EDITED,WAIT,,work,4,5,3,0,0,1,2,6,3,5
+250411_133415890554.jpg,심준형,EDITED,WAIT,,work,6,5,3,0,1,2,1,6,4,4
+250411_133502277094.jpg,심준형,EDITED,WAIT,,work,6,5,3,0,2,1,0,5,5,4
+250411_134156935624.jpg,심준형,EDITED,WAIT,,work,5,6,5,0,0,0,1,6,4,5
+250424_112818764337.jpg,심준형,EDITED,WAIT,,work,6,5,4,1,0,1,0,5,4,5
+250424_112841184247.jpg,심준형,EDITED,WAIT,,work,6,6,5,1,0,0,0,5,4,5
+250424_112924042782.jpg,심준형,EDITED,WAIT,,work,7,6,5,0,0,2,1,8,6,4
+all,-,REVIEW 0,-,,-,43,43,31,2,3,7,7,46,33,36
