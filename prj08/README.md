@@ -175,7 +175,8 @@ prj08/
 │
 ├── docs/
 │   ├── split_policy.md                # 산출물 1 · Split 정책 확정본 (5분 세션 · 600/75/75/150 · 예외 E1)
-│   ├── code_flow.md                   # 코드 흐름 Mermaid 2개
+│   ├── code_flow.md                   # 코드 흐름 (일차별 그림 6장 · import 표 · 그림 원본)
+│   ├── figures/                       # 파이프라인 그림 SVG 7장 (pipeline_overview = README 8장 · pipeline_1~6 = code_flow 1장)
 │   └── code_review/                   # 코드와 같은 구조의 파일별 리뷰
 │       ├── README.md                  # 목차 · 읽는 순서 · 우선순위
 │       ├── configs/                   # dataset_yaml.md
@@ -266,24 +267,6 @@ prj08/
 
 > 위 그림은 **단계만** 보여 줍니다 (주황 = 사람이 정한 지점 · 검정 = 실행 스크립트). 일차별 상세 그림은 [`docs/code_flow.md`](docs/code_flow.md) 1장, import 관계는 3장, 아래는 실행 순서를 글로 적은 전체 지도입니다.
 
-#### 일차별로 보기 (① ~ ⑥ · 2장씩)
-
-<p>
-<img src="docs/figures/pipeline_1_day1-2.svg" width="394" alt="① 1~2일차 · 환경 · Audit · 분포">
-<img src="docs/figures/pipeline_2_day3.svg" width="456" alt="② 3일차 · Split Freeze · YOLO 폴더">
-</p>
-
-<p>
-<img src="docs/figures/pipeline_3_day4-5.svg" width="297" alt="③ 4~5일차 · Baseline 학습 · 평가">
-<img src="docs/figures/pipeline_4_day6-7.svg" width="277" alt="④ 6~7일차 · 실패 분석 → 한 변수 개선">
-</p>
-
-<p>
-<img src="docs/figures/pipeline_5_day8-test.svg" width="388" alt="⑤ 8일차 오전 · Final 확정 → Frozen Test 1회">
-<img src="docs/figures/pipeline_6_day8-9.svg" width="285" alt="⑥ 8~9일차 · Auto Label → 검수 → 인계">
-</p>
-
-> 화면이 좁으면 그림이 한 장씩 아래로 내려갑니다. 그림 원본(mermaid)은 [`docs/code_flow.md`](docs/code_flow.md) 1-1 접기 안에 있습니다.
 
 ```
 [1일차]  01_check_environment.py ──→ 화면 출력 → 5장 팀원 환경 표
