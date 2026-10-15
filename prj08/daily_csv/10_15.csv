@@ -8,4 +8,16 @@
 2026-10-15,최용훈,Done,exp001 Validation 평가,11 평가 전 검사 10/10 · Val 74장 P 0.729 · R 0.732 · mAP50 0.756 · mAP50-95 0.641 · FN 159 → 60 · FP 92 → 41 · 작은 객체 FN 153 → 57 · branch FP 30 → 1 · 갈변 FN 6 그대로(H2 미해결),완료,Day7 · 산출물 4
 2026-10-15,김하민,Docs,7일차 문서 정리,baseline_vs_improved.md 3·4장 작성(확정) · experiment_log.csv decision 칸 · README 11장 Failure Analysis · 12장 Improvement,완료,Day7
 2026-10-15,팀원 전원,Todo,Final Model 후보 확인,exp001을 Final 후보로 할지 팀 확인 · Frozen Test는 보지 않음,확정,Day7 Gate
-2026-10-15,팀원 전원,Todo,8일차 준비,final_model_selection.md 작성 → final_best.pt 지정 → Frozen Test imgsz 1280으로 1회 평가,예정,Day8
+2026-10-15,팀원 전원,Todo,8일차 준비,final_model_selection.md 작성 → final_best.pt 지정 → Frozen Test imgsz 1280으로 1회 평가,완료,Day8
+2026-10-15,최용훈,Docs,README 진행 상황 · 11 · 12장,머리말 6 · 7일차 완료 · 11장 Failure Analysis(H1~H4 · L · 회의 결정) · 12장 Improvement(exp001 결과) · 7일차 Gate 9/9,완료,Day7 · PR #106 #107
+2026-10-15,심준형,Docs,README 6~9장 · code_flow · code_review,실행 순서 16~20(09b · 10 · 11) · 폴더 구조 · 데이터 흐름 · code_review 09b · 10 · 11 추가,완료,PR #109
+2026-10-15,최용훈,Done,Final Model 확정,reports/final_model_selection.md 상태 확정 · Final = exp001 · models/final/final_best.pt sha 029c0e92e594 · Test 보기 전에 커밋(a322016 10:20),완료,Day8 · 산출물 4 · PR #110
+2026-10-15,최용훈,Done,Frozen Test 1회 평가,12_evaluate_final_test.py 검사 15/15 · imgsz 1280 · 1회(10:22 · final_test_runs.csv) · P 0.844 · R 0.560 · mAP50 0.606 · mAP50-95 0.478 · conf 0.25 Recall 0.683 · FN 151 · FP 168,완료,Day8 · 산출물 5 · PR #111
+2026-10-15,최용훈,Done,Frozen Test 해석,Val 대비 하락 원인 2가지: ① Val 대표성(leaf · branch 7 · 8개 → mAP50 하락의 83%) ② 새 세션 일반화(Class 비율 맞춰도 Recall 0.726 · 플라스틱 0.85 → 0.73 · 4/24 세션 G11에 FP 81% · FN 68%) · Confusion Matrix: branch 39% → leaf · leaf 29% → branch · 결과 보고 재학습 안 함,완료,Day8 · README 14 · 16장
+2026-10-15,최용훈,Done,Auto Label 스크립트,13_auto_label.py(Test 8장 · Detection · 후보 TXT · 교과 7 검수 폴더 · 정답 비공개) · 14_auto_label_review.py(승인 · 수정 · 삭제 · 추가 집계) · 팀원용 안내서 PDF,완료,Day8 · 산출물 6 · PR #112
+2026-10-15,김하민,Done,Auto Label 검수 (연습),교과 7 프로그램 8장 · 후보 43 · 승인 32 · Class 수정 3 · BBox 수정 1 · 삭제 7 · 추가 5 · 정답 일치 72% → 76%,완료,Day8 · 검수자 3명 비교
+2026-10-15,심준형,Done,Auto Label 검수 (공식),교과 7 프로그램 8장 · 후보 43 · 승인 31(72%) · Class 수정 2 · BBox 수정 3 · 삭제 7 · 추가 7 · 정답 일치 72% → 78% · 3명 중앙값에 가장 가까움(거리 2) → 공식,완료,Day8 · 산출물 6 · PR #113
+2026-10-15,박건,Done,Auto Label 검수 (연습),교과 7 프로그램 8장 · 후보 43 · 승인 30 · Class 수정 1 · BBox 수정 7 · 삭제 5 · 추가 3 · 정답 일치 72% → 78%,완료,Day8 · 검수자 3명 비교
+2026-10-15,최용훈,Docs,README 15장 · 8일차 완료,15장 Auto Label(공식 + 3명 범위) · 14장 하락 원인 보정 · 16장 한계 · 8일차 Gate 11/11,완료,Day8 · PR #114
+2026-10-15,최용훈,Docs,팀 공부 · 발표 자료,7일차 개선실험 이해하기 · 이어서 이해하기 6-7일차 · 발표 자료 모음 v2 · Auto Label 안내서 (회사 사진 없음),완료,발표 준비
+2026-10-16,팀원 전원,Todo,9일차,Feature Freeze · 보안 · Git 최종 확인 · acceptance_test.md · handoff_subject14.md · README 18장 · 다른 팀원 README 재실행 · Final Gate 자가점검,예정,Day9
