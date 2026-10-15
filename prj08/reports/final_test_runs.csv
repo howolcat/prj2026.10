@@ -1,0 +1,3 @@
+﻿time,event,weight,weight_sha,source,imgsz,code,reason
+2026-10-15 10:22:37,시작,models/final/final_best.pt,029c0e92e594,exp001,1280,a322016,최초 1회
+2026-10-15 10:22:50,완료,models/final/final_best.pt,029c0e92e594,exp001,1280,a322016,0.2분
