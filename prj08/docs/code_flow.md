@@ -1,6 +1,6 @@
 # 교과 8 · 코드 흐름도 (Mermaid)
 
-> 기준: `main` · PR #73 코드 (2026-10-12) · `prj08/`
+> 기준: `main` · PR #117 코드 (2026-10-15 · 9일차 완료) · `prj08/`
 > 이 문서는 **파일 사이**의 흐름(전체 지도)만 다룹니다. 파일 **안쪽** 흐름은 각 코드 리뷰 문서의 "흐름 그림"에 있습니다.
 > GitHub에서 이 파일을 열면 그림으로 보입니다. VS Code는 "Markdown Preview Mermaid Support" 확장을 설치하면 미리보기에서 보입니다.
 
@@ -8,7 +8,174 @@
 
 ---
 
+
 ## 1. 전체 파이프라인 (파일 단위)
+
+한 장에 모든 파일과 화살표를 넣으면 글자가 너무 작아져서, **한눈에 보는 그림 1장 + 일차별 그림 4장**으로 나눴습니다. 화살표는 "무엇이 무엇을 만드나"만 남겼고, `src` import 는 3장 표에서 봅니다. 모든 입력 · import 화살표가 다 들어 있는 예전 상세 그림은 이 장 맨 아래 **접기** 안에 그대로 있습니다.
+
+### 1-0. 한눈에 보기 (단계 단위)
+
+```mermaid
+flowchart TD
+    IN[("교과 7 FINAL<br/>JPG 900 + TXT 900")]
+    A["1~2일차 · 환경 · Audit · 분포<br/>01 · 02a · 02 · 03"]
+    P(["사람 결정<br/>docs/split_policy.md"])
+    B["3일차 · Split Freeze · YOLO 폴더<br/>04 · 05 · 05b · 05a · 06 · 07"]
+    BR[("Bridge 146장<br/>교과 14 보존")]
+    C["4~5일차 · Baseline 학습 · 평가<br/>08 · 09"]
+    D["6일차 · 실패 분석<br/>09a · 09b"]
+    H(["사람 결정<br/>failure_hypothesis.md · H1<br/>improvement_experiment.md"])
+    E["7일차 · 한 변수 개선 실험<br/>10 · 11"]
+    S(["사람 결정 · 커밋<br/>final_model_selection.md"])
+    F["8일차 · Frozen Test 1회<br/>12"]
+    G["8일차 · Auto Label<br/>13 → 교과 7 검수 → 14"]
+    K(["9일차 · Acceptance · Handoff<br/>acceptance_test.md · handoff_subject14.md"])
+
+    IN --> A --> P --> B --> C --> D --> H --> E --> S --> F --> G --> K
+    B -.->|"쓰지 않고 봉인"| BR
+    BR -.-> K
+
+    classDef data fill:#E9ECE8,stroke:#9AA3AE,color:#1B2430
+    classDef script fill:#1B2430,stroke:#1B2430,color:#FFFFFF
+    classDef human fill:#FBF1E6,stroke:#C26A1E,stroke-width:2px,color:#1B2430
+    class IN,BR data
+    class A,B,C,D,E,F,G script
+    class P,H,S,K human
+```
+
+### 1-A. 1~3일차 — 데이터 확인 → Split → YOLO 폴더 (01 ~ 07)
+
+```mermaid
+flowchart TD
+    IN[("교과 7 FINAL<br/>images · labels")]
+    S01["01_check_environment"] --> ENV[/"README 팀원 환경 표"/]
+
+    IN --> S02A["02a_make_audit_fixture"] --> FIX[("data/audit_test<br/>버그 9종")]
+    FIX -->|"fixture 모드"| S02
+    IN --> S02["02_audit_subject7_final<br/>src/dataset_audit"]
+    S02 --> O02[/"audit_check · audit_issue<br/>audit_label_stats"/]
+
+    O02 --> S03["03_split_analysis<br/>src/capture_group"]
+    S03 --> O03[/"capture_groups · 분포 CSV 5개"/]
+    O03 -.->|"숫자 근거"| POL(["split_policy.md<br/>5분 세션 · E1"])
+
+    POL --> S04["04_make_split"]
+    O03 --> S04
+    S04 --> O04[/"splits/kimchi_v1_split.csv<br/>Test 지문 4f9291849fe6"/]
+
+    O04 --> S05["05_freeze_split<br/>src/manifest"]
+    S05 --> O05[/"manifests/ 5개 (v2)<br/>freeze_check"/]
+    S05B["05b_upgrade_manifest_schema<br/>v1 → v2 · 배정 변경 0"] --> O05
+    O05 --> S05A["05a_dataset_summary"] --> O05A[/"dataset_summary.csv"/]
+
+    O05 --> S06["06_build_yolo_dataset"] --> YOLO[("data/yolo<br/>train · val · test<br/>Bridge 없음")]
+    YOLO --> S07["07_verify_yolo_dataset<br/>19항목 · 종료 코드"] --> O07[/"yolo_verify_check.csv"/]
+
+    classDef data fill:#E9ECE8,stroke:#9AA3AE,color:#1B2430
+    classDef script fill:#1B2430,stroke:#1B2430,color:#FFFFFF
+    classDef out fill:#FFFFFF,stroke:#9AA3AE,stroke-dasharray:4 3,color:#1B2430
+    classDef human fill:#FBF1E6,stroke:#C26A1E,stroke-width:2px,color:#1B2430
+    class IN,FIX,YOLO data
+    class S01,S02A,S02,S03,S04,S05,S05B,S05A,S06,S07 script
+    class ENV,O02,O03,O04,O05,O05A,O07 out
+    class POL human
+```
+
+### 1-B. 4~5일차 — Baseline 학습 · 평가 (08 · 09)
+
+```mermaid
+flowchart TD
+    YOLO[("data/yolo")]
+    BY[/"configs/baseline.yaml<br/>imgsz 640 · 50 epoch"/]
+    S07["07 실행<br/>종료 코드 0 확인"]
+
+    YOLO --> S08["08_train_baseline<br/>검사 12항목 · src/train_detector"]
+    BY --> S08
+    S07 -.-> S08
+    S08 --> O08[/"models/baseline/baseline_best.pt<br/>sha 22f35d20a5ea (Git 제외)<br/>baseline_training_condition.md"/]
+
+    O08 --> S09["09_evaluate_baseline<br/>Val만 · src/evaluate_detector"]
+    S07 -.-> S09
+    S09 --> O09[/"baseline_metrics.csv<br/>baseline_class_check.csv<br/>baseline_val_image_check.csv"/]
+
+    classDef data fill:#E9ECE8,stroke:#9AA3AE,color:#1B2430
+    classDef script fill:#1B2430,stroke:#1B2430,color:#FFFFFF
+    classDef out fill:#FFFFFF,stroke:#9AA3AE,stroke-dasharray:4 3,color:#1B2430
+    class YOLO data
+    class S07,S08,S09 script
+    class BY,O08,O09 out
+```
+
+### 1-C. 6~7일차 — 실패 분석 → 한 변수 개선 실험 (09a · 09b · 10 · 11)
+
+```mermaid
+flowchart TD
+    O09[/"baseline_*.csv<br/>(5일차 결과)"/]
+
+    O09 --> S09A["09a_branch_fp_check<br/>branch 오검출 5종 분류"] --> O09A[/"branch_pred_check.csv"/]
+    O09A --> FA(["failure_analysis.csv<br/>사람이 대표 실패 17행"])
+    O09 --> FA
+    FA --> S09B["09b_failure_images<br/>정답 vs 예측 비교 그림"] --> O09B[/"demo/failure_analysis/ 14장<br/>(Git 제외)"/]
+    O09B --> HYP(["failure_hypothesis.md<br/>H1 작은 이물 놓침"])
+
+    HYP --> PLAN(["improvement_experiment.md<br/>상태: 확정 · 바꿀 변수 하나"])
+    PLAN --> EY[/"configs/exp001.yaml<br/>imgsz 640 → 1280 (한 줄)"/]
+    EY --> S10["10_train_experiment<br/>smoke · dry-run · 본 학습<br/>08 도우미 재사용"]
+    S10 --> O10[/"models/improved/exp001_best.pt<br/>sha 029c0e92e594 (Git 제외)"/]
+    O10 --> S11["11_evaluate_experiment<br/>09 채점 함수 그대로 · Val만"]
+    S11 --> O11[/"exp001_metrics · class_check<br/>experiment_log.csv"/]
+    O11 --> CMP(["baseline_vs_improved.md<br/>FN 159 → 60 · Final 후보"])
+
+    classDef script fill:#1B2430,stroke:#1B2430,color:#FFFFFF
+    classDef out fill:#FFFFFF,stroke:#9AA3AE,stroke-dasharray:4 3,color:#1B2430
+    classDef human fill:#FBF1E6,stroke:#C26A1E,stroke-width:2px,color:#1B2430
+    class S09A,S09B,S10,S11 script
+    class O09,O09A,O09B,EY,O10,O11 out
+    class FA,HYP,PLAN,CMP human
+```
+
+### 1-D. 8 · 9일차 — Final 확정 → Frozen Test 1회 → Auto Label → 인계 (12 · 13 · 14)
+
+```mermaid
+flowchart TD
+    CMP(["baseline_vs_improved.md"])
+    O10[/"exp001_best.pt"/]
+
+    CMP --> SEL(["final_model_selection.md<br/>상태: 확정 · 커밋 (Test 보다 먼저)"])
+    O10 -->|"복사 · sha 같음"| FPT[/"models/final/final_best.pt<br/>(Git 제외)"/]
+    SEL --> S12["12_evaluate_final_test<br/>검사 15항목 · 1회 잠금"]
+    FPT --> S12
+    S12 --> O12[/"final_metrics.csv · final_class_check.csv<br/>final_test_runs.csv (1회 증거)"/]
+
+    O12 -->|"12 가 끝나야 실행"| S13["13_auto_label<br/>Test 8장 · Final 예측"]
+    FPT --> S13
+    S13 --> O13[/"demo/prediction_images · candidate_labels<br/>review_workspace · gt_hidden (Git 제외)"/]
+    O13 --> HR(["교과 7 라벨링 프로그램 v4.1<br/>사람 검수"])
+    HR --> S14["14_auto_label_review<br/>후보 ↔ 검수 1:1 짝짓기"]
+    O13 --> S14
+    S14 --> O14[/"auto_label_review.csv<br/>승인 31 / 43"/]
+
+    O12 --> ACC(["9일차 · acceptance_test.md 33/33<br/>handoff_subject14.md"])
+    O14 --> ACC
+
+    classDef script fill:#1B2430,stroke:#1B2430,color:#FFFFFF
+    classDef out fill:#FFFFFF,stroke:#9AA3AE,stroke-dasharray:4 3,color:#1B2430
+    classDef human fill:#FBF1E6,stroke:#C26A1E,stroke-width:2px,color:#1B2430
+    class S12,S13,S14 script
+    class O10,FPT,O12,O13,O14 out
+    class CMP,SEL,HR,ACC human
+```
+
+`data/yolo`는 원본(읽기 전용)이 아니라 **06이 만든 복사본**입니다. 같은 폴더를 06(만든 쪽)과 07(검사하는 쪽)이 따로 확인합니다.
+
+`src/manifest.py`는 05 · 05a · 05b · 06 · 07 · 08 · 09 · 09a · 09b · 10 · 11 · 12 · 13이 모두 `import`해서 manifest(v1 · v2 · split CSV)를 같은 모양으로 읽습니다. 08 · 09 · 09a · 10 · 11 · 12는 학습 전 · 평가 전 · 실행 전에 **07을 그대로 실행**해(import가 아니라 별도 실행) 종료 코드 0을 확인합니다. 3일차 Smoke Test는 스크립트 없이 `yolo detect train` 명령으로 1 epoch만 돌려 파이프라인이 끝까지 이어지는지 확인한 것이고(기록: `smoke_test.md`), 그 Weight는 Baseline으로 쓰지 않습니다. 7일차 10의 `--smoke`는 이와 별개로 **개선 실험 조건**의 GPU 메모리 · 시간만 보는 1 epoch 시험이며(`runs/exp001_smoke`), 기록을 남기지 않습니다. `runs/` · `models/` · `demo/`(Smoke · 08 · 09 · 09a · 09b · 10 · 11 · 12 · 13 · 14 결과)는 Git에 올리지 않고(NDA), `reports/`의 CSV · 그래프 · 조건 문서만 올립니다. 09a의 `branch_pred_check.csv` · 09b의 `failure_image_list.csv` · 13 · 14의 `auto_label_*.csv`는 이미지 없이 파일명 · 좌표 · 숫자와 사람이 적은 확인 결과뿐이라 Git에 올립니다.
+
+7일차는 **"같은 것은 같은 코드로"** 가 원칙입니다. 10은 Baseline과 같은 `train_detector()`로 학습하고 08의 도우미(라벨 지문 · git · 환경 · results 확인 · sha)를 그대로 불러 쓰며, 11은 Baseline을 채점한 09의 함수를 그대로 불러 같은 Val 74장 · 같은 conf 0.25 · 같은 짝짓기로 채점합니다. 그래서 Baseline과 exp001의 숫자 차이는 **바꾼 변수 하나** 때문이라고 말할 수 있습니다. 11은 Test를 평가하지 않고, Final Model 후보는 `baseline_vs_improved.md`에서 팀이 Frozen Test를 보지 않고 정합니다.
+
+8일차는 **"고른 다음에만 시험"** 이 원칙입니다. `final_model_selection.md`를 확정 · **커밋**한 뒤에만 12가 Frozen Test를 열고, 12는 프로젝트에서 유일하게 `allow_test=True`를 쓰며 `final_metrics.csv`가 있으면 두 번째 실행을 거부합니다(실행 기록 `final_test_runs.csv`). 13은 그 `final_metrics.csv`가 있어야만 Test 사진 8장으로 Auto Label 시연(가이드 21.3)을 하고, 정답은 `gt_hidden/`에 숨깁니다. 사람이 교과 7 프로그램으로 검수한 뒤 14가 후보와 검수 결과를 비교해 승인 · 수정 · 삭제 · 추가를 셉니다.
+
+<details>
+<summary><b>상세 그림 펼치기</b> — 모든 입력 · import 화살표 (예전 1장 그림 · 큰 화면 · 확대해서 보기)</summary>
 
 ```mermaid
 flowchart LR
@@ -299,13 +466,7 @@ flowchart LR
     class SMK next
 ```
 
-`data/yolo`는 원본(읽기 전용)이 아니라 **06이 만든 복사본**입니다. 같은 폴더를 06(만든 쪽)과 07(검사하는 쪽)이 따로 확인합니다.
-
-`src/manifest.py`는 05 · 05a · 05b · 06 · 07 · 08 · 09 · 09a · 09b · 10 · 11 · 12 · 13이 모두 `import`해서 manifest(v1 · v2 · split CSV)를 같은 모양으로 읽습니다. 08 · 09 · 09a · 10 · 11 · 12는 학습 전 · 평가 전 · 실행 전에 **07을 그대로 실행**해(import가 아니라 별도 실행) 종료 코드 0을 확인합니다. 3일차 Smoke Test는 스크립트 없이 `yolo detect train` 명령으로 1 epoch만 돌려 파이프라인이 끝까지 이어지는지 확인한 것이고(기록: `smoke_test.md`), 그 Weight는 Baseline으로 쓰지 않습니다. 7일차 10의 `--smoke`는 이와 별개로 **개선 실험 조건**의 GPU 메모리 · 시간만 보는 1 epoch 시험이며(`runs/exp001_smoke`), 기록을 남기지 않습니다. `runs/` · `models/` · `demo/`(Smoke · 08 · 09 · 09a · 09b · 10 · 11 · 12 · 13 · 14 결과)는 Git에 올리지 않고(NDA), `reports/`의 CSV · 그래프 · 조건 문서만 올립니다. 09a의 `branch_pred_check.csv` · 09b의 `failure_image_list.csv` · 13 · 14의 `auto_label_*.csv`는 이미지 없이 파일명 · 좌표 · 숫자와 사람이 적은 확인 결과뿐이라 Git에 올립니다.
-
-7일차는 **"같은 것은 같은 코드로"** 가 원칙입니다. 10은 Baseline과 같은 `train_detector()`로 학습하고 08의 도우미(라벨 지문 · git · 환경 · results 확인 · sha)를 그대로 불러 쓰며, 11은 Baseline을 채점한 09의 함수를 그대로 불러 같은 Val 74장 · 같은 conf 0.25 · 같은 짝짓기로 채점합니다. 그래서 Baseline과 exp001의 숫자 차이는 **바꾼 변수 하나** 때문이라고 말할 수 있습니다. 11은 Test를 평가하지 않고, Final Model 후보는 `baseline_vs_improved.md`에서 팀이 Frozen Test를 보지 않고 정합니다.
-
-8일차는 **"고른 다음에만 시험"** 이 원칙입니다. `final_model_selection.md`를 확정 · **커밋**한 뒤에만 12가 Frozen Test를 열고, 12는 프로젝트에서 유일하게 `allow_test=True`를 쓰며 `final_metrics.csv`가 있으면 두 번째 실행을 거부합니다(실행 기록 `final_test_runs.csv`). 13은 그 `final_metrics.csv`가 있어야만 Test 사진 8장으로 Auto Label 시연(가이드 21.3)을 하고, 정답은 `gt_hidden/`에 숨깁니다. 사람이 교과 7 프로그램으로 검수한 뒤 14가 후보와 검수 결과를 비교해 승인 · 수정 · 삭제 · 추가를 셉니다.
+</details>
 
 ---
 
@@ -344,6 +505,86 @@ flowchart LR
 ---
 
 ## 3. 모듈 의존 관계 (누가 누구를 import 하나)
+
+화살표 수십 개를 한 그림에 그리는 대신, **표 하나(scripts → src)** + **작은 그림 하나(스크립트가 다른 스크립트를 쓰는 곳)** + **라이브러리 표**로 나눴습니다. 예전 그림은 이 장 맨 아래 접기 안에 있습니다.
+
+### 3-1. scripts → src (✓ = import)
+
+| 스크립트 | `dataset_audit` | `capture_group` | `manifest` | `train_detector` | `evaluate_detector` | 가져오는 것 (특이한 것만) |
+|---|:---:|:---:|:---:|:---:|:---:|---|
+| `01_check_environment` | | | | | | (src 안 씀) |
+| `02a_make_audit_fixture` | | | | | | (src 안 씀) |
+| `02_audit_subject7_final` | ✓ | | | | | |
+| `03_split_analysis` | | ✓ | | | | |
+| `04_make_split` | | | | | | (src 안 씀 · CSV 두 개만 읽음) |
+| `05_freeze_split` | | | ✓ | | | `build_v2_rows` · `write_manifest_set` |
+| `05a_dataset_summary` | | | ✓ | | | |
+| `05b_upgrade_manifest_schema` | | | ✓ | | | `build_v2_rows` · `write_manifest_set` |
+| `06_build_yolo_dataset` | | | ✓ | | | |
+| `07_verify_yolo_dataset` | | | ✓ | | | `read_manifest` 만 (06 은 import 안 함) |
+| `08_train_baseline` | | | ✓ | ✓ | | |
+| `09_evaluate_baseline` | | | ✓ | | ✓ | |
+| `09a_branch_fp_check` | | | ✓ | | ✓ | |
+| `09b_failure_images` | | | ✓ | | ✓ | `match_boxes` |
+| `10_train_experiment` | | | ✓ | ✓ | | |
+| `11_evaluate_experiment` | | | ✓ | ✓ | ✓ | `TRAIN_KEYS` (train_detector) |
+| `12_evaluate_final_test` | | | ✓ | | ✓ | `fingerprint` · `allow_test=True` |
+| `13_auto_label` | | | ✓ | | ✓ | `predict_images` |
+| `14_auto_label_review` | | | | | ✓ | `iou_xywh` · `match_boxes` |
+| **합계** | 1 | 1 | 13 | 3 | 7 | |
+
+### 3-2. 스크립트가 다른 스크립트를 쓰는 곳
+
+```mermaid
+flowchart LR
+    S07["07_verify_yolo_dataset"]
+    S08["08_train_baseline"]
+    S09["09_evaluate_baseline"]
+    S10["10_train_experiment"]
+    S11["11_evaluate_experiment"]
+    S12["12_evaluate_final_test"]
+    S13["13_auto_label"]
+    RUN["08 · 09 · 09a · 10 · 11 · 12"]
+
+    S10 -->|"importlib<br/>지문 · git · sha 도우미"| S08
+    S11 -->|"importlib<br/>채점 함수"| S09
+    S12 -->|"importlib<br/>채점 함수"| S09
+    S12 -->|"importlib<br/>git · sha"| S08
+    S13 -->|"importlib<br/>선택 문서 · Final 경로"| S12
+    RUN -.->|"subprocess 로 실행<br/>종료 코드 0 확인"| S07
+
+    classDef script fill:#1B2430,stroke:#1B2430,color:#FFFFFF
+    classDef group fill:#F3F4F1,stroke:#B8C2CF,stroke-dasharray:4 3,color:#1B2430
+    class S07,S08,S09,S10,S11,S12,S13 script
+    class RUN group
+```
+
+실선 = **importlib 로 파일을 모듈처럼 불러와 함수 · 상수를 그대로 씀** (같은 계산을 다시 쓰지 않기 위해) · 점선 = **import 하지 않고 별도 프로세스로 실행만** (07 이 FAIL 이면 학습 · 평가를 시작하지 않음).
+
+### 3-3. 외부 라이브러리
+
+| 라이브러리 | 쓰는 파일 | 메모 |
+|---|---|---|
+| `ultralytics` (YOLO) | `src/train_detector` · `src/evaluate_detector` · `09b` | **함수 안에서** import → 검사를 통과한 뒤에만 불러옴 |
+| `ultralytics` (버전 확인) | `01` · `08` · `09` · `09a` · `11` · `12` | 팀 고정 8.4.175 인지 검사 |
+| `torch` | `01` · `08` · `10` | CUDA · GPU 확인 (08 · 10 은 함수 안) |
+| `pandas` · `numpy` | `03` · `04` · `src/capture_group` | 촬영 세션 · 분포 계산 |
+| `Pillow` | `03` (EXIF 시각) · `09b` (비교 그림 그리기) | |
+| `PyYAML` | `05a` · `08` · `09` · `09a` · `10` · `11` · `12` · `13` | configs/*.yaml 읽기 |
+| 표준 라이브러리 | 전부 | `pathlib` · `csv` · `shutil` · `hashlib` · `re` · `subprocess` · `importlib` 등 |
+
+> `04_make_split.py`는 `src`를 import하지 않고 **결과 CSV 두 개만** 읽습니다. 그래서 앞 단계 코드가 바뀌어도 CSV가 같으면 배정 결과가 같습니다.
+
+> `05` · `05a` · `05b` · `06` · `07` · `08` · `09` · `09a` · `09b` · `10` · `11` · `12` · `13`은 `src/manifest.py`를 import해서 `read_manifest()`로 manifest(v1 · v2 · split CSV)를 같은 모양(모든 행에 `split` 키, Bridge 값은 `bridge_holdout`)으로 읽습니다. 05는 ①~⑤ 검사에서만 04의 v1 split CSV를 `role` 칸 그대로 직접 읽고, ⑥ 이후는 `read_manifest()`를 씁니다. 05 · 05b가 manifest를 쓸 때는 `build_v2_rows()` · `write_manifest_set()`을 함께 씁니다. `08` · `10`은 `src/train_detector.py`를, `09` · `09a` · `09b` · `11` · `12` · `13` · `14`는 `src/evaluate_detector.py`를 import합니다. `12`는 `manifest.py`에서 `fingerprint()`도 가져와 Test 지문을 다시 계산합니다. `11`은 `train_detector.py`에서 `TRAIN_KEYS`만 가져와 10과 같은 규칙으로 "바꾼 것"을 계산합니다. `09b`는 `evaluate_detector.py`에서 `match_boxes()`만 가져와 09와 같은 짝짓기로 TP · FP · FN을 셉니다.
+
+> `07`은 `06`의 코드를 import하지 않습니다. 07이 가져오는 것은 manifest를 읽는 `read_manifest()`뿐입니다. 만든 쪽(B)과 검사하는 쪽(A)을 나눠서, 06에 실수가 있어도 07의 검사가 같이 틀리지 않게 하려는 설계입니다. 그래서 `fingerprint()`는 04 · 05 · 06 · 07에 **같은 계산으로 각각** 들어 있고, `src/manifest.py`에도 같은 계산이 있어 05b · 08이 그쪽을 가져다 씁니다. 10은 08을 통해 같은 계산을 씁니다.
+
+> `08` · `09` · `09a` · `10` · `11` · `12`는 `07`을 import하지 않고 **별도 프로세스로 실행**해서(`subprocess`) 종료 코드 0인지만 확인합니다. 07이 FAIL이면 학습 · 평가 · 분류 · Test 평가를 시작하지 않습니다. `09b`는 07을 실행하지 않는 대신, 가중치 sha가 4일차 기록과 같은지 확인하고 Val 사진만 그립니다.
+
+> `10` · `11`은 스크립트 파일 이름이 숫자로 시작해 일반 `import`가 안 되므로 `importlib`로 **08 · 09 파일을 모듈로 불러옵니다**(`t08` · `e09`). 08 · 09의 `main()`은 `if __name__ == "__main__"` 안에 있어서 불러와도 학습 · 평가가 돌지 않고, 도우미 함수와 상수만 씁니다. 10은 08의 라벨 지문 · git · 환경 · results 확인 · sha를, 11은 09의 지표 기록 · 그림 복사 · 이미지별 / Class별 채점 · sha를 그대로 씁니다 → Baseline과 **계산이 다를 수 없는 구조**입니다. 8일차도 같은 방식으로, `12`는 09(채점 함수)와 08(git · sha)을, `13`은 12(선택 문서 읽기 · Final 경로)를 모듈로 불러옵니다. `12`는 불러온 09 모듈의 폴더 상수만 test로 바꿔 채점 규칙을 한 줄도 다시 쓰지 않습니다.
+
+<details>
+<summary><b>상세 그림 펼치기</b> — 예전 3장 그림 (라이브러리까지 모든 화살표)</summary>
 
 ```mermaid
 flowchart LR
@@ -458,12 +699,4 @@ flowchart LR
     S14 --> STD
 ```
 
-> `04_make_split.py`는 `src`를 import하지 않고 **결과 CSV 두 개만** 읽습니다. 그래서 앞 단계 코드가 바뀌어도 CSV가 같으면 배정 결과가 같습니다.
-
-> `05` · `05a` · `05b` · `06` · `07` · `08` · `09` · `09a` · `09b` · `10` · `11` · `12` · `13`은 `src/manifest.py`를 import해서 `read_manifest()`로 manifest(v1 · v2 · split CSV)를 같은 모양(모든 행에 `split` 키, Bridge 값은 `bridge_holdout`)으로 읽습니다. 05는 ①~⑤ 검사에서만 04의 v1 split CSV를 `role` 칸 그대로 직접 읽고, ⑥ 이후는 `read_manifest()`를 씁니다. 05 · 05b가 manifest를 쓸 때는 `build_v2_rows()` · `write_manifest_set()`을 함께 씁니다. `08` · `10`은 `src/train_detector.py`를, `09` · `09a` · `09b` · `11` · `12` · `13` · `14`는 `src/evaluate_detector.py`를 import합니다. `12`는 `manifest.py`에서 `fingerprint()`도 가져와 Test 지문을 다시 계산합니다. `11`은 `train_detector.py`에서 `TRAIN_KEYS`만 가져와 10과 같은 규칙으로 "바꾼 것"을 계산합니다. `09b`는 `evaluate_detector.py`에서 `match_boxes()`만 가져와 09와 같은 짝짓기로 TP · FP · FN을 셉니다.
-
-> `07`은 `06`의 코드를 import하지 않습니다. 07이 가져오는 것은 manifest를 읽는 `read_manifest()`뿐입니다. 만든 쪽(B)과 검사하는 쪽(A)을 나눠서, 06에 실수가 있어도 07의 검사가 같이 틀리지 않게 하려는 설계입니다. 그래서 `fingerprint()`는 04 · 05 · 06 · 07에 **같은 계산으로 각각** 들어 있고, `src/manifest.py`에도 같은 계산이 있어 05b · 08이 그쪽을 가져다 씁니다. 10은 08을 통해 같은 계산을 씁니다.
-
-> `08` · `09` · `09a` · `10` · `11` · `12`는 `07`을 import하지 않고 **별도 프로세스로 실행**해서(`subprocess`) 종료 코드 0인지만 확인합니다. 07이 FAIL이면 학습 · 평가 · 분류 · Test 평가를 시작하지 않습니다. `09b`는 07을 실행하지 않는 대신, 가중치 sha가 4일차 기록과 같은지 확인하고 Val 사진만 그립니다.
-
-> `10` · `11`은 스크립트 파일 이름이 숫자로 시작해 일반 `import`가 안 되므로 `importlib`로 **08 · 09 파일을 모듈로 불러옵니다**(`t08` · `e09`). 08 · 09의 `main()`은 `if __name__ == "__main__"` 안에 있어서 불러와도 학습 · 평가가 돌지 않고, 도우미 함수와 상수만 씁니다. 10은 08의 라벨 지문 · git · 환경 · results 확인 · sha를, 11은 09의 지표 기록 · 그림 복사 · 이미지별 / Class별 채점 · sha를 그대로 씁니다 → Baseline과 **계산이 다를 수 없는 구조**입니다. 8일차도 같은 방식으로, `12`는 09(채점 함수)와 08(git · sha)을, `13`은 12(선택 문서 읽기 · Final 경로)를 모듈로 불러옵니다. `12`는 불러온 09 모듈의 폴더 상수만 test로 바꿔 채점 규칙을 한 줄도 다시 쓰지 않습니다.
+</details>
