@@ -1,6 +1,6 @@
 # 교과 14 인계 문서 (교과 8 → 교과 14 · 산출물 7 · 가이드 22.7.1)
 
-> **상태**: 초안 (2026-10-15 · 8일차 완료 시점) — 9일차에 확인 후 확정
+> **상태**: 확정 (2026-10-15 · 9일차 · Acceptance ACCEPTED · Feature Freeze 후)
 > 목적: 교과 14 제조 제품검사 프로젝트가 **다시 처음부터 조사하지 않도록** 교과 8 의 데이터 · 모델 · 성능 · 약점 · 남은 일을 넘긴다.
 > 교과 14 의 첫 연결점: **Bridge Holdout 146장으로 교과 8 Final Model 을 다시 확인하는 것** (가이드 22.7.1)
 
@@ -27,7 +27,7 @@
 | 목록 | `manifests/bridge_holdout.csv` (146행 · v2 9칸) |
 | 사진 · 라벨 위치 | `data/subject7_final/images · labels` 안 (목록의 `image_path` · `label_path`) · `data/yolo` 로 복사하지 않음 · Git 제외 |
 | 세션 | G07 76 · G04 39 · G12 25 · G01-S3 5 · G02 1 |
-| 파일명 지문 | `fd6c14c2ac0a` (`src/manifest.fingerprint` 와 같은 계산 · 9일차 재확인) |
+| 파일명 지문 | `fd6c14c2ac0a` (`src/manifest.fingerprint` 와 같은 계산 · 파일명 146개를 정렬해 sha256 앞 12자리 · 교과 14 시작 시 같은 값인지 먼저 확인) |
 | 교과 8 미사용 확인 | `configs/dataset.yaml` 에 없음 · 06 이 복사하지 않음 · 평가 함수가 `bridge_holdout` 을 막음 · 12 · 13 이 Test 외 사진 거부 · Acceptance D7 |
 | 주의 | Class 1(플라스틱)이 82% (635/778) — Bridge 점수도 플라스틱 위주가 됨 → Class 별로 함께 볼 것 |
 

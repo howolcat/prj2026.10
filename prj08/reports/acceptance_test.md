@@ -1,7 +1,7 @@
 # Acceptance Test (9일차 · 산출물 7 · 가이드 22.7)
 
-> **상태**: 초안 (2026-10-15 · 8일차 완료 시점에 저장소 · 실행 기록으로 확인 가능한 항목을 먼저 채움)
-> 9일차에 ☐ 항목을 실제로 확인하고, FAIL 이 있으면 수정 → Retest 결과까지 적은 뒤 맨 아래 판정을 **ACCEPTED** 로 바꾼다.
+> **상태: ACCEPTED** (2026-10-15 · 확인자 최용훈 · 33 / 33 PASS · FAIL 0)
+> 8일차 완료 시점에 저장소 · 실행 기록으로 25개를 먼저 확인하고, 나머지 8개는 학습 PC 에서 직접 확인했다.
 > 확인 기준: main 브랜치 (8일차 완료 · PR #114) · Dataset `kimchi_v1` · Final Model `models/final/final_best.pt` (sha `029c0e92e594`)
 
 ## 1. Dataset
@@ -22,8 +22,8 @@
 |---|---|---|---|
 | M1 | Baseline Model 과 Final Model 을 구분할 수 있다 | PASS | baseline_v1 (imgsz 640 · sha `22f35d20a5ea`) · Final = exp001 (imgsz 1280 · sha `029c0e92e594`) · `reports/experiment_log.csv` |
 | M2 | Baseline 학습조건이 기록되어 있다 | PASS | `configs/baseline.yaml` · `reports/baseline_training_condition.md` |
-| M3 | `baseline_best.pt` 가 있다 | ☐ 9일차 | 학습 PC `models/baseline/baseline_best.pt` · `sha256sum … \| cut -c1-12` = `22f35d20a5ea` 확인 (Git 제외) |
-| M4 | `final_best.pt` 가 있다 | PASS (☐ 재확인) | 12 · 13 실행 시 sha `029c0e92e594` 검사 PASS · 9일차에 학습 PC 에서 한 번 더 |
+| M3 | `baseline_best.pt` 가 있다 | PASS | 학습 PC `models/baseline/baseline_best.pt` · sha `22f35d20a5ea` = 4일차 기록 (10/15 확인 · Git 제외) |
+| M4 | `final_best.pt` 가 있다 | PASS | 학습 PC `models/final/final_best.pt` · sha `029c0e92e594` (10/15 재확인 · 12 · 13 검사도 PASS) |
 | M5 | Final Model 을 선택한 이유가 기록되어 있다 | PASS | `reports/final_model_selection.md` (Val 비교 · 대표 FP/FN · 이유 4가지 · 원본 Weight) |
 
 ## 3. Evaluation
@@ -44,9 +44,9 @@
 | # | 항목 | 결과 | 근거 |
 |---|---|---|---|
 | I1 | 이미지 Detection 이 실행된다 | PASS | `scripts/13_auto_label.py` → `demo/prediction_images/` 8장 (김하민 · 심준형 · 박건 PC 에서 실행) |
-| I2 | BBox 가 표시된다 | ☐ 9일차 | 시연 1 리허설에서 `demo/prediction_images/` 또는 `yolo predict` 결과를 열어 확인 |
-| I3 | Class 가 표시된다 | ☐ 9일차 | 위와 같음 |
-| I4 | Confidence 가 표시된다 | ☐ 9일차 | 위와 같음 |
+| I2 | BBox 가 표시된다 | PASS | 학습 PC 에서 13 실행 → `demo/prediction_images/` 그림을 열어 확인 (10/15) |
+| I3 | Class 가 표시된다 | PASS | 위와 같음 — 박스 위 Class 이름 |
+| I4 | Confidence 가 표시된다 | PASS | 위와 같음 — Class 옆 확신도 숫자 |
 
 ## 5. Auto Label
 
@@ -62,19 +62,32 @@
 
 | # | 항목 | 결과 | 방법 |
 |---|---|---|---|
-| X1 | Feature Freeze (새 기능 · 실험 없음) | ☐ | 9일차 시작 시 팀 공지 · Git 태그 (예: `subject8_final_v1`) |
-| X2 | 외부 Git 에 사진 · 라벨 · weight · runs 없음 | ☐ | `git ls-files \| grep -iE '\.(jpe?g\|pt\|onnx\|engine)$\|/runs/\|/data/\|/models/'` → 출력 없음 |
-| X3 | 다른 팀원이 README 만 보고 핵심 기능을 실행 | ☐ | 환경 확인 → Final Load → 이미지 Prediction → Auto Label 후보 → Human Review (가이드 22.6) |
-| X4 | `git status` 최종 확인 | ☐ | 커밋 안 된 민감 파일 없음 |
+| X1 | Feature Freeze (새 기능 · 실험 없음) | PASS | 10/15 팀 공지 · 이후 문서 · 오탈자만 · Git 태그 `subject8_final_v1` |
+| X2 | 외부 Git 에 사진 · 라벨 · weight · runs 없음 | PASS | `git ls-files \| grep -iE '\.(jpe?g\|pt\|onnx\|engine)$\|/runs/\|/data/\|/models/'` → 출력 없음 (10/15) |
+| X3 | 다른 팀원이 README 만 보고 핵심 기능을 실행 | PASS | 김하민 · 심준형 · 박건이 각자 PC 에서 README 6장 23~25 순서(13 → 교과 7 검수 → 14)로 실행 · 학습 PC 재실행도 같은 8장 · 후보 43개 (재현) |
+| X4 | `git status` 최종 확인 | PASS | `working tree clean` (10/15) |
 
 ## 7. FAIL · Retest 기록
 
 | 날짜 | 항목 | FAIL 내용 | 수정 | Retest |
 |---|---|---|---|---|
-| | | (9일차에 FAIL 이 나오면 여기에 기록 — 없으면 "없음") | | |
+| 10/15 | — | 없음 (Acceptance 중 FAIL 0) | — | — |
 
 ## 8. 판정
 
-- 현재 (10/15): **PASS 25 · 확인 대기 8 (M3 · I2 · I3 · I4 · X1 · X2 · X3 · X4) · FAIL 0** (M4 는 PASS · 9일차 재확인)
-- 9일차 확인 후: ☐ **ACCEPTED** / ☐ 조건부 (사유: )
-- 확인자: ____ · 날짜: 2026-10-__
+- **ACCEPTED** — PASS 33 / 33 · FAIL 0 · 확인자 최용훈 · 2026-10-15
+- 참고 (개발 중 고친 것 · Acceptance FAIL 아님): 09b 비교 그림이 정답을 가림 → 정답 박스 pad · MISSED 노랑 / 10 계획서 확정 검사가 초안 문구로 통과 → 굵은 머리줄만 인정
+
+## 9. Final Gate 자가점검 (가이드 22.8 · 발표 전)
+
+| 구분 | 항목 | 결과 · 근거 |
+|---|---|---|
+| 교과 7 연결 | FINAL 데이터 · JPG 900 + TXT 900 · Class 0~6 유지 · source/original_split/scene_type 보존 · 교과 7 QA 확인 | ✅ D1 · D3 · README 2 · 4장 · prj07/reports/qa_summary.md |
+| Dataset | Audit · Split Policy 문서 · Leakage 확인 · 4역할 Freeze · bridge_holdout.csv 있고 dataset.yaml 에 없음 · Version 확인 | ✅ audit_check 19/19 · split_policy.md 3장 · freeze_check 13/13 · D7 |
+| 학습 | Smoke Test · Baseline Model · Baseline 조건 · Improved 실험 · 실패 · 나빠진 결과도 기록 | ✅ smoke_test.md · M2 · M3 · experiment_log.csv · baseline_vs_improved.md (갈변 · 비용 증가 기록) · 실험은 exp001 1개 |
+| 평가 | P · R · mAP50 · mAP50-95 · Class별 · 대표 FP/FN · 실패 원인 가설 | ✅ E1~E8 · failure_hypothesis.md |
+| Final Model | Test 전에 선택 · final_best.pt · Frozen Test 결과 · 반복 튜닝 없음 | ✅ D6 · M4 · E8 · final_test_runs.csv (1회) |
+| 활용 | Detection · Auto Label 후보 · Human Review | ✅ I1~I4 · A1~A5 |
+| 문서 | README · acceptance_test.md · handoff_subject14.md · failure_analysis · failure_hypothesis · experiment_log · baseline_vs_improved · final_metrics | ✅ 모두 main 에 있음 |
+| 보안 | 기업 Dataset · 원본 이미지 · YOLO TXT 원본 · *.pt/onnx/engine · runs/ · Prediction 이미지가 Git 에 없음 · .gitignore 적용 · git status | ✅ X2 · X4 · 최상위 .gitignore (prj08/models · demo · **/*.jpg 등) |
+| 산출물 8 (발표) | final_presentation.pdf · 시연 2개 · qna_guide.md | ⏳ 발표 준비 주간 (자료: 발표 자료 모음 v2) |

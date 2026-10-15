@@ -20,4 +20,8 @@
 2026-10-15,박건,Done,Auto Label 검수 (연습),교과 7 프로그램 8장 · 후보 43 · 승인 30 · Class 수정 1 · BBox 수정 7 · 삭제 5 · 추가 3 · 정답 일치 72% → 78%,완료,Day8 · 검수자 3명 비교
 2026-10-15,최용훈,Docs,README 15장 · 8일차 완료,15장 Auto Label(공식 + 3명 범위) · 14장 하락 원인 보정 · 16장 한계 · 8일차 Gate 11/11,완료,Day8 · PR #114
 2026-10-15,최용훈,Docs,팀 공부 · 발표 자료,7일차 개선실험 이해하기 · 이어서 이해하기 6-7일차 · 발표 자료 모음 v2 · Auto Label 안내서 (회사 사진 없음),완료,발표 준비
-2026-10-16,팀원 전원,Todo,9일차,Feature Freeze · 보안 · Git 최종 확인 · acceptance_test.md · handoff_subject14.md · README 18장 · 다른 팀원 README 재실행 · Final Gate 자가점검,예정,Day9
+2026-10-15,최용훈,Docs,9일차 초안,acceptance_test.md(PASS 25 · 대기 8) · handoff_subject14.md(Bridge 146 · 지문 fd6c14c2ac0a · 약점 · 할 일 8) · README 18장,완료,Day9 · PR #116
+2026-10-15,팀원 전원,Done,Feature Freeze,새 기능 · 실험 없음 공지 · 이후 문서 · 오탈자만 · 태그 subject8_final_v1,완료,Day9 · 가이드 22.1
+2026-10-15,최용훈,Done,Acceptance 남은 8개 확인,baseline_best sha 22f35d20a5ea · final_best sha 029c0e92e594 · 학습 PC 13 실행(같은 8장 · 후보 43) → prediction_images BBox · Class · Confidence 표시 · git ls-files 민감 파일 0 · git status clean · 팀원 3명 README 순서 재실행,완료,Day9
+2026-10-15,최용훈,Docs,9일차 완료,Acceptance ACCEPTED 33/33 · Final Gate 자가점검 · handoff 확정 · README 머리말 9일차 완료 · 산출물 1~7 완료,완료,Day9
+2026-10-16~,팀원 전원,Todo,산출물 8 발표 준비,final_presentation.pdf · qna_guide.md · 시연 1 · 2 리허설 · 백업 영상 · 역할 분담 (자료: 발표 자료 모음 v2),예정,발표
