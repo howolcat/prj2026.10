@@ -597,14 +597,14 @@ git diff --cached --name-only | grep -iE '\.png$'
 | [`docs/split_policy.md`](docs/split_policy.md) | Split 정책 · 근거 · 결정 기록 |
 | [`docs/code_review/README.md`](docs/code_review/README.md) | 파일별 코드 리뷰 (코드와 같은 폴더 구조) |
 | [`docs/code_flow.md`](docs/code_flow.md) | Mermaid 코드 흐름도 |
-| `reports/audit_expected.md` | Audit 기대값 (Test Oracle) |
-| `reports/issue_log.md` | 문제 · 원인 · 해결 기록 |
-| `reports/smoke_test.md` | Smoke Test 기록 · 가이드와 다른 점 |
-| `reports/baseline_training_condition.md` | Baseline 실제 학습 조건 · 실행 기록 · 4일차 Gate (08이 자동 생성) |
-| `reports/failure_hypothesis.md` | 6일차 실패 가설 H1~H4 · L · 가이드 19장 분류 대응 |
-| `reports/improvement_experiment.md` | 7일차 개선 실험 계획 (변수 하나 · 상태: 확정) |
-| `reports/exp001_training_condition.md` | exp001 실제 학습 조건 · 실행 기록 (10이 자동 생성) |
-| `reports/baseline_vs_improved.md` | Baseline vs exp001 같은 Val 비교 · Final Model 후보 |
-| `reports/final_model_selection.md` | 8일차 Final Model 선택 이유 · 원본 Weight · Frozen Test 조건 (Test 전에 커밋) |
-| `reports/acceptance_test.md` | 9일차 Acceptance Test (**ACCEPTED** · 33/33 · Final Gate 자가점검 포함) |
-| `docs/handoff_subject14.md` | 교과 14 인계 (Bridge · Final · 성능 · 약점 · 할 일) |
+| [`reports/audit_expected.md`](reports/audit_expected.md) | Audit 기대값 (Test Oracle) |
+| [`reports/issue_log.md`](reports/issue_log.md) | 문제 · 원인 · 해결 기록 |
+| [`reports/smoke_test.md`](reports/smoke_test.md) | Smoke Test 기록 · 가이드와 다른 점 |
+| [`reports/baseline_training_condition.md`](reports/baseline_training_condition.md) | Baseline 실제 학습 조건 · 실행 기록 · 4일차 Gate (08이 자동 생성) |
+| [`reports/failure_hypothesis.md`](reports/failure_hypothesis.md) | 6일차 실패 가설 H1~H4 · L · 가이드 19장 분류 대응 |
+| [`reports/improvement_experiment.md`](reports/improvement_experiment.md) | 7일차 개선 실험 계획 (변수 하나 · 상태: 확정) |
+| [`reports/exp001_training_condition.md`](reports/exp001_training_condition.md) | exp001 실제 학습 조건 · 실행 기록 (10이 자동 생성) |
+| [`reports/baseline_vs_improved.md`](reports/baseline_vs_improved.md) | Baseline vs exp001 같은 Val 비교 · Final Model 후보 |
+| [`reports/final_model_selection.md`](reports/final_model_selection.md) | 8일차 Final Model 선택 이유 · 원본 Weight · Frozen Test 조건 (Test 전에 커밋) |
+| [`reports/acceptance_test.md`](reports/acceptance_test.md) | 9일차 Acceptance Test (**ACCEPTED** · 33/33 · Final Gate 자가점검 포함) |
+| [`docs/handoff_subject14.md`](docs/handoff_subject14.md) | 교과 14 인계 (Bridge · Final · 성능 · 약점 · 할 일) |

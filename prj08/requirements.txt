@@ -7,4 +7,4 @@ pillow>=9.0
 pyyaml>=6.0
 
 ultralytics==8.4.175
-pandas
+pandas>=3.0.6
