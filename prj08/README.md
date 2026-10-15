@@ -73,7 +73,6 @@
 ### 6.1 처음 한 번 (환경 · 데이터 준비)
 
 ```bash
-cd ~/exe_01/prj07/prj07_team01/prj08        # 각자 레포 위치
 
 # 가상환경
 python3 -m venv .venv
@@ -571,7 +570,7 @@ Final Model(exp001 · sha `029c0e92e594`)을 확정 · 커밋한 **뒤** Frozen 
 ## 17. 데이터 보안
 
 - 기업 제공 데이터(NDA)는 Git · 디스코드 · 외부 클라우드에 올리지 않는다. (`data/`, `*.jpg`, `*.pt`, `runs/`, `models/` 제외)
-- **보안정책이 `.gitignore`보다 우선**한다 (가이드 22.2) · Public 레포 사용 가능 여부는 선생님 확인 중
+- **보안정책이 `.gitignore`보다 우선**한다 (가이드 22.2)
 - 커밋 전 확인 (`git add` 한 뒤 · 레포 최상위에서):
 
 ```bash
