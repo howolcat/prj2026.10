@@ -363,13 +363,35 @@ prj08/
 - **Val GT 라벨 오류 2건** 발견 → `reports/issue_log.md` 10/14 참고 (평가 해석 시 함께 확인)
 - **Confusion Matrix 읽는 법**: `reports/figures/baseline_confusion_matrix.png`는 Ultralytics 평가 기본값 **conf 0.001** 기준이라 background 칸에 저신뢰 예측 수천 개가 포함됨 → 실제 오검출(FP) 수는 conf 0.25 기준인 `reports/baseline_val_image_check.csv`로 확인
 
-## 11. Failure Analysis
+## 11. Failure Analysis (6일차)
 
-TBD (6일차)
+Baseline(baseline_v1 · imgsz 640)을 Val 74장에서 conf 0.25 로 예측해 보니 **놓침(FN) 159개 · 오검출(FP) 92개**가 나왔다.
+FN · FP 가 많은 사진 14장을 골라 정답(초록) · 놓친 정답(노랑, MISSED) · 예측(빨강)을 한 장에 겹친 비교 이미지(`scripts/09b_failure_images.py`)로 직접 보고, 실패를 다음 가설로 나눴다.
+(H1~H4 · L 은 우리 팀이 붙인 이름이며, 가이드 19.1 · 19.3 분류와의 대응은 `reports/failure_hypothesis.md` 에 정리)
 
-## 12. Improvement
+| 가설 | 내용 | 근거 (Baseline) |
+|---|---|---|
+| **H1** 작은 객체 | 작은 이물이 640 입력에서 너무 작아져 놓침 | FN 159 중 **153개**가 작은 객체 (작은 객체 363개 중 153개 놓침) · plastic_stone_metal FN 147 |
+| H2 Class 특정 FN | 갈변이 색 · 질감이 김치와 비슷해 구분 실패 | disease_browning FN 6/6 · FP 13 |
+| H3 오검출 | 김치 줄기 등을 branch 로 착각 | branch FP 30 |
+| H4 배경 같은 객체 | 배경과 비슷한 이물을 놓침 | 140005 사진 FN 6 |
+| L 라벨 | 라벨 오류 2건 · 라벨 누락 후보 2건 | 사진 검토 중 발견 |
 
-TBD (7일차)
+**10/15 팀 회의 결정**
+1. 가장 영향이 큰 **H1 을 개선 대상으로 확정**했다. 변수는 imgsz 하나만 바꾸며, smoke(1 epoch) 메모리가 11GB 미만이면 1280, 아니면 960 으로 정했다.
+2. Dataset 은 **kimchi_v1 을 그대로 유지**한다. 라벨 문제(L)는 기록만 하고 교과 14 인수인계 목록으로 넘긴다. 실험 중에 데이터를 바꾸면 비교가 공정하지 않기 때문이다.
+
+자세한 내용: `reports/failure_analysis.csv` · `reports/failure_hypothesis.md` · `reports/failure_image_list.csv`
+(비교 이미지는 회사 데이터라 `demo/failure_analysis/` 에만 두고 Git 에 올리지 않음)
+
+## 12. Improvement (7일차)
+
+6일차 실패 분석에서 놓침 159개 중 153개가 작은 객체(H1)였기 때문에, 변수 하나만 바꾼 실험 exp001 로 **imgsz 640 → 1280** 을 시험했다 (smoke 1 epoch 최대 메모리 9.97GB < 11GB 기준 → 1280 채택).
+같은 kimchi_v1 · 같은 Val 74장에서 비교한 결과, mAP50 0.622 → **0.756**, mAP50-95 0.462 → **0.641**, Recall(conf 0.25) 0.591 → **0.846** 으로 올랐다.
+놓침(FN)은 159 → 60, 오검출(FP)은 92 → 41 로 함께 줄었고, 작은 객체 FN 은 153 → 57, branch 오검출은 30 → 1 이 되었다.
+반면 갈변(disease_browning)은 FN 6 → 6 으로 그대로여서 크기가 아닌 색·질감 문제(H2)로 보고 남은 약점으로 기록한다. 대가로 학습 시간은 13.9 → 18.8분, 메모리는 2.48 → 10.14GB 로 늘었다.
+**Frozen Test 를 보지 않고** exp001 을 Final Model 후보로 정했으며, 8일차에 확정한 뒤 Frozen Test 를 imgsz 1280 으로 1회 평가한다.
+자세한 내용: `reports/baseline_vs_improved.md` · `reports/experiment_log.csv`
 
 ## 13. Final Model
 
