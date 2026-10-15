@@ -11,160 +11,206 @@
 
 ## 1. 전체 파이프라인 (파일 단위)
 
-한 장에 모든 파일과 화살표를 넣으면 글자가 너무 작아져서, **한눈에 보는 그림 1장 + 일차별 그림 4장**으로 나눴습니다. 화살표는 "무엇이 무엇을 만드나"만 남겼고, `src` import 는 3장 표에서 봅니다. 모든 입력 · import 화살표가 다 들어 있는 예전 상세 그림은 이 장 맨 아래 **접기** 안에 그대로 있습니다.
+한 장에 모든 파일과 화살표를 넣으면 글자가 너무 작아져서, **한눈에 보는 그림 1장 + 일차별 그림 6장(2장씩 나란히)**으로 나눴습니다. 화살표는 "무엇이 무엇을 만드나"만 남겼고, `src` import 는 3장 표에서 봅니다. 모든 입력 · import 화살표가 다 들어 있는 예전 상세 그림은 이 장 맨 아래 **접기** 안에 그대로 있습니다.
 
 ### 1-0. 한눈에 보기 (단계 단위)
 
-```mermaid
-flowchart TD
-    IN[("교과 7 FINAL<br/>JPG 900 + TXT 900")]
-    A["1~2일차 · 환경 · Audit · 분포<br/>01 · 02a · 02 · 03"]
-    P(["사람 결정<br/>docs/split_policy.md"])
-    B["3일차 · Split Freeze · YOLO 폴더<br/>04 · 05 · 05b · 05a · 06 · 07"]
-    BR[("Bridge 146장<br/>교과 14 보존")]
-    C["4~5일차 · Baseline 학습 · 평가<br/>08 · 09"]
-    D["6일차 · 실패 분석<br/>09a · 09b"]
-    H(["사람 결정<br/>failure_hypothesis.md · H1<br/>improvement_experiment.md"])
-    E["7일차 · 한 변수 개선 실험<br/>10 · 11"]
-    S(["사람 결정 · 커밋<br/>final_model_selection.md"])
-    F["8일차 · Frozen Test 1회<br/>12"]
-    G["8일차 · Auto Label<br/>13 → 교과 7 검수 → 14"]
-    K(["9일차 · Acceptance · Handoff<br/>acceptance_test.md · handoff_subject14.md"])
+> 이 그림을 SVG 로 뽑은 것이 [`docs/figures/pipeline_overview.svg`](figures/pipeline_overview.svg) 이고, README 8장 맨 위에 걸려 있습니다. 그림을 고치면 이 블록을 고친 뒤 SVG 도 다시 뽑습니다 (원본은 이 블록 하나).
 
-    IN --> A --> P --> B --> C --> D --> H --> E --> S --> F --> G --> K
-    B -.->|"쓰지 않고 봉인"| BR
-    BR -.-> K
+```mermaid
+flowchart TB
+    subgraph R1["① 데이터 준비 · 1~3일차"]
+        direction LR
+        IN[("교과 7 FINAL<br/>JPG 900 + TXT 900")] --> A["환경 · Audit · 분포<br/>01 · 02a · 02 · 03"] --> P(["사람 결정<br/>split_policy.md<br/>5분 촬영 세션"]) --> B["Split Freeze · YOLO 폴더<br/>04 · 05 · 05b · 05a · 06 · 07<br/>600 / 74 / 80 / Bridge 146"]
+    end
+    subgraph R2["② 모델 · 4~7일차"]
+        direction LR
+        C["Baseline 학습 · 평가<br/>08 · 09 · imgsz 640<br/>Val mAP50 0.622 · 놓침 159"] --> D["실패 분석<br/>09a · 09b<br/>대표 실패 17행"] --> H(["사람 결정<br/>H1 작은 이물 놓침<br/>바꿀 변수 하나"]) --> E["개선 실험 exp001<br/>10 · 11 · imgsz 1280<br/>Val mAP50 0.756 · 놓침 60"]
+    end
+    subgraph R3["③ 확정 · 활용 · 8~9일차"]
+        direction LR
+        S(["사람 결정 · 커밋<br/>final_model_selection.md<br/>Test 보다 먼저"]) --> F["Frozen Test 1회<br/>12 · imgsz 1280<br/>Test mAP50 0.606"] --> G["Auto Label<br/>13 → 교과 7 검수 → 14<br/>그대로 승인 31 / 43"] --> K(["Acceptance 33 / 33<br/>Handoff → 교과 14<br/>Bridge 146장 첫 시험지"])
+    end
+    R1 --> R2 --> R3
 
     classDef data fill:#E9ECE8,stroke:#9AA3AE,color:#1B2430
     classDef script fill:#1B2430,stroke:#1B2430,color:#FFFFFF
     classDef human fill:#FBF1E6,stroke:#C26A1E,stroke-width:2px,color:#1B2430
-    class IN,BR data
+    class IN data
     class A,B,C,D,E,F,G script
     class P,H,S,K human
+    style R1 fill:#F7F5F1,stroke:#D9D3C7
+    style R2 fill:#F7F5F1,stroke:#D9D3C7
+    style R3 fill:#F7F5F1,stroke:#D9D3C7
 ```
 
-### 1-A. 1~3일차 — 데이터 확인 → Split → YOLO 폴더 (01 ~ 07)
+### 1-1. 일차별 그림 (① ~ ⑥ · 2장씩 나란히)
+
+1-0 보다 자세하게, 일차마다 스크립트 · 결과 파일 · 사람의 결정을 모두 넣었습니다. GitHub 는 mermaid 그림을 옆으로 나란히 놓지 못해서 SVG 로 뽑아 2장씩 붙였습니다.
+
+<p>
+<img src="figures/pipeline_1_day1-2.svg" width="394" alt="① 1~2일차 · 환경 · Audit · 분포">
+<img src="figures/pipeline_2_day3.svg" width="456" alt="② 3일차 · Split Freeze · YOLO 폴더">
+</p>
+
+<p>
+<img src="figures/pipeline_3_day4-5.svg" width="297" alt="③ 4~5일차 · Baseline 학습 · 평가">
+<img src="figures/pipeline_4_day6-7.svg" width="277" alt="④ 6~7일차 · 실패 분석 → 한 변수 개선">
+</p>
+
+<p>
+<img src="figures/pipeline_5_day8-test.svg" width="388" alt="⑤ 8일차 오전 · Final 확정 → Frozen Test 1회">
+<img src="figures/pipeline_6_day8-9.svg" width="285" alt="⑥ 8~9일차 · Auto Label → 검수 → 인계">
+</p>
+
+<details>
+<summary><b>그림 원본 (mermaid) 펼치기</b> — 그림을 고칠 때는 여기를 고친 뒤 SVG 를 다시 뽑습니다</summary>
+
+**① 1~2일차 · 환경 · Audit · 분포** → `figures/pipeline_1_day1-2.svg`
 
 ```mermaid
+---
+title: ① 1~2일차 · 환경 · Audit · 분포
+---
 flowchart TD
-    IN[("교과 7 FINAL<br/>images · labels")]
-    S01["01_check_environment"] --> ENV[/"README 팀원 환경 표"/]
-
-    IN --> S02A["02a_make_audit_fixture"] --> FIX[("data/audit_test<br/>버그 9종")]
-    FIX -->|"fixture 모드"| S02
-    IN --> S02["02_audit_subject7_final<br/>src/dataset_audit"]
-    S02 --> O02[/"audit_check · audit_issue<br/>audit_label_stats"/]
-
+    S01["01_check_environment<br/>버전 · CUDA · YOLO Load"] --> S02A["02a_make_audit_fixture<br/>버그 9종 심은 시험용 데이터"]
+    S02A -->|"검사기부터 검사"| S02["02_audit_subject7_final<br/>src/dataset_audit"]
+    IN[("교과 7 FINAL<br/>JPG 900 + TXT 900")] --> S02
+    S02 --> O02[/"audit_check (19/19)<br/>audit_label_stats"/]
     O02 --> S03["03_split_analysis<br/>src/capture_group"]
-    S03 --> O03[/"capture_groups · 분포 CSV 5개"/]
-    O03 -.->|"숫자 근거"| POL(["split_policy.md<br/>5분 세션 · E1"])
-
-    POL --> S04["04_make_split"]
-    O03 --> S04
-    S04 --> O04[/"splits/kimchi_v1_split.csv<br/>Test 지문 4f9291849fe6"/]
-
-    O04 --> S05["05_freeze_split<br/>src/manifest"]
-    S05 --> O05[/"manifests/ 5개 (v2)<br/>freeze_check"/]
-    S05B["05b_upgrade_manifest_schema<br/>v1 → v2 · 배정 변경 0"] --> O05
-    O05 --> S05A["05a_dataset_summary"] --> O05A[/"dataset_summary.csv"/]
-
-    O05 --> S06["06_build_yolo_dataset"] --> YOLO[("data/yolo<br/>train · val · test<br/>Bridge 없음")]
-    YOLO --> S07["07_verify_yolo_dataset<br/>19항목 · 종료 코드"] --> O07[/"yolo_verify_check.csv"/]
+    S03 --> O03[/"capture_groups.csv<br/>분포 · Leakage CSV 5개"/]
+    O03 --> POL(["사람 결정<br/>docs/split_policy.md<br/>5분 촬영 세션 · 예외 E1"])
 
     classDef data fill:#E9ECE8,stroke:#9AA3AE,color:#1B2430
     classDef script fill:#1B2430,stroke:#1B2430,color:#FFFFFF
     classDef out fill:#FFFFFF,stroke:#9AA3AE,stroke-dasharray:4 3,color:#1B2430
     classDef human fill:#FBF1E6,stroke:#C26A1E,stroke-width:2px,color:#1B2430
-    class IN,FIX,YOLO data
-    class S01,S02A,S02,S03,S04,S05,S05B,S05A,S06,S07 script
-    class ENV,O02,O03,O04,O05,O05A,O07 out
+    class IN data
+    class S01,S02A,S02,S03 script
+    class O02,O03 out
     class POL human
 ```
 
-### 1-B. 4~5일차 — Baseline 학습 · 평가 (08 · 09)
+**② 3일차 · Split Freeze · YOLO 폴더** → `figures/pipeline_2_day3.svg`
 
 ```mermaid
+---
+title: ② 3일차 · Split Freeze · YOLO 폴더
+---
 flowchart TD
-    YOLO[("data/yolo")]
-    BY[/"configs/baseline.yaml<br/>imgsz 640 · 50 epoch"/]
-    S07["07 실행<br/>종료 코드 0 확인"]
-
-    YOLO --> S08["08_train_baseline<br/>검사 12항목 · src/train_detector"]
-    BY --> S08
-    S07 -.-> S08
-    S08 --> O08[/"models/baseline/baseline_best.pt<br/>sha 22f35d20a5ea (Git 제외)<br/>baseline_training_condition.md"/]
-
-    O08 --> S09["09_evaluate_baseline<br/>Val만 · src/evaluate_detector"]
-    S07 -.-> S09
-    S09 --> O09[/"baseline_metrics.csv<br/>baseline_class_check.csv<br/>baseline_val_image_check.csv"/]
+    POL(["split_policy.md"]) --> S04["04_make_split<br/>세션 단위 배정"]
+    S04 --> O04[/"splits/kimchi_v1_split.csv<br/>Test 지문 4f9291849fe6"/]
+    O04 --> S05["05_freeze_split<br/>src/manifest"]
+    S05 --> O05[/"manifests/ 5개<br/>600 / 74 / 80 / Bridge 146"/]
+    S05B["05b_upgrade_manifest_schema<br/>v1 → v2 · 배정 변경 0"] --> O05
+    O05 --> S05A["05a_dataset_summary"] --> O05A[/"dataset_summary.csv"/]
+    O05 --> S06["06_build_yolo_dataset"] --> YOLO[("data/yolo<br/>train · val · test<br/>Bridge 없음")]
+    YOLO --> S07["07_verify_yolo_dataset<br/>19항목 · 종료 코드"]
 
     classDef data fill:#E9ECE8,stroke:#9AA3AE,color:#1B2430
     classDef script fill:#1B2430,stroke:#1B2430,color:#FFFFFF
     classDef out fill:#FFFFFF,stroke:#9AA3AE,stroke-dasharray:4 3,color:#1B2430
+    classDef human fill:#FBF1E6,stroke:#C26A1E,stroke-width:2px,color:#1B2430
     class YOLO data
-    class S07,S08,S09 script
+    class S04,S05,S05B,S05A,S06,S07 script
+    class O04,O05,O05A out
+    class POL human
+```
+
+**③ 4~5일차 · Baseline 학습 · 평가** → `figures/pipeline_3_day4-5.svg`
+
+```mermaid
+---
+title: ③ 4~5일차 · Baseline 학습 · 평가
+---
+flowchart TD
+    YOLO[("data/yolo")] --> S08
+    BY[/"configs/baseline.yaml<br/>imgsz 640 · 50 epoch"/] --> S08
+    S08["08_train_baseline<br/>검사 12항목 · 07 실행 확인<br/>src/train_detector"]
+    S08 --> O08[/"baseline_best.pt<br/>sha 22f35d20a5ea (Git 제외)"/]
+    O08 --> S09["09_evaluate_baseline<br/>Val 74장만 · 07 실행 확인<br/>src/evaluate_detector"]
+    S09 --> O09[/"baseline_metrics.csv<br/>mAP50 0.622 · 놓침 159"/]
+
+    classDef data fill:#E9ECE8,stroke:#9AA3AE,color:#1B2430
+    classDef script fill:#1B2430,stroke:#1B2430,color:#FFFFFF
+    classDef out fill:#FFFFFF,stroke:#9AA3AE,stroke-dasharray:4 3,color:#1B2430
+    classDef human fill:#FBF1E6,stroke:#C26A1E,stroke-width:2px,color:#1B2430
+    class YOLO data
+    class S08,S09 script
     class BY,O08,O09 out
 ```
 
-### 1-C. 6~7일차 — 실패 분석 → 한 변수 개선 실험 (09a · 09b · 10 · 11)
+**④ 6~7일차 · 실패 분석 → 한 변수 개선** → `figures/pipeline_4_day6-7.svg`
 
 ```mermaid
+---
+title: ④ 6~7일차 · 실패 분석 → 한 변수 개선
+---
 flowchart TD
-    O09[/"baseline_*.csv<br/>(5일차 결과)"/]
+    O09[/"baseline_*.csv"/] --> S09A["09a_branch_fp_check<br/>branch 오검출 5종"]
+    S09A --> FA(["사람 · failure_analysis.csv<br/>대표 실패 17행"])
+    FA --> S09B["09b_failure_images<br/>정답 vs 예측 그림 14장"]
+    S09B --> HYP(["사람 결정 · H1<br/>작은 이물 놓침 153 / 159"])
+    HYP --> EY[/"exp001.yaml<br/>imgsz 640 → 1280 (한 줄)"/]
+    EY --> S10["10_train_experiment<br/>다른 설정 정확히 1개 검사<br/>08 도우미 재사용"]
+    S10 --> S11["11_evaluate_experiment<br/>09 채점 함수 그대로"]
+    S11 --> CMP(["baseline_vs_improved.md<br/>놓침 159 → 60 · 오검출 92 → 41"])
 
-    O09 --> S09A["09a_branch_fp_check<br/>branch 오검출 5종 분류"] --> O09A[/"branch_pred_check.csv"/]
-    O09A --> FA(["failure_analysis.csv<br/>사람이 대표 실패 17행"])
-    O09 --> FA
-    FA --> S09B["09b_failure_images<br/>정답 vs 예측 비교 그림"] --> O09B[/"demo/failure_analysis/ 14장<br/>(Git 제외)"/]
-    O09B --> HYP(["failure_hypothesis.md<br/>H1 작은 이물 놓침"])
-
-    HYP --> PLAN(["improvement_experiment.md<br/>상태: 확정 · 바꿀 변수 하나"])
-    PLAN --> EY[/"configs/exp001.yaml<br/>imgsz 640 → 1280 (한 줄)"/]
-    EY --> S10["10_train_experiment<br/>smoke · dry-run · 본 학습<br/>08 도우미 재사용"]
-    S10 --> O10[/"models/improved/exp001_best.pt<br/>sha 029c0e92e594 (Git 제외)"/]
-    O10 --> S11["11_evaluate_experiment<br/>09 채점 함수 그대로 · Val만"]
-    S11 --> O11[/"exp001_metrics · class_check<br/>experiment_log.csv"/]
-    O11 --> CMP(["baseline_vs_improved.md<br/>FN 159 → 60 · Final 후보"])
-
+    classDef data fill:#E9ECE8,stroke:#9AA3AE,color:#1B2430
     classDef script fill:#1B2430,stroke:#1B2430,color:#FFFFFF
     classDef out fill:#FFFFFF,stroke:#9AA3AE,stroke-dasharray:4 3,color:#1B2430
     classDef human fill:#FBF1E6,stroke:#C26A1E,stroke-width:2px,color:#1B2430
     class S09A,S09B,S10,S11 script
-    class O09,O09A,O09B,EY,O10,O11 out
-    class FA,HYP,PLAN,CMP human
+    class O09,EY out
+    class FA,HYP,CMP human
 ```
 
-### 1-D. 8 · 9일차 — Final 확정 → Frozen Test 1회 → Auto Label → 인계 (12 · 13 · 14)
+**⑤ 8일차 오전 · Final 확정 → Frozen Test 1회** → `figures/pipeline_5_day8-test.svg`
 
 ```mermaid
+---
+title: ⑤ 8일차 오전 · Final 확정 → Frozen Test 1회
+---
 flowchart TD
-    CMP(["baseline_vs_improved.md"])
-    O10[/"exp001_best.pt"/]
-
-    CMP --> SEL(["final_model_selection.md<br/>상태: 확정 · 커밋 (Test 보다 먼저)"])
-    O10 -->|"복사 · sha 같음"| FPT[/"models/final/final_best.pt<br/>(Git 제외)"/]
+    CMP(["baseline_vs_improved.md"]) --> SEL(["사람 결정 · 커밋<br/>final_model_selection.md<br/>a322016 · Test 보다 먼저"])
+    O10[/"exp001_best.pt"/] -->|"복사 · sha 같음"| FPT[/"final_best.pt<br/>sha 029c0e92e594"/]
     SEL --> S12["12_evaluate_final_test<br/>검사 15항목 · 1회 잠금"]
     FPT --> S12
-    S12 --> O12[/"final_metrics.csv · final_class_check.csv<br/>final_test_runs.csv (1회 증거)"/]
+    S12 --> O12[/"final_metrics.csv<br/>Test mAP50 0.606<br/>final_test_runs.csv (1회)"/]
 
-    O12 -->|"12 가 끝나야 실행"| S13["13_auto_label<br/>Test 8장 · Final 예측"]
-    FPT --> S13
-    S13 --> O13[/"demo/prediction_images · candidate_labels<br/>review_workspace · gt_hidden (Git 제외)"/]
-    O13 --> HR(["교과 7 라벨링 프로그램 v4.1<br/>사람 검수"])
-    HR --> S14["14_auto_label_review<br/>후보 ↔ 검수 1:1 짝짓기"]
-    O13 --> S14
-    S14 --> O14[/"auto_label_review.csv<br/>승인 31 / 43"/]
-
-    O12 --> ACC(["9일차 · acceptance_test.md 33/33<br/>handoff_subject14.md"])
-    O14 --> ACC
-
+    classDef data fill:#E9ECE8,stroke:#9AA3AE,color:#1B2430
     classDef script fill:#1B2430,stroke:#1B2430,color:#FFFFFF
     classDef out fill:#FFFFFF,stroke:#9AA3AE,stroke-dasharray:4 3,color:#1B2430
     classDef human fill:#FBF1E6,stroke:#C26A1E,stroke-width:2px,color:#1B2430
-    class S12,S13,S14 script
-    class O10,FPT,O12,O13,O14 out
-    class CMP,SEL,HR,ACC human
+    class S12 script
+    class O10,FPT,O12 out
+    class CMP,SEL human
 ```
+
+**⑥ 8~9일차 · Auto Label → 검수 → 인계** → `figures/pipeline_6_day8-9.svg`
+
+```mermaid
+---
+title: ⑥ 8~9일차 · Auto Label → 검수 → 인계
+---
+flowchart TD
+    O12[/"final_metrics.csv<br/>(12 가 끝났다는 증거)"/] --> S13["13_auto_label<br/>Test 8장 · Final 예측"]
+    S13 --> O13[/"후보 TXT 43개 · 검수 폴더<br/>정답은 gt_hidden 에 숨김"/]
+    O13 --> HR(["사람 · 교과 7 프로그램 v4.1<br/>승인 · 수정 · 삭제 · 추가"])
+    HR --> S14["14_auto_label_review<br/>후보 ↔ 검수 1:1 짝짓기"]
+    S14 --> O14[/"auto_label_review.csv<br/>그대로 승인 31 / 43"/]
+    O14 --> ACC(["9일차 · Acceptance 33 / 33<br/>handoff_subject14.md<br/>Bridge 146장 → 교과 14"])
+
+    classDef data fill:#E9ECE8,stroke:#9AA3AE,color:#1B2430
+    classDef script fill:#1B2430,stroke:#1B2430,color:#FFFFFF
+    classDef out fill:#FFFFFF,stroke:#9AA3AE,stroke-dasharray:4 3,color:#1B2430
+    classDef human fill:#FBF1E6,stroke:#C26A1E,stroke-width:2px,color:#1B2430
+    class S13,S14 script
+    class O12,O13,O14 out
+    class HR,ACC human
+```
+
+</details>
 
 `data/yolo`는 원본(읽기 전용)이 아니라 **06이 만든 복사본**입니다. 같은 폴더를 06(만든 쪽)과 07(검사하는 쪽)이 따로 확인합니다.
 
