@@ -2,7 +2,7 @@
 
 > 교과 7에서 검수한 정답 데이터로 YOLO11 객체검출 모델을 학습 · 평가 · 개선한다.
 >
-> **Dataset Version** `kimchi_v1` · **라벨 지문** `5c2b4fc2c3e6` · **진행 상황** 3일차 완료 (Split Freeze · data/yolo 구성 · Smoke Test) · 4일차 완료 (Baseline 학습) · 5일차 완료 (Baseline 평가) · 6일차 완료 (실패 분석 · H1 확정) · 7일차 완료 (exp001 imgsz 1280 · Final 후보) · 8일차 완료 (Final Model 확정 · Frozen Test 1회 · Auto Label → Human Review)
+> **Dataset Version** `kimchi_v1` · **라벨 지문** `5c2b4fc2c3e6` · **진행 상황** 3일차 완료 (Split Freeze · data/yolo 구성 · Smoke Test) · 4일차 완료 (Baseline 학습) · 5일차 완료 (Baseline 평가) · 6일차 완료 (실패 분석 · H1 확정) · 7일차 완료 (exp001 imgsz 1280 · Final 후보) · 8일차 완료 (Final Model 확정 · Frozen Test 1회 · Auto Label → Human Review) · **9일차 완료** (Feature Freeze · Acceptance **ACCEPTED** 33/33 · 교과 14 Handoff 확정 · 태그 `subject8_final_v1`) · 산출물 8 (발표) 준비 중
 
 ---
 
@@ -584,7 +584,7 @@ git diff --cached --name-only | grep -iE '\.png$'
 
 ## 18. 교과 14 Handoff
 
-**상태**: 초안 (10/15) · 9일차 확정 — [`docs/handoff_subject14.md`](docs/handoff_subject14.md) · 검수 [`reports/acceptance_test.md`](reports/acceptance_test.md)
+**상태**: 확정 (10/15 · 9일차) — [`docs/handoff_subject14.md`](docs/handoff_subject14.md) · Acceptance **ACCEPTED** (33/33 · FAIL 0 · [`reports/acceptance_test.md`](reports/acceptance_test.md))
 
 - **첫 연결점**: Bridge Holdout 146장 (BBox 778 · 교과 8 미사용 · `manifests/bridge_holdout.csv`)으로 Final Model(exp001 · imgsz 1280 · sha `029c0e92e594`)을 다시 확인
 - **넘기는 약점**: 나뭇잎 ↔ 나뭇가지 혼동 · 갈변 · 새 촬영 세션(4/24 G11에 Test FP 81% · FN 68%) · 정상 김치 0장 · 라벨 이슈 3건
@@ -606,5 +606,5 @@ git diff --cached --name-only | grep -iE '\.png$'
 | `reports/exp001_training_condition.md` | exp001 실제 학습 조건 · 실행 기록 (10이 자동 생성) |
 | `reports/baseline_vs_improved.md` | Baseline vs exp001 같은 Val 비교 · Final Model 후보 |
 | `reports/final_model_selection.md` | 8일차 Final Model 선택 이유 · 원본 Weight · Frozen Test 조건 (Test 전에 커밋) |
-| `reports/acceptance_test.md` | 9일차 Acceptance Test (초안 · PASS 25 · 확인 대기 8) |
+| `reports/acceptance_test.md` | 9일차 Acceptance Test (**ACCEPTED** · 33/33 · Final Gate 자가점검 포함) |
 | `docs/handoff_subject14.md` | 교과 14 인계 (Bridge · Final · 성능 · 약점 · 할 일) |
