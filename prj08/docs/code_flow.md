@@ -11,42 +11,12 @@
 
 ## 1. 전체 파이프라인 (파일 단위)
 
-한 장에 모든 파일과 화살표를 넣으면 글자가 너무 작아져서, **한눈에 보는 그림 1장 + 일차별 그림 6장(2장씩 나란히)**으로 나눴습니다. 화살표는 "무엇이 무엇을 만드나"만 남겼고, `src` import 는 3장 표에서 봅니다. 모든 입력 · import 화살표가 다 들어 있는 예전 상세 그림은 이 장 맨 아래 **접기** 안에 그대로 있습니다.
+한 장에 모든 파일과 화살표를 넣으면 글자가 너무 작아져서, **일차별 그림 6장(2장씩 나란히)**으로 나눴습니다. 화살표는 "무엇이 무엇을 만드나"만 남겼고, `src` import 는 3장 표에서 봅니다. 모든 입력 · import 화살표가 다 들어 있는 예전 상세 그림은 이 장 맨 아래 **접기** 안에 그대로 있습니다.
 
-### 1-0. 한눈에 보기 (단계 단위)
 
-> 이 그림을 SVG 로 뽑은 것이 [`docs/figures/pipeline_overview.svg`](figures/pipeline_overview.svg) 이고, README 8장 맨 위에 걸려 있습니다. 그림을 고치면 이 블록을 고친 뒤 SVG 도 다시 뽑습니다 (원본은 이 블록 하나).
+### 일차별 그림 (① ~ ⑥ · 2장씩 나란히)
 
-```mermaid
-flowchart TB
-    subgraph R1["① 데이터 준비 · 1~3일차"]
-        direction LR
-        IN[("교과 7 FINAL<br/>JPG 900 + TXT 900")] --> A["환경 · Audit · 분포<br/>01 · 02a · 02 · 03"] --> P(["사람 결정<br/>split_policy.md<br/>5분 촬영 세션"]) --> B["Split Freeze · YOLO 폴더<br/>04 · 05 · 05b · 05a · 06 · 07<br/>600 / 74 / 80 / Bridge 146"]
-    end
-    subgraph R2["② 모델 · 4~7일차"]
-        direction LR
-        C["Baseline 학습 · 평가<br/>08 · 09 · imgsz 640<br/>Val mAP50 0.622 · 놓침 159"] --> D["실패 분석<br/>09a · 09b<br/>대표 실패 17행"] --> H(["사람 결정<br/>H1 작은 이물 놓침<br/>바꿀 변수 하나"]) --> E["개선 실험 exp001<br/>10 · 11 · imgsz 1280<br/>Val mAP50 0.756 · 놓침 60"]
-    end
-    subgraph R3["③ 확정 · 활용 · 8~9일차"]
-        direction LR
-        S(["사람 결정 · 커밋<br/>final_model_selection.md<br/>Test 보다 먼저"]) --> F["Frozen Test 1회<br/>12 · imgsz 1280<br/>Test mAP50 0.606"] --> G["Auto Label<br/>13 → 교과 7 검수 → 14<br/>그대로 승인 31 / 43"] --> K(["Acceptance 33 / 33<br/>Handoff → 교과 14<br/>Bridge 146장 첫 시험지"])
-    end
-    R1 --> R2 --> R3
-
-    classDef data fill:#E9ECE8,stroke:#9AA3AE,color:#1B2430
-    classDef script fill:#1B2430,stroke:#1B2430,color:#FFFFFF
-    classDef human fill:#FBF1E6,stroke:#C26A1E,stroke-width:2px,color:#1B2430
-    class IN data
-    class A,B,C,D,E,F,G script
-    class P,H,S,K human
-    style R1 fill:#F7F5F1,stroke:#D9D3C7
-    style R2 fill:#F7F5F1,stroke:#D9D3C7
-    style R3 fill:#F7F5F1,stroke:#D9D3C7
-```
-
-### 1-1. 일차별 그림 (① ~ ⑥ · 2장씩 나란히)
-
-1-0 보다 자세하게, 일차마다 스크립트 · 결과 파일 · 사람의 결정을 모두 넣었습니다. GitHub 는 mermaid 그림을 옆으로 나란히 놓지 못해서 SVG 로 뽑아 2장씩 붙였습니다.
+README 8장의 한눈에 보기 그림보다 자세하게, 일차마다 스크립트 · 결과 파일 · 사람의 결정을 모두 넣었습니다. GitHub 는 mermaid 그림을 옆으로 나란히 놓지 못해서 SVG 로 뽑아 2장씩 붙였습니다.
 
 <p>
 <img src="figures/pipeline_1_day1-2.svg" width="394" alt="① 1~2일차 · 환경 · Audit · 분포">
@@ -208,6 +178,40 @@ flowchart TD
     class S13,S14 script
     class O12,O13,O14 out
     class HR,ACC human
+```
+
+</details>
+
+<details>
+<summary><b>README 한눈에 보기 그림 원본 (mermaid) 펼치기</b> → <code>figures/pipeline_overview.svg</code></summary>
+
+README 8장 맨 위 그림의 원본입니다. 그림을 고칠 때는 여기를 고친 뒤 SVG 를 다시 뽑습니다.
+
+```mermaid
+flowchart TB
+    subgraph R1["① 데이터 준비 · 1~3일차"]
+        direction LR
+        IN[("교과 7 FINAL<br/>JPG 900 + TXT 900")] --> A["환경 · Audit · 분포<br/>01 · 02a · 02 · 03"] --> P(["사람 결정<br/>split_policy.md<br/>5분 촬영 세션"]) --> B["Split Freeze · YOLO 폴더<br/>04 · 05 · 05b · 05a · 06 · 07<br/>600 / 74 / 80 / Bridge 146"]
+    end
+    subgraph R2["② 모델 · 4~7일차"]
+        direction LR
+        C["Baseline 학습 · 평가<br/>08 · 09 · imgsz 640<br/>Val mAP50 0.622 · 놓침 159"] --> D["실패 분석<br/>09a · 09b<br/>대표 실패 17행"] --> H(["사람 결정<br/>H1 작은 이물 놓침<br/>바꿀 변수 하나"]) --> E["개선 실험 exp001<br/>10 · 11 · imgsz 1280<br/>Val mAP50 0.756 · 놓침 60"]
+    end
+    subgraph R3["③ 확정 · 활용 · 8~9일차"]
+        direction LR
+        S(["사람 결정 · 커밋<br/>final_model_selection.md<br/>Test 보다 먼저"]) --> F["Frozen Test 1회<br/>12 · imgsz 1280<br/>Test mAP50 0.606"] --> G["Auto Label<br/>13 → 교과 7 검수 → 14<br/>그대로 승인 31 / 43"] --> K(["Acceptance 33 / 33<br/>Handoff → 교과 14<br/>Bridge 146장 첫 시험지"])
+    end
+    R1 --> R2 --> R3
+
+    classDef data fill:#E9ECE8,stroke:#9AA3AE,color:#1B2430
+    classDef script fill:#1B2430,stroke:#1B2430,color:#FFFFFF
+    classDef human fill:#FBF1E6,stroke:#C26A1E,stroke-width:2px,color:#1B2430
+    class IN data
+    class A,B,C,D,E,F,G script
+    class P,H,S,K human
+    style R1 fill:#F7F5F1,stroke:#D9D3C7
+    style R2 fill:#F7F5F1,stroke:#D9D3C7
+    style R3 fill:#F7F5F1,stroke:#D9D3C7
 ```
 
 </details>
