@@ -2,7 +2,7 @@
 
 > 교과 7에서 검수한 정답 데이터로 YOLO11 객체검출 모델을 학습 · 평가 · 개선한다.
 >
-> **Dataset Version** `kimchi_v1` · **라벨 지문** `5c2b4fc2c3e6` · **진행 상황** 3일차 완료 (Split Freeze · data/yolo 구성 · Smoke Test) · 4일차 완료 (Baseline 학습) · 5일차 완료 (Baseline 평가) · 6일차 완료 (실패 분석 · H1 확정) · 7일차 완료 (exp001 imgsz 1280 · Final 후보) · 8일차 진행 중 (Final Model 확정 · Frozen Test 1회 완료)
+> **Dataset Version** `kimchi_v1` · **라벨 지문** `5c2b4fc2c3e6` · **진행 상황** 3일차 완료 (Split Freeze · data/yolo 구성 · Smoke Test) · 4일차 완료 (Baseline 학습) · 5일차 완료 (Baseline 평가) · 6일차 완료 (실패 분석 · H1 확정) · 7일차 완료 (exp001 imgsz 1280 · Final 후보) · 8일차 완료 (Final Model 확정 · Frozen Test 1회 · Auto Label → Human Review)
 
 ---
 
@@ -506,14 +506,37 @@ Final Model(exp001 · sha `029c0e92e594`)을 확정 · 커밋한 **뒤** Frozen 
 | disease_browning | 21 | 18 | 14 | 0.14 |
 | green_onion_pepper | 20 | 8 | 2 | 0.60 |
 
-- **Val 보다 낮은 주된 이유 = Class 구성 차이**: Val 정답의 90% 가 플라스틱(351/389)이었지만 Test 는 플라스틱 31% · 나뭇잎 30% · 나뭇가지 26%. Val 에 7~8개뿐이던 leaf · branch 를 Test 에서 처음 제대로 측정했다.
+- **Val 보다 낮은 이유 ① Val 대표성**: Val 정답의 90% 가 플라스틱(351/389)이고 leaf · branch 는 7 · 8개뿐이라 Val mAP50 0.964 · 0.995 로 과대평가됐다. Test(143 · 122개)에서 0.565 · 0.649 로 처음 제대로 측정됐고, **이 두 Class 가 mAP50 하락(−0.150)의 83%** 다.
+- **Val 보다 낮은 이유 ② 새 촬영 세션 일반화**: Test 를 Val 과 같은 Class 비율로 맞춰 계산해도 Recall(conf 0.25)은 0.726 (Val 0.846) — 플라스틱도 0.85 → 0.73 으로 떨어졌고 작은 객체 놓침이 16% → 39% 로 늘었다.
 - **Confusion Matrix** (`reports/figures/final_test_confusion_matrix_normalized.png` · 비율만 참고): branch 의 39% → leaf · leaf 의 29% → branch (서로 혼동) · plastic 의 27% → leaf · 갈변의 43% 놓침 · 정답 없는 자리 오검출의 54% 가 갈변.
 - 갈변은 21개 중 3개 검출 (Val 0개) — 여전히 가장 약한 Class.
 - **결과를 보고 모델을 바꾸거나 다시 학습하지 않았다** (가이드 21.2). 한계로 기록하고 교과 14 로 넘긴다.
 
-## 15. Detection / Auto Label
+## 15. Detection / Auto Label (8일차)
 
-TBD (8일차)
+새 사진(학습 · Val · Test 에 안 쓴 사진)이 없어 **가이드 21.3 방식**으로, Frozen Test 평가를 끝낸 뒤 Test 사진 8장(Class · 촬영 세션 골고루 · `scripts/13_auto_label.py`)으로 시연했다. 정답 TXT 는 따로 보관하고(검수자 비공개), 이 결과로 모델을 다시 학습하지 않았다.
+
+1. **Detection**: Final Model(imgsz 1280 · conf 0.25) → `demo/prediction_images/` (BBox · Class · Confidence · Git 제외)
+2. **Auto Label 후보**: YOLO TXT 43개 박스 → `demo/auto_label/candidate_labels/` (Git 제외)
+3. **Human Review**: 교과 7 라벨링 프로그램 v4.1 로 `demo/auto_label/review_workspace` 를 열어 검수 (후보 = 원본 라벨 자리 · 그대로 저장 = DONE · 고침 = EDITED)
+4. **집계**: `scripts/14_auto_label_review.py` → `reports/auto_label_review.csv` · 검수 라벨 `demo/auto_label/reviewed_labels/`
+
+| 가이드 21.5 항목 | **공식 (심준형)** | 검수자 3명 범위 (김하민 · 심준형 · 박건) |
+|---|---:|---|
+| 사진 · AI 후보 BBox | 8장 · 43개 | 같음 |
+| 그대로 승인 | **31 (72%)** | 30 ~ 32 (70 ~ 74%) |
+| Class 수정 | 2 | 1 ~ 3 |
+| BBox 수정 | 3 | 1 ~ 7 |
+| 삭제 (오검출) | 7 | 5 ~ 7 |
+| 누락 추가 | 7 | 3 ~ 7 |
+| REVIEW | 0 | 0 |
+| 검수 후 최종 BBox | 43 | 41 ~ 43 |
+| (참고) 정답 46개와 일치 | AI 후보만 33 (72%) → 검수 후 **36 (78%)** | 검수 후 35 ~ 36 (76 ~ 78%) |
+
+- **AI 후보의 약 3/4 을 사람이 손대지 않고 승인**했다 — 3명 모두 70% 이상으로 재현됨. 교과 7 처럼 처음부터 그리는 대신, 4개 중 1개 정도만 고치고 놓친 것을 추가하면 된다.
+- **사람마다 가장 많이 갈린 것은 BBox 수정(1 ~ 7) · 누락 추가(3 ~ 7)** — 박스를 얼마나 꼭 맞출지 · 작은 조각을 이물로 볼지의 판단 차이. 오검출 삭제(5 ~ 7)는 비교적 일치했다. → 교과 7 의 Class · BBox 기준서를 검수 전에 다시 맞출 필요.
+- 사람 검수 후에도 정답과의 일치는 76 ~ 78% (정답 46개 중 10 ~ 11개 불일치) — 4K 의 아주 작은 조각 · 나뭇잎 ↔ 나뭇가지 경계는 사람에게도 어렵다 (참고 비교 · 정답 자체 오류 가능성도 있음).
+- 공식 결과 선정 규칙: 결과를 보기 전에 정한 대로 **3명의 중앙값에 가장 가까운 검수자**(정답 일치율로는 고르지 않음) → 심준형.
 
 ## 16. 알려진 한계
 
@@ -522,6 +545,7 @@ TBD (8일차)
 - **Class 6(파·고추)은 G01 한 세션에만 존재** → 예외 E1로 분할 · Class 6 점수는 참고값
 - **Val이 Class 1 중심** (BBox 389개 중 351개) → 모델 비교 때 전체 mAP와 함께 Class별 AP 확인
 - **Frozen Test 80장** → 작아서 점수 변동이 클 수 있음
+- **Auto Label 시연은 Test 사진 8장 · 박스 43개** → 새 사진이 아니고 표본이 작아 승인율(70 ~ 74%)은 참고값 · 검수자 간 BBox 판단 차이가 큼 (BBox 수정 1 ~ 7)
 - **Val 이 Test 분포를 대표하지 못함** → Val 은 플라스틱 90% · Test 는 leaf · branch 56% → Val 로 고른 Final 이 Test 에서 mAP50 0.756 → 0.606 · Split 때 'Class별 20개 이상' 기준을 Test · Bridge 에만 두고 Val 에는 두지 않았음 → 교과 14 에서는 Class 균형을 맞춘 검증 세트 필요
 - **leaf_paper ↔ branch 혼동** (Test: branch 의 39% → leaf · leaf 의 29% → branch) · plastic 의 27% 도 leaf 로 예측 → 두 Class 기준 재확인 필요
 - **갈변 ↔ 김치 배경 양방향 혼동** (Test: 갈변 43% 놓침 · 정답 없는 자리 오검출의 54% 가 갈변) · Val 0/6 · Test 3/21
