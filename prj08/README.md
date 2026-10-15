@@ -113,9 +113,16 @@ LC_ALL=C cat data/subject7_final/labels/*.txt | sha256sum | cut -c1-12
 | 13 | `python scripts/09_evaluate_baseline.py` | 평가 전 검사 10항목 PASS → Val 평가 · `reports/baseline_metrics.csv` · 그림 3장 · `reports/baseline_val_image_check.csv` · `reports/baseline_class_check.csv` (Val만 · Test · Bridge 미사용) |
 | 14 | `git status --short` | **아무것도 안 나오면** 내 결과 = 팀 기준 결과 (확인 후 `git restore reports/ splits/`) |
 | 15 | `python scripts/09a_branch_fp_check.py` | 6일차 · 실행 전 검사 6항목 PASS → Val branch 예측 5종 분류 · 용훈 PC 결과와 비교 `다름 0` · `reports/branch_pred_check.csv` (사람 확인 칸은 비어 있음 · **확인을 채운 뒤에는 다시 돌리지 않기** · 덮어씀 · Val만 · Test · Bridge 미사용) |
+| 16 | `python scripts/09b_failure_images.py` | 6일차 · `baseline_best.pt` sha 확인 → `reports/failure_analysis.csv` 대표 실패 사진(Val만 · 중복 제거) 14장 비교 그림 `demo/failure_analysis/*_compare.jpg` (Git 제외 · NDA) · 목록 `reports/failure_image_list.csv` |
+| 17 | `python scripts/10_train_experiment.py --config configs/exp001.yaml --smoke` | 7일차 · 1 epoch 시험 → `runs/exp001_smoke/` · 시간 · GPU 메모리만 확인 (기록 안 남김 · exp001은 최대 9.97GB < 11GB → imgsz 1280 채택) |
+| 18 | `python scripts/10_train_experiment.py --config configs/exp001.yaml --dry-run` | 학습 전 검사 PASS (Baseline과 다른 학습 설정 **정확히 1개** · `reports/improvement_experiment.md` **상태: 확정** · 덮어쓰기 방지) · `reports/exp001_training_condition.md` 초안 |
+| 19 | `python scripts/10_train_experiment.py --config configs/exp001.yaml` | 검사 PASS → exp001 학습 50 / 50 epoch · loss NaN/inf 0 → `models/improved/exp001_best.pt` 보관 · 조건 문서 상태 `완료` (`configs` · `src` · `scripts` · `manifests`가 커밋된 상태여야 시작) |
+| 20 | `python scripts/11_evaluate_experiment.py --config configs/exp001.yaml` | 평가 전 검사 10항목 PASS → 09 채점 함수 그대로 Val 평가 · `reports/exp001_metrics.csv` · `exp001_class_check.csv` · `exp001_val_image_check.csv` · 그림 3장 · `reports/experiment_log.csv` 갱신 (decision 칸은 보존) · `reports/baseline_vs_improved.md`는 없을 때만 초안 (Val만 · Test · Bridge 미사용) |
 | (참고) | Smoke Test 명령 | `reports/smoke_test.md` 2장 · 1 epoch · `runs/smoke_day3/` (Git 제외) · 재현용이 아니라 파이프라인 연결 확인용 |
 
 > `05b_upgrade_manifest_schema.py`는 10/13 `manifests/`를 v1(3칸) → v2(9칸)로 바꿀 때 **한 번** 쓴 스크립트입니다. 지금 main의 `manifests/`는 이미 v2라 실행할 필요가 없습니다. (실행해도 "이미 v2" 확인만 하고 아무것도 쓰지 않음)
+
+> `10_train_experiment.py`는 **① `--smoke` → `improvement_experiment.md`를 `상태: 확정`으로 → ② `--dry-run` → ③ 본 학습** 순서로 씁니다. `runs/exp001/` · `models/improved/exp001_best.pt`가 이미 있으면 덮어쓰지 않고 멈추므로, 다음 실험은 `configs/exp002.yaml`처럼 **새 이름**으로 만듭니다. 10 · 11은 둘 다 `--config`로 같은 실험 설정 파일을 받습니다.
 
 ## 7. 폴더 구조
 
@@ -128,15 +135,16 @@ prj08/
 │
 ├── configs/
 │   ├── dataset.yaml                   # 산출물 1 · path: data/yolo · Class ID 0~6 영문 이름 · Bridge 미포함
-│   └── baseline.yaml                  # 4일차 · Baseline 학습 조건 (팀 확정값 · epochs 50 · batch 16 · imgsz 640 · AdamW 0.000909 · 0.9 · seed 42)
+│   ├── baseline.yaml                  # 4일차 · Baseline 학습 조건 (팀 확정값 · epochs 50 · batch 16 · imgsz 640 · AdamW 0.000909 · 0.9 · seed 42)
+│   └── exp001.yaml                    # 7일차 · 개선 실험 조건 (baseline.yaml 복사 + imgsz 640 → 1280 한 줄만 변경 · name · reason)
 │
 ├── src/                               # 재사용 "기능" (혼자 실행하지 않음)
 │   ├── __init__.py                    # src를 패키지로 인식시키는 빈 파일
 │   ├── dataset_audit.py               # Pair · YOLO 형식 · Class · 좌표 · Manifest 검사 함수
 │   ├── capture_group.py               # 파일명 → 촬영 시각 · 촬영 세션(capture_group) 묶기 · 시간 차 계산
-│   ├── manifest.py                    # manifests/ 읽기 · 쓰기 공통 (v1 · v2 스키마 · split 이름 · 지문) → 05 · 05a · 05b · 06 · 07 · 08 · 09가 import
-│   ├── train_detector.py              # 4일차 · YOLO 학습 공통 함수 (TRAIN_KEYS 12개만 model.train()에 전달) → 08이 import
-│   └── evaluate_detector.py           # 5일차 · Val 평가 · 이미지 예측 · TP/FP/FN 짝짓기 (Frozen Test 보호) → 09가 import
+│   ├── manifest.py                    # manifests/ 읽기 · 쓰기 공통 (v1 · v2 스키마 · split 이름 · 지문) → 05 · 05a · 05b · 06 · 07 · 08 · 09 · 09a · 09b · 10 · 11이 import
+│   ├── train_detector.py              # 4일차 · YOLO 학습 공통 함수 (TRAIN_KEYS 12개만 model.train()에 전달) → 08 · 10이 import (11은 TRAIN_KEYS만)
+│   └── evaluate_detector.py           # 5일차 · Val 평가 · 이미지 예측 · TP/FP/FN 짝짓기 (Frozen Test 보호) → 09 · 09a · 09b · 11이 import
 │
 ├── scripts/                           # 실제 "실행" 파일 (번호 = 실행 순서)
 │   ├── 01_check_environment.py        # 1일차 · Python / PyTorch / Ultralytics / GPU · YOLO11n Load
@@ -151,7 +159,10 @@ prj08/
 │   ├── 07_verify_yolo_dataset.py      # 3일차 · data/yolo가 manifests와 같은지 19항목 검증 (읽기만)
 │   ├── 08_train_baseline.py           # 4일차 · 학습 전 12항목 검사 → Baseline 학습 → 조건 문서 자동 기록 (--dry-run: 검사만)
 │   ├── 09_evaluate_baseline.py        # 5일차 · Baseline Val 평가 · Class별 지표 · 이미지별 FP/FN · Class별 TP/FN/FP (Test · Bridge 미사용)
-│   └── 09a_branch_fp_check.py         # 6일차 · Val branch 예측 5종 분류 (H3 · 오검출 확인) · 사람 확인 칸 (Test · Bridge 미사용)
+│   ├── 09a_branch_fp_check.py         # 6일차 · Val branch 예측 5종 분류 (H3 · 오검출 확인) · 사람 확인 칸 (Test · Bridge 미사용)
+│   ├── 09b_failure_images.py          # 6일차 · 대표 실패 사례 Val 사진에 정답(초록 · 놓침 노랑) + 예측(빨강)을 겹친 비교 그림 (demo/ · Git 제외)
+│   ├── 10_train_experiment.py         # 7일차 · 한 변수 원칙 검사 → 개선 실험 학습 (--smoke: 1 epoch 시험 · --dry-run: 검사만) · 08 도우미 재사용
+│   └── 11_evaluate_experiment.py      # 7일차 · 09 채점 함수 그대로 개선 모델 Val 평가 → Baseline 비교 · experiment_log.csv (Test · Bridge 미사용)
 │
 ├── docs/
 │   ├── split_policy.md                # 산출물 1 · Split 정책 확정본 (5분 세션 · 600/75/75/150 · 예외 E1)
@@ -160,10 +171,10 @@ prj08/
 │       ├── README.md                  # 목차 · 읽는 순서 · 우선순위
 │       ├── configs/                   # dataset_yaml.md
 │       ├── src/                       # dataset_audit.md · capture_group.md · manifest.md · train_detector.md · evaluate_detector.md
-│       └── scripts/                   # 01 · 02a · 02 · 03 · 04 · 05 · 05a · 05b · 06 · 07 · 08 · 09 · 09a 리뷰
+│       └── scripts/                   # 01 · 02a · 02 · 03 · 04 · 05 · 05a · 05b · 06 · 07 · 08 · 09 · 09a · 09b · 10 · 11 리뷰
 │
 ├── reports/                           # 결과 · 기록 (파일명 · 숫자만 · Git에 올림)
-│   ├── figures/                       # 09 · 학습곡선 · Confusion Matrix (baseline_results.png · baseline_confusion_matrix(_normalized).png · 그래프만)
+│   ├── figures/                       # 09 · 11 · 학습곡선 · Confusion Matrix (baseline_* · exp001_* · results.png · confusion_matrix(_normalized).png · 그래프만)
 │   ├── audit_expected.md              # Audit 전에 고정한 기대값 (Test Oracle · 교과 7 문서 기준)
 │   ├── audit_issue.csv                # 900장 문제 목록 (0건 → 제목 줄만)
 │   ├── audit_check.csv                # 기대값 vs 실제 19항목 (v2 기준 PASS 19 / FAIL 0)
@@ -186,7 +197,17 @@ prj08/
 │   ├── baseline_val_image_check.csv   # 09 · 이미지별 GT · 예측 · TP · FP · FN · 작은 객체 FN → 6일차 Failure Analysis 입력
 │   ├── baseline_class_check.csv       # 09 · Class별 GT · TP · FN · FP · conf 0.25 기준 Recall · Precision → 7일차 비교 기준
 │   ├── branch_pred_check.csv          # 09a · branch 예측 1개 = 1행 · 분류 5종 · 원본 좌표 · 사람 확인(human_check · memo) → H3 근거
-│   ├── failure_analysis.csv           # 6일차 · 실패 대표 사례 (원인 · 증거 · 다음 행동) · H3 행은 branch_pred_check.csv 근거
+│   ├── failure_analysis.csv           # 6일차 · 실패 대표 사례 (원인 · 증거 · 다음 행동) · H3 행은 branch_pred_check.csv 근거 → 09b · 11의 입력
+│   ├── failure_hypothesis.md          # 6일차 · 산출물 3 · 실패 가설 H1~H4 · L · 가이드 19장 분류와의 대응 · 7일차 결정 규칙
+│   ├── failure_image_list.csv         # 09b · 비교 그림을 만든 사진 목록 · 실패 유형 · TP · FP · FN (숫자만)
+│   ├── improvement_experiment.md      # 7일차 · 산출물 4 · 개선 실험 계획 (바꿀 변수 imgsz 하나 · 상태: 확정이어야 10이 학습)
+│   ├── exp001_training_condition.md   # 10 · exp001 실제 학습 조건 · 학습 전 검사 · 실행 기록 · Weight sha (자동 생성)
+│   ├── exp001_results.csv             # 10 · runs/exp001/results.csv 사본 (숫자만)
+│   ├── exp001_metrics.csv             # 11 · exp001 Val 전체 + Class별 P · R · mAP50 · mAP50-95 (baseline_metrics.csv와 같은 형식)
+│   ├── exp001_val_image_check.csv     # 11 · exp001 이미지별 GT · 예측 · TP · FP · FN · 작은 객체 FN
+│   ├── exp001_class_check.csv         # 11 · exp001 Class별 GT · TP · FN · FP · conf 0.25 기준 Recall · Precision
+│   ├── experiment_log.csv             # 11 · 산출물 5 · 실험 1개 = 1행 (조건 · 바꾼 변수 · Val 지표 · sha · decision은 팀이 작성)
+│   ├── baseline_vs_improved.md        # 11 초안 + 팀 작성 · 같은 Val 비교 · 핵심 FP/FN 변화 · Final Model 후보 (Frozen Test 안 봄)
 │   ├── label_preview.md               # 가이드 16.4 · Split 복사 후 라벨 Preview 20장 (교과 7 도구 · 20/20 일치)
 │   ├── smoke_test.md                  # 가이드 16.5~16.7 · 1 epoch → Weight → Prediction 연결 확인 · 가이드와 다른 점 6장
 │   └── issue_log.md                   # 문제 · 원인 · 해결 기록
@@ -197,7 +218,8 @@ prj08/
 ├── daily_csv/
 │   ├── 10_12.csv                      # 일일 작업 기록
 │   ├── 10_13.csv                      # 일일 작업 기록
-│   └── 10_14.csv                      # 일일 작업 기록
+│   ├── 10_14.csv                      # 일일 작업 기록
+│   └── 10_15.csv                      # 일일 작업 기록
 │
 ├── manifests/                         # 산출물 1 · 05가 Freeze · v2 9칸 (file_name · image_path · label_path · source_dataset ·
 │   │                                  #   original_split · scene_type · capture_group · split · dataset_version)
@@ -207,10 +229,10 @@ prj08/
 │   ├── test.csv                       # 80 · Frozen Test (지문 4f9291849fe6 · 8일차 전 사용 금지)
 │   └── bridge_holdout.csv             # 146 · 교과 14 보존 · 교과 8 사용 금지
 │
-├── demo/                              # (6 · 8일차) 실패 사례 · Prediction · Auto Label 결과 (일부 Git 제외)
+├── demo/                              # (6 · 8일차) 실패 사례 · Prediction · Auto Label 결과 (일부 Git 제외 · failure_analysis/ = 09b 비교 그림 · Git 제외)
 ├── presentation/                      # (9일차) 발표 PDF · Q&A
-├── models/                            # ⚠ Git 제외 · baseline/ (baseline_best.pt) · improved/ · final/
-├── runs/                              # ⚠ Git 제외 · Ultralytics 결과 (smoke_day3 · smoke_day3_predict* · baseline_v1 · baseline_v1_val · predict/baseline_val_images · predict/branch_check)
+├── models/                            # ⚠ Git 제외 · baseline/ (baseline_best.pt) · improved/ (exp001_best.pt) · final/
+├── runs/                              # ⚠ Git 제외 · Ultralytics 결과 (smoke_day3 · smoke_day3_predict* · baseline_v1 · baseline_v1_val · predict/baseline_val_images · predict/branch_check · exp001_smoke · exp001 · exp001_val · predict/exp001_val_images)
 │
 └── data/                              # ⚠ Git 제외 (NDA)
     ├── subject7_final/                # 교과 7 FINAL 복사본 · 읽기 전용 · 라벨 지문 5c2b4fc2c3e6
@@ -271,7 +293,7 @@ prj08/
          runs/smoke_day3/weights/best.pt (Git 제외 · Baseline 아님) · reports/smoke_test.md
 
 [3일차 보완]  05b_upgrade_manifest_schema.py : manifests/ v1 → v2 (1회 · reports/manifest_schema_check.csv)
-              (05 · 05a · 05b · 06 · 07 · 08 · 09는 manifest 읽기 · 쓰기를 src/manifest.py 하나로 공유)
+              (05 · 05a · 05b · 06 · 07 · 08 · 09 · 09a · 09b · 10 · 11은 manifest 읽기 · 쓰기를 src/manifest.py 하나로 공유)
 
 [4일차]
          08_train_baseline.py ←── configs/baseline.yaml + configs/dataset.yaml + manifests/ + data/yolo
@@ -297,6 +319,32 @@ prj08/
          reports/branch_pred_check.csv (Git · human_check · memo는 사람이 채움) · runs/predict/branch_check/ (Git 제외 · NDA)
               ▼
          [사람] branch 박스 확인 (라벨 누락 · 김치 줄기 착각 · 다른 이물) ──→ reports/failure_analysis.csv H3 행 · (라벨 누락이면) reports/issue_log.md
+              ▼
+         [사람] FN · FP 많은 Val 사진 14장 선정 ──→ reports/failure_analysis.csv · reports/failure_hypothesis.md (H1~H4 · L)
+              ▼
+         09b_failure_images.py ←── reports/failure_analysis.csv + models/baseline/baseline_best.pt + baseline_training_condition.md (sha) + manifests/val.csv + data/yolo (val)
+              │  (import src.manifest · src.evaluate_detector.match_boxes · Val만 · conf 0.25 · IoU 0.5 = 09와 같은 기준)
+              ▼
+         demo/failure_analysis/*_compare.jpg (Git 제외 · NDA · 정답 초록 · 놓침 노랑 · 예측 빨강) · reports/failure_image_list.csv (Git)
+              ▼
+         [사람] 10/15 회의 → H1 개선 대상 확정 ──→ configs/exp001.yaml · reports/improvement_experiment.md (변수 imgsz 하나 · 상태: 확정)
+
+[7일차]
+         10_train_experiment.py --smoke ←── configs/exp001.yaml (1 epoch · runs/exp001_smoke · 기록 안 남김 · 최대 9.97GB < 11GB → imgsz 1280)
+              ▼
+         10_train_experiment.py ←── configs/exp001.yaml + configs/baseline.yaml (학습 설정 차이 = 정확히 1개) + improvement_experiment.md (확정) + manifests/ + data/yolo
+              │  (import src.manifest · src.train_detector · 08을 모듈로 불러 지문 · git · 환경 도우미 재사용 · 학습 전 07 실행 → 종료 코드 0 확인)
+              ▼
+         runs/exp001/ · models/improved/exp001_best.pt (Git 제외) · reports/exp001_training_condition.md · reports/exp001_results.csv (Git)
+              ▼
+         11_evaluate_experiment.py ←── models/improved/exp001_best.pt + exp001_training_condition.md (상태 · sha) + reports/baseline_*.csv 3개 + reports/failure_analysis.csv
+              │  (import src.manifest · src.evaluate_detector · src.train_detector.TRAIN_KEYS · 09를 모듈로 불러 채점 함수 그대로 · 평가 전 07 실행)
+              │  평가 전 검사 10항목 · split = val 고정 (Frozen Test · Bridge 미사용)
+              ▼
+         reports/exp001_metrics · exp001_class_check · exp001_val_image_check.csv · reports/figures/exp001_*.png · reports/experiment_log.csv (Git)
+         runs/exp001_val/ · runs/predict/exp001_val_images/ (Git 제외)
+              ▼
+         [사람] reports/baseline_vs_improved.md 해석 · experiment_log.csv decision 작성 ──→ Frozen Test 를 보지 않고 exp001 을 Final Model 후보로
 ```
 
 | 파일 | 입력 | 출력 | 의존 |
@@ -315,6 +363,9 @@ prj08/
 | `08_train_baseline.py` | `configs/baseline.yaml` · `configs/dataset.yaml` · `manifests/` · `data/yolo` (07 검증 PASS) · 원본 labels (지문) | `runs/baseline_v1/` · `models/baseline/baseline_best.pt` · `reports/baseline_training_condition.md` · `reports/baseline_results.csv` | `src.manifest` · `src.train_detector` · PyYAML · torch · ultralytics · git |
 | `09_evaluate_baseline.py` | `models/baseline/baseline_best.pt` · `reports/baseline_training_condition.md` · `configs/baseline.yaml` · `manifests/val.csv` · `data/yolo` (val) | `reports/baseline_metrics.csv` · `reports/figures/` · `reports/baseline_val_image_check.csv` · `reports/baseline_class_check.csv` · `runs/baseline_v1_val/` · `runs/predict/baseline_val_images/` | `src.manifest` · `src.evaluate_detector` · PyYAML |
 | `09a_branch_fp_check.py` | `models/baseline/baseline_best.pt` · `reports/baseline_training_condition.md` (sha) · `configs/dataset.yaml` · `manifests/val.csv` · `data/yolo` (val) · `reports/baseline_val_image_check.csv` (비교용) | `reports/branch_pred_check.csv` · `runs/predict/branch_check/` | `src.manifest` · `src.evaluate_detector` · PyYAML |
+| `09b_failure_images.py` | `reports/failure_analysis.csv` · `models/baseline/baseline_best.pt` · `reports/baseline_training_condition.md` (sha) · `manifests/val.csv` · `data/yolo` (val) | `demo/failure_analysis/*_compare.jpg` · `reports/failure_image_list.csv` | `src.manifest` · `src.evaluate_detector` (`match_boxes`) · Pillow · ultralytics |
+| `10_train_experiment.py` | `configs/exp001.yaml` · `configs/baseline.yaml` · `reports/improvement_experiment.md` · `configs/dataset.yaml` · `manifests/` · `data/yolo` (07 검증 PASS) · 원본 labels (지문) | `runs/exp001/` (`--smoke`: `runs/exp001_smoke/`) · `models/improved/exp001_best.pt` · `reports/exp001_training_condition.md` · `reports/exp001_results.csv` | `src.manifest` · `src.train_detector` · `08_train_baseline.py` (importlib) · PyYAML · torch · git |
+| `11_evaluate_experiment.py` | `models/improved/exp001_best.pt` · `reports/exp001_training_condition.md` · `configs/exp001.yaml` · `configs/baseline.yaml` · `reports/baseline_*.csv` 3개 · `reports/failure_analysis.csv` · `data/yolo` (val) | `reports/exp001_metrics.csv` · `reports/exp001_class_check.csv` · `reports/exp001_val_image_check.csv` · `reports/figures/exp001_*.png` · `reports/experiment_log.csv` · `reports/baseline_vs_improved.md` (없을 때만) · `runs/exp001_val/` · `runs/predict/exp001_val_images/` | `src.manifest` · `src.evaluate_detector` · `src.train_detector` (`TRAIN_KEYS`) · `09_evaluate_baseline.py` (importlib) · PyYAML |
 
 > 함수 단위 설명과 리뷰는 [`docs/code_review/README.md`](docs/code_review/README.md), 그림은 [`docs/code_flow.md`](docs/code_flow.md)를 참고합니다.
 
@@ -334,7 +385,7 @@ prj08/
 - **예외 E1**: 파·고추 252개 중 251개가 G01에만 있어 G01만 2분 하위 세션으로 분할 배정 (Class 6 점수는 참고값)
 - **검증**: 합격 기준 8 / 8 PASS (`reports/split_check.csv`) · Frozen Test 지문 `4f9291849fe6`
 - **data/yolo 구성 · 검증**: 06이 Train · Val · Test만 복사하고(Bridge는 `data/yolo`에 넣지 않음) 07이 `manifests/`와 같은지 확인 (이미지 600 / 74 / 80 · BBox 2,957 / 389 / 477)
-- **Frozen Test 보호**: 08은 test 평가 코드가 없고, 09의 평가 함수는 `val`만 허용합니다 (`test`는 8일차에 `allow_test=True`를 명시해야 열림 · `bridge_holdout`은 막힘)
+- **Frozen Test 보호**: 08 · 10은 test 평가 코드가 없고, 09 · 11의 평가 함수는 `val`만 허용하며, 09a · 09b는 Val 사진만 씁니다 (`test`는 8일차에 `allow_test=True`를 명시해야 열림 · `bridge_holdout`은 막힘)
 - 근거와 결정 기록: `docs/split_policy.md`
 
 ## 10. Baseline
@@ -455,3 +506,7 @@ TBD (9일차 · `docs/handoff_subject14.md`)
 | `reports/issue_log.md` | 문제 · 원인 · 해결 기록 |
 | `reports/smoke_test.md` | Smoke Test 기록 · 가이드와 다른 점 |
 | `reports/baseline_training_condition.md` | Baseline 실제 학습 조건 · 실행 기록 · 4일차 Gate (08이 자동 생성) |
+| `reports/failure_hypothesis.md` | 6일차 실패 가설 H1~H4 · L · 가이드 19장 분류 대응 |
+| `reports/improvement_experiment.md` | 7일차 개선 실험 계획 (변수 하나 · 상태: 확정) |
+| `reports/exp001_training_condition.md` | exp001 실제 학습 조건 · 실행 기록 (10이 자동 생성) |
+| `reports/baseline_vs_improved.md` | Baseline vs exp001 같은 Val 비교 · Final Model 후보 |
