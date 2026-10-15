@@ -584,7 +584,11 @@ git diff --cached --name-only | grep -iE '\.png$'
 
 ## 18. 교과 14 Handoff
 
-TBD (9일차 · `docs/handoff_subject14.md`)
+**상태**: 초안 (10/15) · 9일차 확정 — [`docs/handoff_subject14.md`](docs/handoff_subject14.md) · 검수 [`reports/acceptance_test.md`](reports/acceptance_test.md)
+
+- **첫 연결점**: Bridge Holdout 146장 (BBox 778 · 교과 8 미사용 · `manifests/bridge_holdout.csv`)으로 Final Model(exp001 · imgsz 1280 · sha `029c0e92e594`)을 다시 확인
+- **넘기는 약점**: 나뭇잎 ↔ 나뭇가지 혼동 · 갈변 · 새 촬영 세션(4/24 G11에 Test FP 81% · FN 68%) · 정상 김치 0장 · 라벨 이슈 3건
+- **넘기는 할 일**: Class · 날짜 균형 검증 세트 · 두 Class 기준 재정리 → `kimchi_v2` · 갈변 데이터 · Negative 사진 · 현장 속도
 
 ## 참고 문서
 
@@ -602,3 +606,5 @@ TBD (9일차 · `docs/handoff_subject14.md`)
 | `reports/exp001_training_condition.md` | exp001 실제 학습 조건 · 실행 기록 (10이 자동 생성) |
 | `reports/baseline_vs_improved.md` | Baseline vs exp001 같은 Val 비교 · Final Model 후보 |
 | `reports/final_model_selection.md` | 8일차 Final Model 선택 이유 · 원본 Weight · Frozen Test 조건 (Test 전에 커밋) |
+| `reports/acceptance_test.md` | 9일차 Acceptance Test (초안 · PASS 25 · 확인 대기 8) |
+| `docs/handoff_subject14.md` | 교과 14 인계 (Bridge · Final · 성능 · 약점 · 할 일) |
