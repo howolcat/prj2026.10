@@ -120,6 +120,10 @@ LC_ALL=C cat data/subject7_final/labels/*.txt | sha256sum | cut -c1-12
 | 20 | `python scripts/11_evaluate_experiment.py --config configs/exp001.yaml` | 평가 전 검사 10항목 PASS → 09 채점 함수 그대로 Val 평가 · `reports/exp001_metrics.csv` · `exp001_class_check.csv` · `exp001_val_image_check.csv` · 그림 3장 · `reports/experiment_log.csv` 갱신 (decision 칸은 보존) · `reports/baseline_vs_improved.md`는 없을 때만 초안 (Val만 · Test · Bridge 미사용) |
 | 21 | `python scripts/12_evaluate_final_test.py --dry-run` | 8일차 · Frozen Test 평가 전 검사 15항목 (`reports/final_model_selection.md` **상태: 확정 · 커밋됨** · `final_best.pt` sha = 선택 문서 = exp001 기록 · Test 지문 `4f9291849fe6` · 1회 잠금) · Test는 열지 않음 |
 | 22 | `python scripts/12_evaluate_final_test.py` | **딱 1회** · Final Model(imgsz 1280)로 Frozen Test 80장 평가 → `reports/final_metrics.csv` · `final_class_check.csv` · `final_test_image_check.csv` · `final_test_runs.csv` · 그림 `reports/figures/final_test_*.png` (`final_metrics.csv`가 있으면 다시 실행 거부 · Bridge 미사용) |
+| 23 | `python scripts/13_auto_label.py --dry-run` | 8일차 · Auto Label 준비 검사 (Frozen Test 평가 끝남 · Final sha · 고른 사진이 전부 Test · 검수 시작 전) + 사용할 Test 사진 8장 목록 (새 사진이 없어 가이드 21.3 방식) |
+| 24 | `python scripts/13_auto_label.py` | Final Model(imgsz 1280 · conf 0.25)로 `demo/prediction_images/` Detection 결과 · `demo/auto_label/candidate_labels/` 후보 TXT · 교과 7 프로그램 검수 폴더 `demo/auto_label/review_workspace/` (정답은 `gt_hidden/`에 따로 · 전부 Git 제외) · `reports/auto_label_candidates.csv` |
+| (사람) | `cd ../prj07 && python main.py` | 교과 7 라벨링 프로그램 v4.1 → **data 폴더 열기** `prj08/demo/auto_label/review_workspace` → 후보 박스 확인 · 수정 · 삭제 · 추가 → 저장 (그대로 = DONE · 고침 = EDITED · 애매함 = REVIEW) |
+| 25 | `python scripts/14_auto_label_review.py` | 후보 vs 사람 검수 비교 → 승인 · Class 수정 · BBox 수정 · 삭제 · 누락 추가 · REVIEW 집계 `reports/auto_label_review.csv` · 검수 라벨 `demo/auto_label/reviewed_labels/` |
 | (참고) | Smoke Test 명령 | `reports/smoke_test.md` 2장 · 1 epoch · `runs/smoke_day3/` (Git 제외) · 재현용이 아니라 파이프라인 연결 확인용 |
 
 > `05b_upgrade_manifest_schema.py`는 10/13 `manifests/`를 v1(3칸) → v2(9칸)로 바꿀 때 **한 번** 쓴 스크립트입니다. 지금 main의 `manifests/`는 이미 v2라 실행할 필요가 없습니다. (실행해도 "이미 v2" 확인만 하고 아무것도 쓰지 않음)
@@ -165,7 +169,9 @@ prj08/
 │   ├── 09b_failure_images.py          # 6일차 · 대표 실패 사례 Val 사진에 정답(초록 · 놓침 노랑) + 예측(빨강)을 겹친 비교 그림 (demo/ · Git 제외)
 │   ├── 10_train_experiment.py         # 7일차 · 한 변수 원칙 검사 → 개선 실험 학습 (--smoke: 1 epoch 시험 · --dry-run: 검사만) · 08 도우미 재사용
 │   ├── 11_evaluate_experiment.py      # 7일차 · 09 채점 함수 그대로 개선 모델 Val 평가 → Baseline 비교 · experiment_log.csv (Test · Bridge 미사용)
-│   └── 12_evaluate_final_test.py      # 8일차 · Final Model Frozen Test 1회 평가 (선택 문서 커밋 확인 · 1회 잠금 · 09 채점 함수 그대로 · 가이드 이름 11_evaluate_final_test.py)
+│   ├── 12_evaluate_final_test.py      # 8일차 · Final Model Frozen Test 1회 평가 (선택 문서 커밋 확인 · 1회 잠금 · 09 채점 함수 그대로 · 가이드 이름 11_evaluate_final_test.py)
+│   ├── 13_auto_label.py               # 8일차 · Final Model Detection 이미지 · Auto Label 후보 TXT · 교과 7 검수 폴더 (Test 8장 · Frozen Test 평가 뒤에만 · 가이드 이름 12_auto_label.py)
+│   └── 14_auto_label_review.py        # 8일차 · Auto Label 후보 vs 사람 검수 비교 → 승인 · 수정 · 삭제 · 추가 집계
 │
 ├── docs/
 │   ├── split_policy.md                # 산출물 1 · Split 정책 확정본 (5분 세션 · 600/75/75/150 · 예외 E1)
@@ -216,6 +222,8 @@ prj08/
 │   ├── final_class_check.csv          # 12 · Frozen Test Class별 GT · TP · FN · FP (conf 0.25)
 │   ├── final_test_image_check.csv     # 12 · Frozen Test 이미지별 TP · FP · FN · 작은 객체 FN (교과 14 대표 FP/FN 근거)
 │   ├── final_test_runs.csv            # 12 · Frozen Test 실행 기록 (1회 증거)
+│   ├── auto_label_candidates.csv      # 13 · Auto Label 사진별 후보 BBox 수 · Class (숫자만)
+│   ├── auto_label_review.csv          # 14 · 산출물 6 · 사진별 승인 · Class 수정 · BBox 수정 · 삭제 · 누락 추가 · REVIEW
 │   ├── label_preview.md               # 가이드 16.4 · Split 복사 후 라벨 Preview 20장 (교과 7 도구 · 20/20 일치)
 │   ├── smoke_test.md                  # 가이드 16.5~16.7 · 1 epoch → Weight → Prediction 연결 확인 · 가이드와 다른 점 6장
 │   └── issue_log.md                   # 문제 · 원인 · 해결 기록
