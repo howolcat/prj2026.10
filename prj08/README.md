@@ -1,4 +1,10 @@
+<div align="center">
+
 # 조각김치 이물 객체검출 (YOLO11)
+
+**[결과 한눈에](#자세히-보기) · [빠른 실행](#6-설치--실행-방법) · [폴더 · 산출물](#7-폴더-구조) · [한계](#16-알려진-한계) · [문서](#참고-문서)**
+
+</div>
 
 식품 공장의 조각김치 이물 사진 900장으로 YOLO11n 검출 모델을 만들고, **라벨링 → 학습 → 평가 → 자동 라벨링**까지 한 사이클을 완성했습니다.
 실패 원인을 데이터로 찾아 **변수 하나만 바꿔 개선**했고, 처음 보는 테스트 세트로 **한 번만 평가**해 점수가 낮아진 원인(검증 세트 편중 · 검증에 없던 촬영일)까지 확인했습니다.
@@ -25,12 +31,24 @@
 
 ## 1. 프로젝트 목적
 
+교과 7에서 검수한 정답 데이터로 YOLO11n을 학습 · 평가 · 개선하고, Auto Label → Human Review까지 연결한다.
+
+<details>
+<summary>펼쳐 보기</summary>
+
 - 교과 7 FINAL(JPG 900장 + YOLO TXT 900개)을 학습용 Dataset으로 구성한다.
 - YOLO11n Baseline을 학습하고 Validation에서 Precision · Recall · mAP · FP · FN을 분석한다.
 - 실패 원인 하나만 바꾼 Improved Model을 같은 Validation에서 비교해 Final Model을 고르고, Frozen Test로 최종 성능과 한계를 확인한다.
 - Final Model로 Detection · Auto Label 후보를 만들고 교과 7 라벨링 도구로 Human Review까지 연결한다.
 
+</details>
+
 ## 2. 교과 7 → 교과 8 연결
+
+교과 7 FINAL 900장(BBox 4,601 · 전체 QA PASS)을 읽기 전용으로 그대로 사용한다.
+
+<details>
+<summary>펼쳐 보기</summary>
 
 - 교과 7 FINAL: `data/subject7_final/` (원본: `master_data/final` · Git 미포함 · 읽기 전용)
 - JPG 900장 / YOLO TXT 900개 · Pair 900 · 동일 이미지(md5) 0쌍
@@ -39,7 +57,14 @@
 - BBox 4,601개 (`kimchi_v1` · 아래 Class 표)
 - QA 상태: 900장 전체 QA PASS · 교과 7 QA 결과: `prj07/reports/qa_summary.md`
 
+</details>
+
 ## 3. Dataset 설명
+
+원본은 3묶음 900장 — 학습데이터1 train 500 · 학습데이터2 train 220 · validation 180.
+
+<details>
+<summary>펼쳐 보기</summary>
 
 | source_dataset | original_split | 수량 |
 |---|---|---:|
@@ -47,6 +72,8 @@
 | 이물검출_학습데이터2 | train | 220 |
 | 이물검출_학습데이터2 | validation | 180 |
 | **합계** | | **900** |
+
+</details>
 
 ## 4. Class
 
@@ -65,6 +92,11 @@
 > 교과 7 문서(qa_summary · handoff)는 4,602개로 적혀 있지만, 10/08 라벨 추가 수정(Class 2→0 56개 등)을 반영한 4,601개를 기준으로 한다. 상세: `reports/issue_log.md`, `docs/split_policy.md`
 
 ## 5. 실행환경
+
+Python 3.10 · PyTorch 2.14.1+cu130 · Ultralytics 8.4.175 · RTX 3060 — 팀원 전원 환경 · 라벨 지문 일치 확인.
+
+<details>
+<summary>펼쳐 보기</summary>
 
 | 항목 | 값 |
 |---|---|
@@ -85,7 +117,14 @@
 | 김하민 | 8.4.175 | True | RTX 3060 | 성공 | `5c2b4fc2c3e6` |
 | 심준형 | 8.4.175 | True | RTX 3060 | 성공 | `5c2b4fc2c3e6` |
 
+</details>
+
 ## 6. 설치 · 실행 방법
+
+가상환경 → torch(cu130) → requirements → 교과 7 FINAL 복사 → `scripts/01` ~ `14` 순서대로 실행.
+
+<details>
+<summary>펼쳐 보기</summary>
 
 ### 6.1 처음 한 번 (환경 · 데이터 준비)
 
@@ -146,7 +185,14 @@ LC_ALL=C cat data/subject7_final/labels/*.txt | sha256sum | cut -c1-12
 
 > `10_train_experiment.py`는 **① `--smoke` → `improvement_experiment.md`를 `상태: 확정`으로 → ② `--dry-run` → ③ 본 학습** 순서로 씁니다. `runs/exp001/` · `models/improved/exp001_best.pt`가 이미 있으면 덮어쓰지 않고 멈추므로, 다음 실험은 `configs/exp002.yaml`처럼 **새 이름**으로 만듭니다. 10 · 11은 둘 다 `--config`로 같은 실험 설정 파일을 받습니다.
 
+</details>
+
 ## 7. 폴더 구조
+
+가이드 필수 산출물 8종 · 이를 뒷받침하는 우리 산출물 · 전체 폴더 트리.
+
+<details>
+<summary>펼쳐 보기</summary>
 
 ### 7.1 필수 산출물
 
@@ -164,7 +210,6 @@ LC_ALL=C cat data/subject7_final/labels/*.txt | sha256sum | cut -c1-12
 > ⚠ `models/` · `runs/` · `demo/`는 NDA · 용량 때문에 Git에서 제외합니다 (17장 데이터 보안).
 
 ### 7.2 우리 산출물
-
 
 | 위치 | 개수 |
 |---|---|
@@ -308,12 +353,16 @@ prj08/
 
 > Git은 빈 폴더를 저장하지 않습니다. `demo/`, `presentation/`, `models/` 하위 폴더는 각자 PC에만 있고, 파일이 생기는 날 Git에 올라갑니다.
 
+</details>
+
 ## 8. 실행 순서와 데이터 흐름
 
 ![교과 8 전체 파이프라인 한눈에 보기 — 1~9일차 · 주황 = 사람의 결정](docs/figures/pipeline_overview.svg)
 
 > 위 그림은 **단계만** 보여 줍니다 (주황 = 사람이 정한 지점 · 검정 = 실행 스크립트). 일차별 상세 그림은 [`docs/code_flow.md`](docs/code_flow.md) 1장, import 관계는 3장, 아래는 실행 순서를 글로 적은 전체 지도입니다.
 
+<details>
+<summary>일차별 스크립트 · 결과 파일 흐름 펼쳐 보기</summary>
 
 ```
 [1일차]  01_check_environment.py ──→ 화면 출력 → 5장 팀원 환경 표
@@ -464,7 +513,14 @@ prj08/
 
 > 함수 단위 설명과 리뷰는 [`docs/code_review/README.md`](docs/code_review/README.md), 그림은 [`docs/code_flow.md`](docs/code_flow.md)를 참고합니다.
 
+</details>
+
 ## 9. Dataset Split
+
+5분 촬영 세션 단위로 Train 600 · Val 74 · Test 80 · Bridge 146 배정 — 세션 누수 0건 · 합격 기준 8/8 PASS.
+
+<details>
+<summary>펼쳐 보기</summary>
 
 **상태**: 정책 확정 (2026-10-12 · 팀 회의) · 배정 선행 완료 · **3일차 Freeze 완료** (2026-10-13 · `manifests/` v2 · 검사 13항목 PASS)
 
@@ -483,7 +539,14 @@ prj08/
 - **Frozen Test 보호**: 08 · 10은 test 평가 코드가 없고, 09 · 11의 평가 함수는 `val`만 허용하며, 09a · 09b는 Val 사진만 씁니다 (`test`는 8일차에 `allow_test=True`를 명시해야 열림 · 12만 사용 · 1회 · 13은 12가 끝난 뒤 Test 사진 8장만 시연에 사용 · `bridge_holdout`은 막힘)
 - 근거와 결정 기록: `docs/split_policy.md`
 
+</details>
+
 ## 10. Baseline
+
+YOLO11n · imgsz 640 · 50 epoch → Val mAP50 0.622 · 놓침 159 · 오검출 92.
+
+<details>
+<summary>펼쳐 보기</summary>
 
 **상태**: 4일차 학습 완료 · 5일차 Validation 평가 완료 (`scripts/09_evaluate_baseline.py`)
 
@@ -509,7 +572,14 @@ prj08/
 - **Val GT 라벨 오류 2건** 발견 → `reports/issue_log.md` 10/14 참고 (평가 해석 시 함께 확인)
 - **Confusion Matrix 읽는 법**: `reports/figures/baseline_confusion_matrix.png`는 Ultralytics 평가 기본값 **conf 0.001** 기준이라 background 칸에 저신뢰 예측 수천 개가 포함됨 → 실제 오검출(FP) 수는 conf 0.25 기준인 `reports/baseline_val_image_check.csv`로 확인
 
+</details>
+
 ## 11. Failure Analysis (6일차)
+
+놓침 159개 중 153개(96%)가 작은 객체 → 가설 H1(작은 객체)을 개선 대상으로 확정.
+
+<details>
+<summary>펼쳐 보기</summary>
 
 Baseline(baseline_v1 · imgsz 640)을 Val 74장에서 conf 0.25 로 예측해 보니 **놓침(FN) 159개 · 오검출(FP) 92개**가 나왔다.
 FN · FP 가 많은 사진 14장을 골라 정답(초록) · 놓친 정답(노랑, MISSED) · 예측(빨강)을 한 장에 겹친 비교 이미지(`scripts/09b_failure_images.py`)로 직접 보고, 실패를 다음 가설로 나눴다.
@@ -530,7 +600,14 @@ FN · FP 가 많은 사진 14장을 골라 정답(초록) · 놓친 정답(노�
 자세한 내용: `reports/failure_analysis.csv` · `reports/failure_hypothesis.md` · `reports/failure_image_list.csv`
 (비교 이미지는 회사 데이터라 `demo/failure_analysis/` 에만 두고 Git 에 올리지 않음)
 
+</details>
+
 ## 12. Improvement (7일차)
+
+imgsz 640 → 1280 하나만 바꿔 Val mAP50 0.622 → 0.756 · 놓침 159 → 60 (갈변은 그대로).
+
+<details>
+<summary>펼쳐 보기</summary>
 
 6일차 실패 분석에서 놓침 159개 중 153개가 작은 객체(H1)였기 때문에, 변수 하나만 바꾼 실험 exp001 로 **imgsz 640 → 1280** 을 시험했다 (smoke 1 epoch 최대 메모리 9.97GB < 11GB 기준 → 1280 채택).
 같은 kimchi_v1 · 같은 Val 74장에서 비교한 결과, mAP50 0.622 → **0.756**, mAP50-95 0.462 → **0.641**, Recall(conf 0.25) 0.591 → **0.846** 으로 올랐다.
@@ -539,7 +616,14 @@ FN · FP 가 많은 사진 14장을 골라 정답(초록) · 놓친 정답(노�
 **Frozen Test 를 보지 않고** exp001 을 Final Model 후보로 정했으며, 8일차에 확정한 뒤 Frozen Test 를 imgsz 1280 으로 1회 평가한다.
 자세한 내용: `reports/baseline_vs_improved.md` · `reports/experiment_log.csv`
 
+</details>
+
 ## 13. Final Model (8일차)
+
+Test를 보기 전에 Val 결과만으로 exp001(imgsz 1280)을 Final Model로 확정.
+
+<details>
+<summary>펼쳐 보기</summary>
 
 **Final Model = exp001** (`models/final/final_best.pt` · sha `029c0e92e594` = `models/improved/exp001_best.pt` · Git 제외).
 Frozen Test 를 보기 **전에** 같은 Val 74장 결과만으로 baseline_v1 과 exp001 중에서 골랐다 (`reports/final_model_selection.md` · 상태: 확정 · 커밋 후 Test).
@@ -554,7 +638,14 @@ Frozen Test 를 보기 **전에** 같은 Val 74장 결과만으로 baseline_v1 �
 - 알려진 약점: 갈변(disease_browning) 6개는 두 모델 모두 0개 검출 · 입력 1280 이라 메모리 · 처리 시간이 더 든다.
 - Frozen Test 는 Final Model 과 같은 **imgsz 1280** 으로 **1회만** 평가한다 (`scripts/12_evaluate_final_test.py` · 두 번째 실행 거부).
 
+</details>
+
 ## 14. Frozen Test (8일차)
+
+Test 80장 1회 평가 → mAP50 0.606 · 하락 원인은 검증 세트 편중과 새 촬영 세션.
+
+<details>
+<summary>펼쳐 보기</summary>
 
 Final Model(exp001 · sha `029c0e92e594`)을 확정 · 커밋한 **뒤** Frozen Test 80장(지문 `4f9291849fe6`)을 imgsz 1280 으로 **1회** 평가했다 (`scripts/12_evaluate_final_test.py` · 실행 기록 `reports/final_test_runs.csv`).
 
@@ -581,7 +672,14 @@ Final Model(exp001 · sha `029c0e92e594`)을 확정 · 커밋한 **뒤** Frozen 
 - 갈변은 21개 중 3개 검출 (Val 0개) — 여전히 가장 약한 Class.
 - **결과를 보고 모델을 바꾸거나 다시 학습하지 않았다** (가이드 21.2). 한계로 기록하고 교과 14 로 넘긴다.
 
+</details>
+
 ## 15. Detection / Auto Label (8일차)
+
+Test 사진 8장 시연 → AI 후보 43개 중 31개(72%)를 사람이 수정 없이 승인.
+
+<details>
+<summary>펼쳐 보기</summary>
 
 새 사진(학습 · Val · Test 에 안 쓴 사진)이 없어 **가이드 21.3 방식**으로, Frozen Test 평가를 끝낸 뒤 Test 사진 8장(Class · 촬영 세션 골고루 · `scripts/13_auto_label.py`)으로 시연했다. 정답 TXT 는 따로 보관하고(검수자 비공개), 이 결과로 모델을 다시 학습하지 않았다.
 
@@ -607,7 +705,14 @@ Final Model(exp001 · sha `029c0e92e594`)을 확정 · 커밋한 **뒤** Frozen 
 - 사람 검수 후에도 정답과의 일치는 76 ~ 78% (정답 46개 중 10 ~ 11개 불일치) — 4K 의 아주 작은 조각 · 나뭇잎 ↔ 나뭇가지 경계는 사람에게도 어렵다 (참고 비교 · 정답 자체 오류 가능성도 있음).
 - 공식 결과 선정 규칙: 결과를 보기 전에 정한 대로 **3명의 중앙값에 가장 가까운 검수자**(정답 일치율로는 고르지 않음) → 심준형.
 
+</details>
+
 ## 16. 알려진 한계
+
+정상 김치 0장 · 검증 세트 편중 · 나뭇잎 ↔ 나뭇가지 혼동 · 갈변 약점 등 — 다음 단계로 인계.
+
+<details>
+<summary>펼쳐 보기</summary>
 
 - **정상 김치(Negative) 0장** → 정상 김치를 이물로 잘못 찾는(FP) 경향을 평가할 수 없음 · 5일차 확인 결과 Val에도 정상 김치 사진이 없어 측정 불가 → 대신 이물 장면 안의 배경 오검출(정답 없는 자리)로 일부 확인 (`reports/baseline_val_image_check.csv`)
 - **object_only 150장은 전부 Train** → "이물만 있는 장면"의 성능은 평가하지 않음
@@ -621,7 +726,14 @@ Final Model(exp001 · sha `029c0e92e594`)을 확정 · 커밋한 **뒤** Frozen 
 - **Val GT 라벨 오류 2건** (`reports/issue_log.md` 10/14) → Baseline Val 점수에 영향을 줄 수 있어 Failure Analysis에서 함께 확인
 - **촬영 조건이 단조로움** (4일 · 같은 트레이 · 같은 조명) → 다른 환경에서의 성능은 이 데이터로 알 수 없음
 
+</details>
+
 ## 17. 데이터 보안
+
+기업 데이터(NDA) · 가중치는 Git에 올리지 않는다 — 커밋 전 확인 명령 2개.
+
+<details>
+<summary>펼쳐 보기</summary>
 
 - 기업 제공 데이터(NDA)는 Git · 디스코드 · 외부 클라우드에 올리지 않는다. (`data/`, `*.jpg`, `*.pt`, `runs/`, `models/` 제외)
 - **보안정책이 `.gitignore`보다 우선**한다 (가이드 22.2)
@@ -634,6 +746,8 @@ git diff --cached --name-only | grep -iE '\.(jpe?g|pt)$|/data/|/runs/|/models/'
 # ② png 가 나오면 reports/figures/ 의 그래프인지 눈으로 확인 (김치 사진이 보이는 그림은 올리지 않음)
 git diff --cached --name-only | grep -iE '\.png$'
 ```
+
+</details>
 
 ## 18. 교과 14 Handoff
 
@@ -665,6 +779,11 @@ git diff --cached --name-only | grep -iE '\.png$'
 
 ## 진행 기록
 
+<details>
+<summary>일차별 진행 기록 펼쳐 보기</summary>
+
 > 교과 7에서 검수한 정답 데이터로 YOLO11 객체검출 모델을 학습 · 평가 · 개선한다.
 >
 > **Dataset Version** `kimchi_v1` · **라벨 지문** `5c2b4fc2c3e6` · **진행 상황** 3일차 완료 (Split Freeze · data/yolo 구성 · Smoke Test) · 4일차 완료 (Baseline 학습) · 5일차 완료 (Baseline 평가) · 6일차 완료 (실패 분석 · H1 확정) · 7일차 완료 (exp001 imgsz 1280 · Final 후보) · 8일차 완료 (Final Model 확정 · Frozen Test 1회 · Auto Label → Human Review) · **9일차 완료** (Feature Freeze · Acceptance **ACCEPTED** 33/33 · 교과 14 Handoff 확정 · 태그 `subject8_final_v1`) · 산출물 8 (발표) 준비 중
+
+</details>
