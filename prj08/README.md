@@ -1,8 +1,25 @@
-# 교과 8 · 조각김치 이물 객체검출 (YOLO11)
+# 조각김치 이물 객체검출 (YOLO11)
 
-> 교과 7에서 검수한 정답 데이터로 YOLO11 객체검출 모델을 학습 · 평가 · 개선한다.
->
-> **Dataset Version** `kimchi_v1` · **라벨 지문** `5c2b4fc2c3e6` · **진행 상황** 3일차 완료 (Split Freeze · data/yolo 구성 · Smoke Test) · 4일차 완료 (Baseline 학습) · 5일차 완료 (Baseline 평가) · 6일차 완료 (실패 분석 · H1 확정) · 7일차 완료 (exp001 imgsz 1280 · Final 후보) · 8일차 완료 (Final Model 확정 · Frozen Test 1회 · Auto Label → Human Review) · **9일차 완료** (Feature Freeze · Acceptance **ACCEPTED** 33/33 · 교과 14 Handoff 확정 · 태그 `subject8_final_v1`) · 산출물 8 (발표) 준비 중
+식품 공장의 조각김치 이물 사진 900장으로 YOLO11n 검출 모델을 만들고, **라벨링 → 학습 → 평가 → 자동 라벨링**까지 한 사이클을 완성했습니다.
+실패 원인을 데이터로 찾아 **변수 하나만 바꿔 개선**했고, 최종 모델은 처음 보는 테스트 세트로 **한 번만 평가**해 한계까지 기록했습니다.
+
+<p align="center">
+  <img src="docs/figures/readme_dashboard.png" alt="프로젝트 한눈에 보기: 핵심 숫자 4개, 데이터 분포, 성능 변화, Class 성적표, AI 라벨 검수 결과" width="100%">
+</p>
+
+## 자세히 보기
+
+대시보드의 숫자마다 근거가 되는 장으로 바로 이동할 수 있습니다.
+
+| 대시보드 | 궁금한 점 | 자세히 |
+|---|---|---|
+| 분석 · **96%** | 왜 입력 해상도를 바꿨나? | [11. 실패 분석](#11-failure-analysis-6일차) |
+| 개선 · **−62%** | 무엇을 바꿨고, 무엇이 좋아졌나? | [10. Baseline](#10-baseline) → [12. Improvement](#12-improvement-7일차) |
+| 검증 · **0.606** | 왜 테스트 점수가 검증보다 낮나? | [13. Final Model](#13-final-model-8일차) → [14. Frozen Test](#14-frozen-test-8일차) |
+| 활용 · **72%** | AI 라벨을 사람이 어떻게 검수했나? | [15. Auto Label](#15-detection--auto-label-8일차) |
+| ① 데이터 분포 | 데이터를 어떻게 검수하고 나눴나? | [3. Dataset](#3-dataset-설명) · [4. Class](#4-class) · [9. Split](#9-dataset-split) |
+| ③ Class 성적표 | 약점과 다음 할 일은? | [16. 알려진 한계](#16-알려진-한계) · [18. Handoff](#18-교과-14-handoff) |
+| — | 직접 실행해 보려면? | [6. 설치 · 실행 방법](#6-설치--실행-방법) |
 
 ---
 
@@ -645,3 +662,9 @@ git diff --cached --name-only | grep -iE '\.png$'
 | [`reports/acceptance_test.md`](reports/acceptance_test.md) | 9일차 Acceptance Test (**ACCEPTED** · 33/33 · Final Gate 자가점검 포함) |
 | [`docs/handoff_subject14.md`](docs/handoff_subject14.md) | 교과 14 인계 (Bridge · Final · 성능 · 약점 · 할 일) |
 | [`docs/deliverables_map.md`](docs/deliverables_map.md) | 필수 산출물 vs 우리 산출물 구분 · 추가 파일을 만든 이유 |
+
+## 진행 기록
+
+> 교과 7에서 검수한 정답 데이터로 YOLO11 객체검출 모델을 학습 · 평가 · 개선한다.
+>
+> **Dataset Version** `kimchi_v1` · **라벨 지문** `5c2b4fc2c3e6` · **진행 상황** 3일차 완료 (Split Freeze · data/yolo 구성 · Smoke Test) · 4일차 완료 (Baseline 학습) · 5일차 완료 (Baseline 평가) · 6일차 완료 (실패 분석 · H1 확정) · 7일차 완료 (exp001 imgsz 1280 · Final 후보) · 8일차 완료 (Final Model 확정 · Frozen Test 1회 · Auto Label → Human Review) · **9일차 완료** (Feature Freeze · Acceptance **ACCEPTED** 33/33 · 교과 14 Handoff 확정 · 태그 `subject8_final_v1`) · 산출물 8 (발표) 준비 중
