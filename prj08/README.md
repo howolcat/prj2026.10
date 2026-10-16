@@ -206,6 +206,7 @@ prj08/
 │   ├── split_policy.md                # 산출물 1 · Split 정책 확정본 (5분 세션 · 600/75/75/150 · 예외 E1)
 │   ├── code_flow.md                   # 코드 흐름 (일차별 그림 6장 · import 표 · 그림 원본)
 │   ├── figures/                       # 파이프라인 그림 SVG 7장 (pipeline_overview = README 8장 · pipeline_1~6 = code_flow 1장)
+│   ├── deliverables_map.md            # 필수 산출물 vs 우리 산출물 구분표
 │   └── code_review/                   # 코드와 같은 구조의 파일별 리뷰
 │       ├── README.md                  # 목차 · 읽는 순서 · 우선순위
 │       ├── configs/                   # dataset_yaml.md
