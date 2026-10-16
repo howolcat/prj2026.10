@@ -208,11 +208,11 @@ LC_ALL=C cat data/subject7_final/labels/*.txt | sha256sum | cut -c1-12
 
 | 위치 | 개수 |
 |---|---|
-| `reports/` | 33 (그림 4 포함) |
+| `reports/` | 44 (그림 9 포함) |
 | `configs/` | 2 |
 | `splits/` | 1 |
 | `daily_csv/` | 4 |
-| `docs/` | 그림 7 · `code_flow.md` 1 · `code_review/` 26 |
+| `docs/` | 그림 8 · `code_flow.md` 1 · `code_review/` 26 |
 
 > 파일별로 왜 만들었는지는 [`docs/deliverables_map.md`](docs/deliverables_map.md)에 정리했습니다.
 
@@ -254,9 +254,7 @@ prj08/
 ├── docs/
 │   ├── ★split_policy.md · ★handoff_subject14.md · deliverables_map.md · code_flow.md
 │   ├── code_review/  # scripts · src · configs 와 같은 이름의 리뷰 .md
-│   └── figures/      pipeline_overview.svg · pipeline_1_day1_2.svg · pipeline_2_day3.svg
-│                     pipeline_3_day4_5.svg · pipeline_4_day6_7.svg · pipeline_5_day8_test.svg
-│                     pipeline_6_day8_9.svg · readme_dashboard.png
+│   └── figures/      # README · code_flow.md 에 들어가는 이미지 (파이프라인 그림 · 대시보드)
 │
 ├── reports/          # 결과 · 검사 기록 (숫자만)
 │   │  ── 2일차 데이터 검사 ──
@@ -283,14 +281,12 @@ prj08/
 │   ├── auto_label_candidates.csv · ★auto_label_review.csv
 │   │  ── 9일차 · 공통 ──
 │   ├── ★acceptance_test.md · issue_log.md
-│   └── ★figures/     baseline_results.png · baseline_confusion_matrix(_normalized).png
-│                     exp001_results.png · exp001_confusion_matrix(_normalized).png
-│                     final_test_confusion_matrix(_normalized).png · final_test_pr_curve.png
+│   └── ★figures/     # 학습곡선 · Confusion Matrix · PR 곡선 (Baseline · exp001 · Final Test)
 │
 ├── manifests/        ★split_manifest.csv (900) · ★train.csv (600) · ★val.csv (74)
 │                     ★test.csv (80) · ★bridge_holdout.csv (146)
 ├── splits/           kimchi_v1_split.csv
-├── daily_csv/        10_12.csv · 10_13.csv · 10_14.csv · 10_15.csv
+├── daily_csv/        # 일일 작업 기록 (날짜별 CSV)
 │
 ├── ⚠ data/           subject7_final/ (원본 900장) · audit_test/ · yolo/ (학습 폴더)
 ├── ⚠ models/         baseline/ · improved/ · final/ (.pt)
