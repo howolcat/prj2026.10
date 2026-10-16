@@ -475,7 +475,7 @@ Final Model(exp001 · sha `029c0e92e594`)을 확정 · 커밋한 **뒤** Frozen 
 
 </details>
 
-## 한계 · 보안 · 인계
+## 한계 · 보안 · 인계 · 팀
 
 <details>
 <summary><b>16. 알려진 한계</b> — 정상 김치 0장 · 검증 세트 편중 · 나뭇잎↔나뭇가지 · 갈변</summary>
@@ -520,11 +520,6 @@ git diff --cached --name-only | grep -iE '\.png$'
 - **넘기는 약점**: 나뭇잎 ↔ 나뭇가지 혼동 · 갈변 · 새 촬영 세션(4/24 G11에 Test FP 81% · FN 68%) · 정상 김치 0장 · 라벨 이슈 3건
 - **넘기는 할 일**: Class · 날짜 균형 검증 세트 · 두 Class 기준 재정리 → `kimchi_v2` · 갈변 데이터 · Negative 사진 · 현장 속도
 
-</details>
-
-## 팀
-
-<details>
 <summary><b>19. 팀 역할</b> — PM 최용훈 · Data / QA 심준형 · Evaluation / Experiment 박건 · Inference / Document 김하민</summary>
 
 | 팀원 | 역할 | 주요 작업 |
