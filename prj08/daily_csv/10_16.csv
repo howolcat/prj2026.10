@@ -23,3 +23,9 @@
 2026-10-16,심준형,Done,시연 1 Detection 영상,final_best.pt sha 029c0e92e594 확인 · Test 강한 사례 1장 · 약한 사례 1장 Detection(imgsz 1280 · conf 0.25) · runs/demo_detect 결과 이미지에 BBox · Class · Confidence 표시 확인 · OBS 1920×1080 30FPS 녹화 · 영상은 demo/에만 두고 Git 제외,완료,발표 · 산출물 8
 2026-10-16,심준형,Done,시연 2 Auto Label → Human Review 영상,공식 검수 결과 보존을 위해 raw/만 ~/demo_ws에 복사 · 교과 7 프로그램 v4.1로 AI 후보 1장 검수 시연(승인 · Class 수정 · 삭제 → scene_type 입력 → 저장 EDITED) · work/labels · dataset_manifest.csv · label_history.csv 생성 확인 · 공식 결과 요약 출력(후보 43 · 승인 31(72%) · Class 수정 2 · BBox 수정 3 · 삭제 7 · 추가 7) · 영상은 demo/에만 두고 Git 제외,완료,발표 · 산출물 8
 2026-10-16,심준형,Fix,OBS 녹화 영상 재생 안 됨,Fragmented MP4는 첫 장면만 나오고 멈춤(길이 정보 없음) → 녹화 형식 Hybrid MP4로 변경 · 디스플레이 캡처 화면 잘림 → 캔버스를 모니터 기본 해상도로 맞춤,완료,발표 · 시연 녹화
+2026-10-16,박건,Docs,개발 기준선 대조,프로젝트 개발·관리 기준선 1~8장을 현재 레포와 비교 · 할 일 정리(파일명 규칙 · 필수/우리 산출물 구분 · Ruff/Pytest · 이슈 문서 · 버전 태그),완료,Day10
+2026-10-16,박건,Docs,산출물 구분표,docs/deliverables_map.md 추가 (가이드 필수 산출물 1~8 vs 우리 산출물 39개 · 만든 이유) · README 7장을 7.1 필수 산출물 · 7.2 우리 산출물 · 7.3 폴더 트리로 나눔,완료,PR #123
+2026-10-16,박건,Fix,README 폴더 트리 수정,7장 트리에 deliverables_map.md 반영 · 트리 설명 정정,완료,PR #124
+2026-10-16,박건,Fix,파일명 규칙 정리,기준선 1장(영문 소문자 + 언더스코어) 위반 18개 이름 변경 (final_test_pr_curve.png · pipeline_*_dayN_M.svg · prj07 final_yolo_images/ 등) · 참조 문서 함께 수정,완료,PR #129
+2026-10-16,박건,Fix,스크립트 번호 재정렬,번호 = 실행 순서로 01~18 다시 매김 (02a·05a·09a·09b 알파벳 번호 제거) · 1회성 05b → scripts/archive/upgrade_manifest_schema_v1_to_v2.py · 코드 안 경로 9곳 · 리뷰 문서 · 기록 문서 함께 수정 · README 6.3 옛 번호 대응표 추가,완료,PR #129
+2026-10-16,박건,Done,번호 변경 검증,py 문법 검사 전체 통과 · 코드 속 스크립트 경로 9개 존재 확인 · 문서 링크 82개 깨짐 0 · 05 · 07 · archive 재실행 결과 CSV 변화 0 (학습 · Frozen Test 재실행 없음),완료,PR #129
