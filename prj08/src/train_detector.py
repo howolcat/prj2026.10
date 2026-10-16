@@ -1,6 +1,6 @@
 """YOLO 학습 공통 기능 (가이드 8장 · 17.2 src/train_detector.py).
 
-4일차 Baseline(08_train_baseline.py)과 7일차 개선 실험이 같은 함수를 쓴다.
+4일차 Baseline(10_train_baseline.py)과 7일차 개선 실험이 같은 함수를 쓴다.
 → 두 실험의 차이는 "넘겨 준 설정값" 하나뿐이어야 한다 (가이드 20.2 한 번에 한 변수).
 
 여기서는 학습만 한다. 학습 전 검사 · 결과 정리 · 기록은 실행 스크립트(scripts/)가 맡는다.

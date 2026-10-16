@@ -9,7 +9,7 @@
 | 항목 | 값 |
 |---|---|
 | Dataset Version | `kimchi_v1` · 라벨 지문 `5c2b4fc2c3e6` |
-| 사용 데이터 | Train 600 · Val 74 (`manifests/` 기준 · `07` 검증 PASS 19 / FAIL 0) |
+| 사용 데이터 | Train 600 · Val 74 (`manifests/` 기준 · `09` 검증 PASS 19 / FAIL 0) |
 | **사용하지 않은 데이터** | **Frozen Test 80 · Bridge Holdout 146** (학습 · Prediction 모두 미사용) |
 | 모델 | `yolo11n.pt` (사전학습 가중치) |
 | 설정 | epochs=1 · imgsz=640 · batch=8 · workers=2 · seed=0 · deterministic=True (나머지 기본값) |
@@ -85,7 +85,7 @@ yolo detect predict model=runs/smoke_day3/weights/best.pt source=data/yolo/image
 | 가이드 | 우리 팀 | 이유 |
 |---|---|---|
 | 작은 Smoke Dataset (Train 30~40 · Val 5~10장) · `data/smoke/` · `configs/smoke_dataset.yaml` | 전체 Train 600 · Val 74 · `configs/dataset.yaml` 그대로 · 1 epoch | 1 epoch 약 22초로 충분히 빠름 · 실제 학습 경로(`data/yolo`)를 그대로 검증해 4일차와 같은 조건 확인 |
-| `scripts/05_smoke_train.py` · `runs/smoke_v1` | `yolo detect train` CLI · `runs/smoke_day3` | 1회성 확인이라 스크립트 대신 명령 기록 (2장) · 우리 05 번호는 Freeze 스크립트가 사용 중 |
+| `scripts/05_smoke_train.py` · `runs/smoke_v1` | `yolo detect train` CLI · `runs/smoke_day3` | 1회성 확인이라 스크립트 대신 명령 기록 (2장) |
 | Prediction 1장 · conf 0.25 | Val 74장 · conf 0.05 / 0.25 비교 | 1 epoch 모델의 오검출 양상을 함께 확인 |
 
 > Test · Bridge 미사용 · Smoke Weight ≠ Baseline 원칙은 가이드와 같다.

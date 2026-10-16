@@ -4,7 +4,7 @@
 
 ## 1. 한 줄 요약
 
-이미지 · YOLO 라벨 · 교과 7 Manifest를 **읽기만 해서** 짝 · 형식 · Class · 좌표 문제를 목록으로 만들고, Class별 BBox 수를 세는 **기능 모음**입니다. 혼자 실행되지 않고 `scripts/02_audit_subject7_final.py`가 불러 씁니다.
+이미지 · YOLO 라벨 · 교과 7 Manifest를 **읽기만 해서** 짝 · 형식 · Class · 좌표 문제를 목록으로 만들고, Class별 BBox 수를 세는 **기능 모음**입니다. 혼자 실행되지 않고 `scripts/03_audit_subject7_final.py`가 불러 씁니다.
 
 ## 2. 입력 · 출력 · 실행
 
@@ -146,7 +146,7 @@ stats["class4_files"] = len({i["file"] for i in issues if i["issue_type"] == "CL
 ```
 
 - `manifest_path=None` 기본값 덕분에 **Fixture 모드(Manifest 없음)와 실제 모드를 같은 함수**로 처리합니다.
-- `image_rows`에 출처 · split · scene_type을 붙여 두었기 때문에, 이 결과(`audit_label_stats.csv`)가 **03 · 04 스크립트의 입력**이 됩니다.
+- `image_rows`에 출처 · split · scene_type을 붙여 두었기 때문에, 이 결과(`audit_label_stats.csv`)가 **04 · 05 스크립트의 입력**이 됩니다.
 - `class4_files`는 줄 수가 아니라 **파일 수**로 셉니다(기대값 메모 기준과 맞춤).
 
 ### 4.6 `compare_with_expected` · `write_csv`
@@ -162,7 +162,7 @@ with open(path, "w", encoding="utf-8-sig", newline="") as f:   # 엑셀 한글 �
 
 | 관계 | 파일 |
 |---|---|
-| 이 파일을 쓰는 곳 | `scripts/02_audit_subject7_final.py` |
-| 테스트 데이터 | `scripts/02a_make_audit_fixture.py` → `data/audit_test/` |
-| 결과가 쓰이는 곳 | `audit_label_stats.csv` → `03_split_analysis.py` · `04_make_split.py` |
-| 기대값 | `reports/audit_expected.md` (→ `02`의 `EXPECTED`) |
+| 이 파일을 쓰는 곳 | `scripts/03_audit_subject7_final.py` |
+| 테스트 데이터 | `scripts/02_make_audit_fixture.py` → `data/audit_test/` |
+| 결과가 쓰이는 곳 | `audit_label_stats.csv` → `04_split_analysis.py` · `05_make_split.py` |
+| 기대값 | `reports/audit_expected.md` (→ `03`의 `EXPECTED`) |

@@ -2,7 +2,7 @@
 # 7일차 개선 실험 exp001 (가이드 20장 "한 번에 주요 변수 하나만")
 # ------------------------------------------------------------------
 # - configs/baseline.yaml 을 그대로 복사하고 "딱 한 줄"만 바꾼다.
-#   scripts/10_train_experiment.py 가 두 파일을 비교해서 학습 설정이 2개 이상 다르면 학습을 거부한다.
+#   scripts/14_train_experiment.py 가 두 파일을 비교해서 학습 설정이 2개 이상 다르면 학습을 거부한다.
 # - 바꾼 줄에는 ◆ 표시. 나머지(데이터 · 모델 · epochs · batch · optimizer · seed …)는 Baseline 과 같아야 한다.
 # - 학습 전에 reports/improvement_experiment.md 를 "상태: 확정" 으로 써야 학습이 시작된다 (가이드 20.3).
 # ==================================================================
@@ -20,7 +20,7 @@ pretrained: true
 epochs: 50
 patience: 50
 imgsz: 1280        # ◆ 640 → 1280 (H1 작은 이물 놓침 · 6일차 failure_hypothesis.md) · 회의에서 960 으로 정하면 이 숫자만 바꾸기
-batch: 16          # GPU 메모리가 부족하면 → 10_train_experiment.py --smoke 로 먼저 확인 (바꾸면 변수 2개가 됨 · 회의 결정 · 기록)
+batch: 16          # GPU 메모리가 부족하면 → 14_train_experiment.py --smoke 로 먼저 확인 (바꾸면 변수 2개가 됨 · 회의 결정 · 기록)
 workers: 2
 
 optimizer: AdamW

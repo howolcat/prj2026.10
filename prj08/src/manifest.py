@@ -98,6 +98,6 @@ def write_manifest_set(manifest_dir: Path, rows: list[dict]) -> None:
 
 
 def fingerprint(names) -> str:
-    """파일명 목록의 sha256 앞 12자리 (04 · 05 · 06 · 07 과 같은 계산)."""
+    """파일명 목록의 sha256 앞 12자리 (05 · 06 · 08 · 09 와 같은 계산)."""
     text = "\n".join(sorted(names)).encode("utf-8")
     return hashlib.sha256(text).hexdigest()[:12]

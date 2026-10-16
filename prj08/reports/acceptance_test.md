@@ -13,8 +13,8 @@
 | D3 | `source_dataset / original_split / scene_type` 을 추적할 수 있다 | PASS | `manifests/*.csv` v2 9칸 (`reports/manifest_schema_check.csv` 14/14) |
 | D4 | Train / Validation / Frozen Test / Bridge Holdout Manifest 가 존재한다 | PASS | `manifests/` train 600 · val 74 · test 80 · bridge_holdout 146 · split_manifest 900 |
 | D5 | Split 정책을 설명할 수 있다 | PASS | `docs/split_policy.md` (5분 촬영 세션 · 예외 E1 · 합격 기준 8/8 · Leakage 근거) |
-| D6 | Frozen Test 가 Final Model 선택 전에 사용되지 않았다 | PASS | `final_model_selection.md` 커밋 `a322016` (10/15 10:20) → Test 실행 10:22 (`reports/final_test_runs.csv`) · 08 · 10 은 test 코드 없음 · 09 · 11 은 val 만 허용 |
-| D7 | Bridge Holdout 이 교과 8 학습 · 튜닝 · 모델 선택 · Frozen Test 에 사용되지 않았다 | PASS | `configs/dataset.yaml` 에 Bridge 없음 · 06 이 data/yolo 로 복사하지 않음 · 13 이 Test 외 사진 거부 · 모든 스크립트 검사 "Bridge 없음" PASS |
+| D6 | Frozen Test 가 Final Model 선택 전에 사용되지 않았다 | PASS | `final_model_selection.md` 커밋 `a322016` (10/15 10:20) → Test 실행 10:22 (`reports/final_test_runs.csv`) · 10 · 14 는 test 코드 없음 · 11 · 15 는 val 만 허용 |
+| D7 | Bridge Holdout 이 교과 8 학습 · 튜닝 · 모델 선택 · Frozen Test 에 사용되지 않았다 | PASS | `configs/dataset.yaml` 에 Bridge 없음 · 08 이 data/yolo 로 복사하지 않음 · 17 이 Test 외 사진 거부 · 모든 스크립트 검사 "Bridge 없음" PASS |
 
 ## 2. Model
 
@@ -23,7 +23,7 @@
 | M1 | Baseline Model 과 Final Model 을 구분할 수 있다 | PASS | baseline_v1 (imgsz 640 · sha `22f35d20a5ea`) · Final = exp001 (imgsz 1280 · sha `029c0e92e594`) · `reports/experiment_log.csv` |
 | M2 | Baseline 학습조건이 기록되어 있다 | PASS | `configs/baseline.yaml` · `reports/baseline_training_condition.md` |
 | M3 | `baseline_best.pt` 가 있다 | PASS | 학습 PC `models/baseline/baseline_best.pt` · sha `22f35d20a5ea` = 4일차 기록 (10/15 확인 · Git 제외) |
-| M4 | `final_best.pt` 가 있다 | PASS | 학습 PC `models/final/final_best.pt` · sha `029c0e92e594` (10/15 재확인 · 12 · 13 검사도 PASS) |
+| M4 | `final_best.pt` 가 있다 | PASS | 학습 PC `models/final/final_best.pt` · sha `029c0e92e594` (10/15 재확인 · 16 · 17 검사도 PASS) |
 | M5 | Final Model 을 선택한 이유가 기록되어 있다 | PASS | `reports/final_model_selection.md` (Val 비교 · 대표 FP/FN · 이유 4가지 · 원본 Weight) |
 
 ## 3. Evaluation
@@ -43,8 +43,8 @@
 
 | # | 항목 | 결과 | 근거 |
 |---|---|---|---|
-| I1 | 이미지 Detection 이 실행된다 | PASS | `scripts/13_auto_label.py` → `demo/prediction_images/` 8장 (김하민 · 심준형 · 박건 PC 에서 실행) |
-| I2 | BBox 가 표시된다 | PASS | 학습 PC 에서 13 실행 → `demo/prediction_images/` 그림을 열어 확인 (10/15) |
+| I1 | 이미지 Detection 이 실행된다 | PASS | `scripts/17_auto_label.py` → `demo/prediction_images/` 8장 (김하민 · 심준형 · 박건 PC 에서 실행) |
+| I2 | BBox 가 표시된다 | PASS | 학습 PC 에서 17 실행 → `demo/prediction_images/` 그림을 열어 확인 (10/15) |
 | I3 | Class 가 표시된다 | PASS | 위와 같음 — 박스 위 Class 이름 |
 | I4 | Confidence 가 표시된다 | PASS | 위와 같음 — Class 옆 확신도 숫자 |
 
@@ -64,7 +64,7 @@
 |---|---|---|---|
 | X1 | Feature Freeze (새 기능 · 실험 없음) | PASS | 10/15 팀 공지 · 이후 문서 · 오탈자만 · Git 태그 `subject8_final_v1` |
 | X2 | 외부 Git 에 사진 · 라벨 · weight · runs 없음 | PASS | `git ls-files \| grep -iE '\.(jpe?g\|pt\|onnx\|engine)$\|/runs/\|/data/\|/models/'` → 출력 없음 (10/15) |
-| X3 | 다른 팀원이 README 만 보고 핵심 기능을 실행 | PASS | 김하민 · 심준형 · 박건이 각자 PC 에서 README 6장 23~25 순서(13 → 교과 7 검수 → 14)로 실행 · 학습 PC 재실행도 같은 8장 · 후보 43개 (재현) |
+| X3 | 다른 팀원이 README 만 보고 핵심 기능을 실행 | PASS | 김하민 · 심준형 · 박건이 각자 PC 에서 README 6장 23~25 순서(17 → 교과 7 검수 → 18)로 실행 · 학습 PC 재실행도 같은 8장 · 후보 43개 (재현) |
 | X4 | `git status` 최종 확인 | PASS | `working tree clean` (10/15) |
 
 ## 7. FAIL · Retest 기록
@@ -76,7 +76,7 @@
 ## 8. 판정
 
 - **ACCEPTED** — PASS 33 / 33 · FAIL 0 · 확인자 최용훈 · 2026-10-15
-- 참고 (개발 중 고친 것 · Acceptance FAIL 아님): 09b 비교 그림이 정답을 가림 → 정답 박스 pad · MISSED 노랑 / 10 계획서 확정 검사가 초안 문구로 통과 → 굵은 머리줄만 인정
+- 참고 (개발 중 고친 것 · Acceptance FAIL 아님): 13 비교 그림이 정답을 가림 → 정답 박스 pad · MISSED 노랑 / 14 계획서 확정 검사가 초안 문구로 통과 → 굵은 머리줄만 인정
 
 ## 9. Final Gate 자가점검 (가이드 22.8 · 발표 전)
 

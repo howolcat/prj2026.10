@@ -18,11 +18,11 @@
 
 ## 3. 무엇을 그대로 두나
 
-Dataset Version `kimchi_v1` (10/15 회의 · 라벨 수정 안 함) · Train 600 / Val 74 · YOLO11n 사전학습 · epochs 50 · patience 50 · **batch 16** · AdamW 0.000909 · momentum 0.9 · seed 42 · deterministic · amp · workers 2 · 같은 학습 함수(`src/train_detector.py`) · 같은 채점 코드(09 의 함수를 11 이 그대로 사용)
+Dataset Version `kimchi_v1` (10/15 회의 · 라벨 수정 안 함) · Train 600 / Val 74 · YOLO11n 사전학습 · epochs 50 · patience 50 · **batch 16** · AdamW 0.000909 · momentum 0.9 · seed 42 · deterministic · amp · workers 2 · 같은 학습 함수(`src/train_detector.py`) · 같은 채점 코드(11 의 함수를 15 가 그대로 사용)
 
-→ `scripts/10_train_experiment.py` 가 학습 전에 "Baseline 과 다른 학습 설정 = 정확히 1개 (imgsz)" 를 검사한다.
+→ `scripts/14_train_experiment.py` 가 학습 전에 "Baseline 과 다른 학습 설정 = 정확히 1개 (imgsz)" 를 검사한다.
 
-## 4. 1 epoch 시험 결과 (`10_train_experiment.py --smoke` · 10/15 08:2x)
+## 4. 1 epoch 시험 결과 (`14_train_experiment.py --smoke` · 10/15 08:2x)
 
 | 항목 | 값 |
 |---|---|
@@ -34,7 +34,7 @@ Dataset Version `kimchi_v1` (10/15 회의 · 라벨 수정 안 함) · Train 600
 | **결정** | 회의 규칙 "11GB 미만 → 1280" 에 따라 **imgsz 1280 확정** · batch 16 유지 |
 | 주의 | 1 epoch 시험은 모자이크 증강이 꺼진 상태로 측정됨 (`Closing dataloader mosaic`) · 본 학습 1~40 epoch 는 모자이크가 켜져 메모리를 조금 더 쓸 수 있음 → 본 학습 중 메모리 부족(OOM)으로 멈추면 규칙대로 **imgsz 960 으로 바꿔 다시 학습** (`runs/exp001` 삭제 후 · issue_log 기록) |
 
-## 5. 무엇을 보고 판단하나 (같은 Val 74장 · `11_evaluate_experiment.py`)
+## 5. 무엇을 보고 판단하나 (같은 Val 74장 · `15_evaluate_experiment.py`)
 
 - 주 지표: **FN (conf 0.25 · Baseline 159) · 작은 객체 FN (Baseline 153 / 363) · Recall (conf 0.25 · Baseline 0.591)** — H1 이 실제로 줄었는가
 - 함께 볼 것: mAP50 (0.622) · mAP50-95 (0.462) · FP 증가 여부 (92) · 갈변 FN (6 · H2) · branch FP (30 · H3) · 6일차 대표 사진 14장의 FN 변화

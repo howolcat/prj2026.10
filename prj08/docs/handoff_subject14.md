@@ -28,7 +28,7 @@
 | 사진 · 라벨 위치 | `data/subject7_final/images · labels` 안 (목록의 `image_path` · `label_path`) · `data/yolo` 로 복사하지 않음 · Git 제외 |
 | 세션 | G07 76 · G04 39 · G12 25 · G01-S3 5 · G02 1 |
 | 파일명 지문 | `fd6c14c2ac0a` (`src/manifest.fingerprint` 와 같은 계산 · 파일명 146개를 정렬해 sha256 앞 12자리 · 교과 14 시작 시 같은 값인지 먼저 확인) |
-| 교과 8 미사용 확인 | `configs/dataset.yaml` 에 없음 · 06 이 복사하지 않음 · 평가 함수가 `bridge_holdout` 을 막음 · 12 · 13 이 Test 외 사진 거부 · Acceptance D7 |
+| 교과 8 미사용 확인 | `configs/dataset.yaml` 에 없음 · 08 이 복사하지 않음 · 평가 함수가 `bridge_holdout` 을 막음 · 16 · 17 이 Test 외 사진 거부 · Acceptance D7 |
 | 주의 | Class 1(플라스틱)이 82% (635/778) — Bridge 점수도 플라스틱 위주가 됨 → Class 별로 함께 볼 것 |
 
 ## 3. Final Model
@@ -94,7 +94,7 @@ Class 별 Frozen Test (conf 0.25 · Recall / mAP50): leaf 0.77 / 0.565 · plasti
 | AI 후보 · 사람 검수 라벨 | `demo/auto_label/candidate_labels/` · `reviewed_labels/` | ❌ |
 | 검수 집계 (공식 · 심준형) | `reports/auto_label_review.csv` — 후보 43 · 승인 31 (72%) · Class 수정 2 · BBox 수정 3 · 삭제 7 · 추가 7 | ✅ |
 | 검수자 3명 범위 | 승인 70~74% · BBox 수정 1~7 · 추가 3~7 · 정답 일치 76~78% (README 15장) | ✅ |
-| 재실행 | `python scripts/13_auto_label.py` → 교과 7 프로그램으로 `demo/auto_label/review_workspace` 열기 → `python scripts/14_auto_label_review.py` | — |
+| 재실행 | `python scripts/17_auto_label.py` → 교과 7 프로그램으로 `demo/auto_label/review_workspace` 열기 → `python scripts/18_auto_label_review.py` | — |
 
 ## 9. 교과 14 에서 이어갈 작업 (우선순위)
 

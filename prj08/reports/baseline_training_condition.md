@@ -1,6 +1,6 @@
 # Baseline 학습 조건 (산출물 2 · 가이드 17장)
 
-> **상태**: 완료  ·  **작성**: `scripts/08_train_baseline.py` 자동 생성  ·  **조건 원본**: `configs/baseline.yaml`
+> **상태**: 완료  ·  **작성**: `scripts/10_train_baseline.py` 자동 생성  ·  **조건 원본**: `configs/baseline.yaml`
 > 성능 해석은 5일차 `reports/baseline_metrics.csv` 에서 한다. 이 문서는 '어떤 조건으로 학습했는가'만 기록한다.
 
 ## 1. 학습 조건 (Freeze)
@@ -31,7 +31,7 @@
 | PASS | manifest 스키마 | v2 | v2 |
 | PASS | Dataset Version | kimchi_v1 | kimchi_v1 |
 | PASS | 라벨 지문 | 5c2b4fc2c3e6 | 5c2b4fc2c3e6 |
-| PASS | 07 data/yolo 검증 | 종료 코드 0 | 종료 코드 0 · → PASS 19 / FAIL 0   (저장: reports/yolo_verify_check.csv) |
+| PASS | 09 data/yolo 검증 | 종료 코드 0 | 종료 코드 0 · → PASS 19 / FAIL 0   (저장: reports/yolo_verify_check.csv) |
 | PASS | 시작 가중치 있음 | yolo11n.pt | yolo11n.pt |
 | PASS | runs/baseline_v1 아직 없음 (덮어쓰기 방지) | 없음 | 없음 |
 | PASS | models/baseline/baseline_best.pt 아직 없음 | 없음 | 없음 |

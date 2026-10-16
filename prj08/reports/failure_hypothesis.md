@@ -12,7 +12,7 @@
 | `reports/baseline_val_image_check.csv` | 이미지별 TP · FP · FN · 작은 객체 FN (실패 의심 71 / 74장) |
 | `reports/failure_analysis.csv` | 대표 실패 사례 17행 |
 | `reports/branch_pred_check.csv` | branch 예측 38개 사람 확인 (H3) |
-| `demo/failure_analysis/` | 대표 사진 14장 비교 이미지 · 초록 = 맞힌 정답 · 노랑 = 놓친 정답 · 빨강 = 예측 (Git 제외 · `scripts/09b_failure_images.py` · 목록 `reports/failure_image_list.csv`) |
+| `demo/failure_analysis/` | 대표 사진 14장 비교 이미지 · 초록 = 맞힌 정답 · 노랑 = 놓친 정답 · 빨강 = 예측 (Git 제외 · `scripts/13_failure_images.py` · 목록 `reports/failure_image_list.csv`) |
 
 ## 2. 반복되는 실패 (관찰)
 
@@ -31,7 +31,7 @@
 |---|---|---|---|
 | **H1 작은 이물 놓침** | 640으로 줄이면 7~14px가 되는 플라스틱 · 이물을 놓치거나 종류 · 위치를 틀림 | 놓친 정답 159개 중 **153개가 작은 객체** (640 기준 32px 미만 · Val 정답의 93%가 작은 객체) · 플라스틱 FN 147 · 상위 10장 FN 40 중 G06 플라스틱 33개 전부 7~14px · Class 혼동 7 · 위치 어긋남 8 | **가장 큼** |
 | H2 갈변을 못 찾음 | Val 갈변 6개 모두 놓침 · 갈변 FP 13개는 작은 플라스틱 착각 | conf 0.05까지 반응 0 · Train 갈변 391개 중 표본 43개 재현율 49% (참고 진단) | 작음 (6개) · H1과 겹침 |
-| H3 branch 오검출 | 김치 줄기 · 배추 그림자를 가지로 착각 · 근처 작은 이물을 가지로 혼동 | branch FP 30 = 줄기 착각 16 · 정답 없는 이물 3 · 근처 이물 혼동 11 · 진짜 가지 라벨 누락 0 | 중간 (30) · 11개는 H1과 같은 뿌리 |
+| H3 branch 오검출 | 김치 줄기 · 배추 그림자를 가지로 착각 · 근처 작은 이물을 가지로 혼동 | branch FP 30 = 줄기 착각 16 · 정답 없는 이물 3 · 근처 이물 혼동 15 · 진짜 가지 라벨 누락 0 | 중간 (30) · 11개는 H1과 같은 뿌리 |
 | H4 배경과 비슷한 이물 | 투명 · 초록 플라스틱은 크기가 커도 놓침 | 250411_140005265446 투명 2 · 초록 1 | 사례 수집 단계 |
 | L 라벨 오류 · 누락 | 빈 자리 정답 박스 · 정답 없는 이물 | 라벨 오류 2 · 누락 후보 2 (갈변 · 돌) · Val 정답의 약 1% | 작음 · kimchi_v1 유지 |
 
@@ -54,15 +54,15 @@
 
 ✅ **`imgsz` (입력 크기)** — 640 → **1280** 을 1순위로 시험 (10/15 회의 확정)
 
-- 결정 규칙: `10_train_experiment.py --smoke` (1280 · batch 16 · 1 epoch) 결과 **GPU 메모리 최대 11GB 미만 → 1280** · 11GB 이상이거나 메모리 부족(OOM)으로 멈추면 → **960**
+- 결정 규칙: `14_train_experiment.py --smoke` (1280 · batch 16 · 1 epoch) 결과 **GPU 메모리 최대 11GB 미만 → 1280** · 11GB 이상이거나 메모리 부족(OOM)으로 멈추면 → **960**
 - batch 등 다른 설정은 바꾸지 않는다 (메모리 때문에 batch 를 줄이는 대신 imgsz 를 960 으로 낮춤 → 한 변수 원칙 유지)
 - 최종 값 · 시험 결과는 `reports/improvement_experiment.md` 1 · 4장에 기록
 
 ## 6. 유지 조건
 
 - Dataset Version `kimchi_v1` 유지 (10/15 회의 · 라벨 오류 2 · 누락 후보 2는 고치지 않음 → Baseline 과 같은 시험지로 비교 · 수정은 교과 14 인계 목록으로)
-- Train 600 / Val 74 동일 · 같은 `src/train_detector.py` · 같은 채점 코드(09)
-- 나머지 학습 설정(`configs/baseline.yaml`) 동일 — `10_train_experiment.py`가 "다른 설정 정확히 1개"를 학습 전에 검사
+- Train 600 / Val 74 동일 · 같은 `src/train_detector.py` · 같은 채점 코드(11)
+- 나머지 학습 설정(`configs/baseline.yaml`) 동일 — `14_train_experiment.py`가 "다른 설정 정확히 1개"를 학습 전에 검사
 
 ## 7. 확인 범위 · 한계
 
