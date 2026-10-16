@@ -1,6 +1,6 @@
 # exp001 학습 조건 (산출물 4 · 가이드 20장)
 
-> **상태**: 완료  ·  **작성**: `scripts/10_train_experiment.py` 자동 생성  ·  **조건 원본**: `configs/exp001.yaml`
+> **상태**: 완료  ·  **작성**: `scripts/14_train_experiment.py` 자동 생성  ·  **조건 원본**: `configs/exp001.yaml`
 > 비교 기준: `baseline_v1` (`configs/baseline.yaml`) · 계획: `reports/improvement_experiment.md`
 
 ## 1. 바꾼 것 (한 변수)
@@ -25,7 +25,7 @@ Dataset Version `kimchi_v1` · 라벨 지문 `5c2b4fc2c3e6` · Train 600 / Val 7
 | PASS | manifest 스키마 | v2 | v2 |
 | PASS | Dataset Version = Baseline | kimchi_v1 | kimchi_v1 |
 | PASS | 라벨 지문 | 5c2b4fc2c3e6 | 5c2b4fc2c3e6 |
-| PASS | 07 data/yolo 검증 | 종료 코드 0 | 종료 코드 0 · → PASS 19 / FAIL 0   (저장: reports/yolo_verify_check.csv) |
+| PASS | 09 data/yolo 검증 | 종료 코드 0 | 종료 코드 0 · → PASS 19 / FAIL 0   (저장: reports/yolo_verify_check.csv) |
 | PASS | 시작 가중치 있음 | yolo11n.pt | yolo11n.pt |
 | PASS | Baseline 과 다른 학습 설정 = 정확히 1개 | 1개 | imgsz 640 → 1280 |
 | PASS | improvement_experiment.md 확정 · 변수 기록 | **상태: 확정** · `imgsz` · 1280 | 확정 |
@@ -45,4 +45,4 @@ Dataset Version `kimchi_v1` · 라벨 지문 `5c2b4fc2c3e6` · Train 600 / Val 7
 | Improved Weight | `models/improved/exp001_best.pt` · sha `029c0e92e594` (= `runs/exp001/weights/best.pt`) |
 | results.csv | 사본 `reports/exp001_results.csv` |
 
-> 평가는 `scripts/11_evaluate_experiment.py` (Baseline 과 같은 Val · 같은 채점 코드).
+> 평가는 `scripts/15_evaluate_experiment.py` (Baseline 과 같은 Val · 같은 채점 코드).

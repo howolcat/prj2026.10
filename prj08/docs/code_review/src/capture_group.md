@@ -14,7 +14,7 @@
 | `assign_capture_groups` | 촬영 시각 Series · 기준(분) | 세션 번호 Series (1부터) |
 | `nearest_gap_seconds` | 시각 Series 2개 (target · reference) | target별 최소 시간 차(초) |
 
-실행: 직접 실행 안 함 · `scripts/03_split_analysis.py`가 import
+실행: 직접 실행 안 함 · `scripts/04_split_analysis.py`가 import
 
 ## 3. 구조
 
@@ -109,6 +109,6 @@ return pd.Series(out, index=target.index)
 
 | 관계 | 파일 |
 |---|---|
-| 이 파일을 쓰는 곳 | `scripts/03_split_analysis.py` |
-| 결과가 쓰이는 곳 | `reports/capture_groups.csv` → `scripts/04_make_split.py` |
-| 같은 로직이 한 번 더 | `04_make_split.py`의 `split_e1()` (G01을 2분 기준으로 다시 나눔) |
+| 이 파일을 쓰는 곳 | `scripts/04_split_analysis.py` |
+| 결과가 쓰이는 곳 | `reports/capture_groups.csv` → `scripts/05_make_split.py` |
+| 같은 로직이 한 번 더 | `05_make_split.py`의 `split_e1()` (G01을 2분 기준으로 다시 나눔) |

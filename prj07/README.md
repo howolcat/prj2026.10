@@ -7,7 +7,7 @@
 
 
 <p align="center">
-  <img src="docs/FINAL_YOLO_images/app_main.png" width="900" alt="라벨링 프로그램 실행 화면">
+  <img src="docs/final_yolo_images/app_main.png" width="900" alt="라벨링 프로그램 실행 화면">
   <br><sub>라벨링 프로그램 실행 화면 (v4.1 · 사진 영역 blur) — 검수자 교차검수 · REVIEW 사유 선택 · BBox 5개</sub>
 </p>
 
@@ -62,8 +62,8 @@ prj07_team01/
 │   ├── bbox_guide.md                 # BBox 기준서
 │   ├── subject08_handoff.md          # (자동 생성) 교과 8 전달 문서
 │   ├── git_commit_log.md             # Git 커밋 이력 (2번 산출물 증빙 · 팀원별 · 날짜별)
-│   ├── FINAL_YOLO_Label_Evidence.md  # 최종 라벨링 증빙 문서
-│   └── FINAL_YOLO_images/            # 최종 라벨링 증빙 문서 삽입 이미지
+│   ├── final_yolo_label_evidence.md  # 최종 라벨링 증빙 문서
+│   └── final_yolo_images/            # 최종 라벨링 증빙 문서 삽입 이미지
 ├── manifests/
 │   ├── dataset_manifest.csv          # (자동 생성) 제출용 작업대장 사본
 │   ├── label_history.csv             # (자동 생성) 라벨 저장·검수 이력 (누가·언제·무엇을)

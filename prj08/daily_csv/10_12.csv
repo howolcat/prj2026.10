@@ -15,16 +15,16 @@
 2026-10-12,최용훈,Done,옛 레포 정리,GitHub prj08_team01 레포 Archive,완료,
 2026-10-12,최용훈,Done,Audit 기대값 정리,reports/audit_expected.md - Handoff·QA Summary·Manifest 대조 · Leakage 75.6% 재확인 · 세션 18개 중 17개 혼합,완료,Day2
 2026-10-12,최용훈,Done,Audit 검사기 작성,src/dataset_audit.py · Pair · YOLO 칸 수 · Class 범위 · 좌표 · BBox 경계 · Manifest 대조,완료,Day2
-2026-10-12,최용훈,Done,검사기 검증 (Fixture),02a_make_audit_fixture.py · 버그 9종 심은 테스트 데이터 → 9종 모두 검출,완료,Day2
-2026-10-12,박건,Done,900장 Dataset Audit,02_audit_subject7_final.py · 형식 오류 0 · Empty 0 · Class 4 0 · Manifest 900 일치 · 기대값 19항목 PASS 14 / FAIL 5,완료,Day2 · reports/audit_check.csv
+2026-10-12,최용훈,Done,검사기 검증 (Fixture),02_make_audit_fixture.py · 버그 9종 심은 테스트 데이터 → 9종 모두 검출,완료,Day2
+2026-10-12,박건,Done,900장 Dataset Audit,03_audit_subject7_final.py · 형식 오류 0 · Empty 0 · Class 4 0 · Manifest 900 일치 · 기대값 19항목 PASS 14 / FAIL 5,완료,Day2 · reports/audit_check.csv
 2026-10-12,박건,Fix,Class 수 불일치 원인 추적,교과 7 문서 4602 vs 실제 4601 · 라벨 저장 시각과 이승훈 10/08 zip 비교(diff 0) → 10/08 라벨 추가 수정이 문서에 미반영 · 데이터 · 기대값 수정 없음,완료,Day2 · reports/issue_log.md
 2026-10-12,팀원 전원,Done,팀원별 Audit 확인,5명 Audit 실행 · 심준형 · 김하민 PASS 19 / FAIL 0 → 10/07본(4602) 사용 발견,완료,Day2
 2026-10-12,심준형 · 김하민,Fix,라벨 버전 통일,10/08본 TXT 900개로 교체 · 읽기 전용 재잠금 · Audit PASS 14 / FAIL 5 재확인,완료,Day2
 2026-10-12,팀원 전원,Done,kimchi_v1 확정,10/08 수정본 900장 · BBox 4601 · 라벨 지문 5c2b4fc2c3e6 5명 일치 · README Class 표 갱신,완료,Day2 · README.md
-2026-10-12,김하민,Done,분포 · Leakage 분석,src/capture_group.py · 03_split_analysis.py · 5분 세션 18개 · 기존 val 180장 전부 train과 같은 세션 · 60초 이내 135장 · 최소 8초,완료,Day2 · reports/capture_group_compare.csv
+2026-10-12,김하민,Done,분포 · Leakage 분석,src/capture_group.py · 04_split_analysis.py · 5분 세션 18개 · 기존 val 180장 전부 train과 같은 세션 · 60초 이내 135장 · 최소 8초,완료,Day2 · reports/capture_group_compare.csv
 2026-10-12,김하민,Done,촬영 시각 확인,EXIF 없음 · 250410 연속 3장 육안 확인(약 45초 간격 · 같은 트레이 · 조명) → 파일명 = 촬영 순서,완료,Day2 · docs/split_policy.md
 2026-10-12,팀원 전원,Done,Split 정책 회의,가이드 역할 정의 · 5분 세션 · 600/75/75/150(±10) · G18 object_only → Train · Bridge = 김치 세션 · Test · Bridge Class별 20개 이상 · 예외 E1(G01 파·고추 2분 분할),완료,Day2 · docs/split_policy.md
-2026-10-12,김하민,Done,Split 배정 (3일차 선행),04_make_split.py 전수 탐색 · Train 600 / Val 74 / Test 80 / Bridge 146 · 합격 기준 8개 PASS · Frozen Test 지문 4f9291849fe6,완료,Day3 선행 · splits/kimchi_v1_split.csv
+2026-10-12,김하민,Done,Split 배정 (3일차 선행),05_make_split.py 전수 탐색 · Train 600 / Val 74 / Test 80 / Bridge 146 · 합격 기준 8개 PASS · Frozen Test 지문 4f9291849fe6,완료,Day3 선행 · splits/kimchi_v1_split.csv
 2026-10-12,심준형,Fix,Zone.Identifier 정리,Windows 다운로드 꼬리표 파일 삭제 · .gitignore에 *:Zone.Identifier 추가,완료,
 2026-10-12,심준형,Todo,Val Class 편중 대응,Val BBox 389개 중 351개가 Class 1 → 3일차 모델 비교 때 Class별 AP 함께 확인,예정,Day3
 2026-10-12,심준형,Todo,YOLO 데이터 구성,kimchi_v1_split.csv → images · labels / train · val · test 폴더 · YOLO11n Baseline 학습,예정,Day3

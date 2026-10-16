@@ -2,7 +2,7 @@
 
 > **상태: 확정** (2026-10-15 · Frozen Test 를 보기 전 · Validation 결과만으로 결정)
 > 근거: `reports/baseline_vs_improved.md` (4장) · `reports/experiment_log.csv` · `reports/failure_hypothesis.md` (H1)
-> 이 문서를 **커밋한 뒤에만** `scripts/12_evaluate_final_test.py` 가 Frozen Test 를 연다 (선택 → 시험 순서를 Git 기록으로 남김).
+> 이 문서를 **커밋한 뒤에만** `scripts/16_evaluate_final_test.py` 가 Frozen Test 를 연다 (선택 → 시험 순서를 Git 기록으로 남김).
 
 ## 1. Final Model
 
@@ -35,7 +35,7 @@
 - **H1 작은 이물 놓침 → 크게 개선**: 작은 객체 FN 153 → 57 · 플라스틱 FN 147 → 52 · 6일차 대표 사진 14장 FN 49 → 25 (14장 모두 같거나 감소)
 - **H3 branch 오검출 → 거의 해결**: branch FP 30 → 1 · 벌레 FP 14 → 1
 - **H2 갈변 → 그대로**: 갈변 FN 6 → 6 · FP 13 → 15 (Final Model 의 알려진 약점)
-- 나빠진 것: 갈변 FP +2 · 파 · 고추 FP +1 (표본 6개) · 학습 시간 13.9 → 18.8분 · GPU 메모리 2.48 → 10.14 GB · 사진 1장 처리 약 11 → 17 ms
+- 나빠진 것: 갈변 FP +2 · 파 · 고추 FP +1 (표본 6개) · 학습 시간 13.9 → 18.8분 · GPU 메모리 2.48 → 10.14 GB · 사진 1장 처리 약 15 → 17 ms
 
 ## 4. 선택 이유
 
@@ -50,8 +50,8 @@
 |---|---|---|
 | 평가 대상 | `data/yolo/images/test` 80장 · Test 지문 `4f9291849fe6` | 3일차에 봉인한 Frozen Test |
 | imgsz | **1280** | Final Model 이 학습한 크기와 같게 (가이드 21.2 예시 코드의 640 은 "Final Model 평가조건과 일치" 를 뜻함 · 640 으로 평가하면 작은 이물이 다시 작아져 실제 성능보다 낮게 나옴) |
-| conf · IoU (이미지별 · Class별 표) | 0.25 · 0.5 | Val 과 같은 채점 기준 (09 의 함수) |
-| 횟수 | **1회** | Test 결과를 보고 다시 고르거나 튜닝하지 않는다 (가이드 21.2) · 12 가 두 번째 실행을 막는다 |
+| conf · IoU (이미지별 · Class별 표) | 0.25 · 0.5 | Val 과 같은 채점 기준 (11 의 함수) |
+| 횟수 | **1회** | Test 결과를 보고 다시 고르거나 튜닝하지 않는다 (가이드 21.2) · 16 이 두 번째 실행을 막는다 |
 | Bridge Holdout | 사용 안 함 | 교과 14 보존 |
 
 > Frozen Test 결과가 Val 보다 낮게 나와도 Final Model 을 바꾸지 않고 그대로 기록한다 (`reports/final_metrics.csv` · README 14장).

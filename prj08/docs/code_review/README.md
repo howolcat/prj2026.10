@@ -19,24 +19,24 @@ docs/code_review/
 │   └── evaluate_detector.md           # src/evaluate_detector.py
 └── scripts/
     ├── 01_check_environment.md        # scripts/01_check_environment.py
-    ├── 02a_make_audit_fixture.md      # scripts/02a_make_audit_fixture.py
-    ├── 02_audit_subject7_final.md     # scripts/02_audit_subject7_final.py
-    ├── 03_split_analysis.md           # scripts/03_split_analysis.py
-    ├── 04_make_split.md               # scripts/04_make_split.py
-    ├── 05_freeze_split.md             # scripts/05_freeze_split.py
-    ├── 05a_dataset_summary.md         # scripts/05a_dataset_summary.py
-    ├── 05b_upgrade_manifest_schema.md # scripts/05b_upgrade_manifest_schema.py
-    ├── 06_build_yolo_dataset.md       # scripts/06_build_yolo_dataset.py
-    ├── 07_verify_yolo_dataset.md      # scripts/07_verify_yolo_dataset.py
-    ├── 08_train_baseline.md           # scripts/08_train_baseline.py
-    ├── 09_evaluate_baseline.md        # scripts/09_evaluate_baseline.py
-    ├── 09a_branch_fp_check.md         # scripts/09a_branch_fp_check.py
-    ├── 09b_failure_images.md          # scripts/09b_failure_images.py
-    ├── 10_train_experiment.md         # scripts/10_train_experiment.py
-    ├── 11_evaluate_experiment.md      # scripts/11_evaluate_experiment.py
-    ├── 12_evaluate_final_test.md      # scripts/12_evaluate_final_test.py
-    ├── 13_auto_label.md               # scripts/13_auto_label.py
-    └── 14_auto_label_review.md        # scripts/14_auto_label_review.py
+    ├── 02_make_audit_fixture.md      # scripts/02_make_audit_fixture.py
+    ├── 03_audit_subject7_final.md     # scripts/03_audit_subject7_final.py
+    ├── 04_split_analysis.md           # scripts/04_split_analysis.py
+    ├── 05_make_split.md               # scripts/05_make_split.py
+    ├── 06_freeze_split.md             # scripts/06_freeze_split.py
+    ├── 07_dataset_summary.md         # scripts/07_dataset_summary.py
+    ├── upgrade_manifest_schema_v1_to_v2.md # scripts/archive/upgrade_manifest_schema_v1_to_v2.py
+    ├── 08_build_yolo_dataset.md       # scripts/08_build_yolo_dataset.py
+    ├── 09_verify_yolo_dataset.md      # scripts/09_verify_yolo_dataset.py
+    ├── 10_train_baseline.md           # scripts/10_train_baseline.py
+    ├── 11_evaluate_baseline.md        # scripts/11_evaluate_baseline.py
+    ├── 12_branch_fp_check.md         # scripts/12_branch_fp_check.py
+    ├── 13_failure_images.md          # scripts/13_failure_images.py
+    ├── 14_train_experiment.md         # scripts/14_train_experiment.py
+    ├── 15_evaluate_experiment.md      # scripts/15_evaluate_experiment.py
+    ├── 16_evaluate_final_test.md      # scripts/16_evaluate_final_test.py
+    ├── 17_auto_label.md               # scripts/17_auto_label.py
+    └── 18_auto_label_review.md        # scripts/18_auto_label_review.py
 ```
 
 `src/__init__.py`는 내용이 없는 파일(“src를 패키지로 인식시키는 표시”)이라 별도 문서를 만들지 않았습니다.
@@ -52,24 +52,24 @@ docs/code_review/
 | `src/train_detector.py` | 4 | 43 | YOLO 학습 공통 함수 (`TRAIN_KEYS` 12개만 전달) | [train_detector.md](src/train_detector.md) |
 | `src/evaluate_detector.py` | 5 | 94 | Val 평가 · 이미지 예측 · TP/FP/FN 짝짓기 (Frozen Test 보호) | [evaluate_detector.md](src/evaluate_detector.md) |
 | `scripts/01_check_environment.py` | 1 | 36 | 환경 · GPU · YOLO Load 확인 | [01_check_environment.md](scripts/01_check_environment.md) |
-| `scripts/02a_make_audit_fixture.py` | 2 | 76 | 버그 9종을 심은 테스트 데이터 | [02a_make_audit_fixture.md](scripts/02a_make_audit_fixture.md) |
-| `scripts/02_audit_subject7_final.py` | 2 | 118 | 900장 Audit + 기대값 대조 | [02_audit_subject7_final.md](scripts/02_audit_subject7_final.md) |
-| `scripts/03_split_analysis.py` | 2 | 202 | 분포 · EXIF · 세션 비교 · Leakage | [03_split_analysis.md](scripts/03_split_analysis.md) |
-| `scripts/04_make_split.py` | 3 선행 | 266 | 전수 탐색 배정 + 합격 기준 검증 | [04_make_split.md](scripts/04_make_split.md) |
-| `scripts/05_freeze_split.py` | 3 | 149 | 13항목 검사 후 `manifests/`(스키마 v2)로 Split Freeze | [05_freeze_split.md](scripts/05_freeze_split.md) |
-| `scripts/05a_dataset_summary.py` | 3 | 128 | 8항목 검사 후 Dataset Version 요약표(`dataset_summary.csv`) 작성 | [05a_dataset_summary.md](scripts/05a_dataset_summary.md) |
-| `scripts/05b_upgrade_manifest_schema.py` | 3 보완 | 117 | `manifests/` v1(3칸) → v2(9칸) 업그레이드 · 배정 변경 0 | [05b_upgrade_manifest_schema.md](scripts/05b_upgrade_manifest_schema.md) |
-| `scripts/06_build_yolo_dataset.py` | 3 | 182 | Split 목록으로 `data/yolo` 학습 폴더 구성 (Bridge 제외) | [06_build_yolo_dataset.md](scripts/06_build_yolo_dataset.md) |
-| `scripts/07_verify_yolo_dataset.py` | 3 | 134 | `data/yolo`가 Freeze 본과 같은지 19항목 검증 | [07_verify_yolo_dataset.md](scripts/07_verify_yolo_dataset.md) |
-| `scripts/08_train_baseline.py` | 4 | 300 | 학습 전 12항목 검사 → Baseline 학습 → 조건 문서 자동 기록 | [08_train_baseline.md](scripts/08_train_baseline.md) |
-| `scripts/09_evaluate_baseline.py` | 5 | 323 | Val 평가 · Class별 지표 · 이미지별 FP/FN · Class별 TP/FN/FP (Test · Bridge 미사용) | [09_evaluate_baseline.md](scripts/09_evaluate_baseline.md) |
-| `scripts/09a_branch_fp_check.py` | 6 준비 | 275 | Val branch 예측을 5종으로 분류 · 사람 확인 칸 (가설 H3 · 오검출 확인) | [09a_branch_fp_check.md](scripts/09a_branch_fp_check.md) |
-| `scripts/09b_failure_images.py` | 6 | 184 | 대표 실패 사례 Val 사진에 정답(초록 · 노랑) + 예측(빨강)을 겹친 비교 그림 (`demo/` · Git 제외) | [09b_failure_images.md](scripts/09b_failure_images.md) |
-| `scripts/10_train_experiment.py` | 7 | 245 | 한 변수 원칙 검사 → Smoke · Dry-run · 개선 실험 학습 → Improved Weight 보관 · 조건 문서 | [10_train_experiment.md](scripts/10_train_experiment.md) |
-| `scripts/11_evaluate_experiment.py` | 7 | 252 | 09 채점 함수 그대로 개선 모델 Val 평가 → Baseline 비교 · `experiment_log.csv` · 비교 md 초안 (Test 미사용) | [11_evaluate_experiment.md](scripts/11_evaluate_experiment.md) |
-| `scripts/12_evaluate_final_test.py` | 8 | 285 | 선택 문서 커밋 · Final sha · Test 지문 등 15항목 검사 → Frozen Test **1회** 평가 (09 채점 함수 그대로 · 1회 잠금) | [12_evaluate_final_test.md](scripts/12_evaluate_final_test.md) |
-| `scripts/13_auto_label.py` | 8 | 215 | Frozen Test 평가 뒤 Test 사진 8장으로 Detection 이미지 · Auto Label 후보 TXT · 교과 7 검수 폴더 준비 (정답은 숨김) | [13_auto_label.md](scripts/13_auto_label.md) |
-| `scripts/14_auto_label_review.py` | 8 | 172 | AI 후보 vs 사람 검수 1:1 비교 → 승인 · Class 수정 · BBox 수정 · 삭제 · 누락 추가 집계 | [14_auto_label_review.md](scripts/14_auto_label_review.md) |
+| `scripts/02_make_audit_fixture.py` | 2 | 76 | 버그 9종을 심은 테스트 데이터 | [02_make_audit_fixture.md](scripts/02_make_audit_fixture.md) |
+| `scripts/03_audit_subject7_final.py` | 2 | 118 | 900장 Audit + 기대값 대조 | [03_audit_subject7_final.md](scripts/03_audit_subject7_final.md) |
+| `scripts/04_split_analysis.py` | 2 | 202 | 분포 · EXIF · 세션 비교 · Leakage | [04_split_analysis.md](scripts/04_split_analysis.md) |
+| `scripts/05_make_split.py` | 3 선행 | 266 | 전수 탐색 배정 + 합격 기준 검증 | [05_make_split.md](scripts/05_make_split.md) |
+| `scripts/06_freeze_split.py` | 3 | 149 | 13항목 검사 후 `manifests/`(스키마 v2)로 Split Freeze | [06_freeze_split.md](scripts/06_freeze_split.md) |
+| `scripts/07_dataset_summary.py` | 3 | 128 | 8항목 검사 후 Dataset Version 요약표(`dataset_summary.csv`) 작성 | [07_dataset_summary.md](scripts/07_dataset_summary.md) |
+| `scripts/archive/upgrade_manifest_schema_v1_to_v2.py` | 3 보완 | 117 | `manifests/` v1(3칸) → v2(9칸) 업그레이드 · 배정 변경 0 | [upgrade_manifest_schema_v1_to_v2.md](scripts/archive/upgrade_manifest_schema_v1_to_v2.md) |
+| `scripts/08_build_yolo_dataset.py` | 3 | 182 | Split 목록으로 `data/yolo` 학습 폴더 구성 (Bridge 제외) | [08_build_yolo_dataset.md](scripts/08_build_yolo_dataset.md) |
+| `scripts/09_verify_yolo_dataset.py` | 3 | 134 | `data/yolo`가 Freeze 본과 같은지 19항목 검증 | [09_verify_yolo_dataset.md](scripts/09_verify_yolo_dataset.md) |
+| `scripts/10_train_baseline.py` | 4 | 300 | 학습 전 12항목 검사 → Baseline 학습 → 조건 문서 자동 기록 | [10_train_baseline.md](scripts/10_train_baseline.md) |
+| `scripts/11_evaluate_baseline.py` | 5 | 323 | Val 평가 · Class별 지표 · 이미지별 FP/FN · Class별 TP/FN/FP (Test · Bridge 미사용) | [11_evaluate_baseline.md](scripts/11_evaluate_baseline.md) |
+| `scripts/12_branch_fp_check.py` | 6 준비 | 275 | Val branch 예측을 5종으로 분류 · 사람 확인 칸 (가설 H3 · 오검출 확인) | [12_branch_fp_check.md](scripts/12_branch_fp_check.md) |
+| `scripts/13_failure_images.py` | 6 | 184 | 대표 실패 사례 Val 사진에 정답(초록 · 노랑) + 예측(빨강)을 겹친 비교 그림 (`demo/` · Git 제외) | [13_failure_images.md](scripts/13_failure_images.md) |
+| `scripts/14_train_experiment.py` | 7 | 245 | 한 변수 원칙 검사 → Smoke · Dry-run · 개선 실험 학습 → Improved Weight 보관 · 조건 문서 | [14_train_experiment.md](scripts/14_train_experiment.md) |
+| `scripts/15_evaluate_experiment.py` | 7 | 252 | 11 채점 함수 그대로 개선 모델 Val 평가 → Baseline 비교 · `experiment_log.csv` · 비교 md 초안 (Test 미사용) | [15_evaluate_experiment.md](scripts/15_evaluate_experiment.md) |
+| `scripts/16_evaluate_final_test.py` | 8 | 285 | 선택 문서 커밋 · Final sha · Test 지문 등 15항목 검사 → Frozen Test **1회** 평가 (11 채점 함수 그대로 · 1회 잠금) | [16_evaluate_final_test.md](scripts/16_evaluate_final_test.md) |
+| `scripts/17_auto_label.py` | 8 | 215 | Frozen Test 평가 뒤 Test 사진 8장으로 Detection 이미지 · Auto Label 후보 TXT · 교과 7 검수 폴더 준비 (정답은 숨김) | [17_auto_label.md](scripts/17_auto_label.md) |
+| `scripts/18_auto_label_review.py` | 8 | 172 | AI 후보 vs 사람 검수 1:1 비교 → 승인 · Class 수정 · BBox 수정 · 삭제 · 누락 추가 집계 | [18_auto_label_review.md](scripts/18_auto_label_review.md) |
 
 ## 그림은 어디에?
 
@@ -87,38 +87,38 @@ docs/code_review/
 ```
 01_check_environment → dataset_yaml
       ↓
-dataset_audit (기능) → 02a_make_audit_fixture → 02_audit_subject7_final
+dataset_audit (기능) → 02_make_audit_fixture → 03_audit_subject7_final
       ↓  audit_label_stats.csv
-capture_group (기능) → 03_split_analysis
+capture_group (기능) → 04_split_analysis
       ↓  capture_groups.csv  +  docs/split_policy.md (사람의 결정)
-04_make_split
+05_make_split
       ↓  splits/kimchi_v1_split.csv
-05_freeze_split  ←→  manifest (기능: read_manifest · build_v2_rows · write_manifest_set)
+06_freeze_split  ←→  manifest (기능: read_manifest · build_v2_rows · write_manifest_set)
       ↓  manifests/split_manifest.csv
-05b_upgrade_manifest_schema (v1 → v2) → 05a_dataset_summary
+upgrade_manifest_schema_v1_to_v2 (v1 → v2) → 07_dataset_summary
       ↓  manifests/ (v2) · reports/dataset_summary.csv
-06_build_yolo_dataset
+08_build_yolo_dataset
       ↓  data/yolo
-07_verify_yolo_dataset
+09_verify_yolo_dataset
       ↓
-train_detector (기능) → 08_train_baseline
+train_detector (기능) → 10_train_baseline
       ↓  models/baseline/baseline_best.pt · reports/baseline_training_condition.md
-evaluate_detector (기능) → 09_evaluate_baseline
+evaluate_detector (기능) → 11_evaluate_baseline
       ↓  reports/baseline_val_image_check.csv · baseline_class_check.csv
-09a_branch_fp_check  (6일차 · branch 오검출 확인 · reports/branch_pred_check.csv)
+12_branch_fp_check  (6일차 · branch 오검출 확인 · reports/branch_pred_check.csv)
       ↓  reports/failure_analysis.csv (사람이 대표 실패 사례 정리)
-09b_failure_images  (6일차 · GT vs 예측 비교 그림 · demo/failure_analysis/)
+13_failure_images  (6일차 · GT vs 예측 비교 그림 · demo/failure_analysis/)
       ↓  reports/improvement_experiment.md (사람의 결정 · 바꿀 변수 하나 · 상태: 확정)
-10_train_experiment  (7일차 · --smoke → --dry-run → 본 학습 · 08 도우미 재사용)
+14_train_experiment  (7일차 · --smoke → --dry-run → 본 학습 · 10 도우미 재사용)
       ↓  models/improved/exp001_best.pt · reports/exp001_training_condition.md
-11_evaluate_experiment  (7일차 · 09 채점 함수 그대로 · Baseline 비교)
+15_evaluate_experiment  (7일차 · 11 채점 함수 그대로 · Baseline 비교)
       ↓  reports/experiment_log.csv · reports/baseline_vs_improved.md (해석 · 결정은 팀)
       ↓  reports/final_model_selection.md (사람의 결정 · Final = exp001 · Test 전에 커밋)
-12_evaluate_final_test  (8일차 · Frozen Test 1회 · 09 채점 함수 그대로 · 1회 잠금)
+16_evaluate_final_test  (8일차 · Frozen Test 1회 · 11 채점 함수 그대로 · 1회 잠금)
       ↓  reports/final_metrics.csv (= Test 사진을 써도 된다는 신호)
-13_auto_label  (8일차 · Test 8장 · Detection · 후보 TXT · 검수 폴더 · 정답 숨김)
+17_auto_label  (8일차 · Test 8장 · Detection · 후보 TXT · 검수 폴더 · 정답 숨김)
       ↓  교과 7 라벨링 프로그램 (사람 검수 → review_workspace/work · final)
-14_auto_label_review  (8일차 · 후보 vs 검수 집계 · reports/auto_label_review.csv)
+18_auto_label_review  (8일차 · 후보 vs 검수 집계 · reports/auto_label_review.csv)
 ```
 
 ## 표기법
