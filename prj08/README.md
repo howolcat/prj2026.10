@@ -16,7 +16,7 @@
 <summary><b>팀</b> — 최용훈 PM · 심준형 Data / QA · 박건 Evaluation · Experiment · 김하민 Inference · Document</summary>
 
 | 팀원 | 역할 | 주요 작업 |
-|:-:|---|---|
+|:-:|:-:|---|
 | <img src="https://github.com/yonghoonchoi88.png" width="80"><br>최용훈<br> [`@yonghoonchoi88`](https://github.com/yonghoonchoi88) | **PM / Integrator** | Split 정책 · `kimchi_v1` 확정 · Baseline 학습 · 평가 · exp001 · Final Model · Frozen Test 1회 · Acceptance 33/33 · Handoff |
 | <img src="https://github.com/simpson92.png" width="80"><br>심준형<br> [`@simpson92`](https://github.com/simpson92) | **Data / QA** · **Training** | 교과 7 FINAL 통계 · 환경 확인 · A PC 재현(08 → 09 PASS 19) · 코드 리뷰 문서 · branch 오검출 확인 · **Auto Label 공식 검수** |
 | <img src="https://github.com/howolcat.png" width="80"><br>박건<br> [`@howolcat`](https://github.com/howolcat) | **Evaluation / Failure** · **Experiment** | 교과 7 FINAL 확보 · 900장 Audit(03) · Split Freeze(06) · YOLO 데이터 구성 · 검증(08 · 09) · Smoke Test · `.gitignore` 보안 규칙 · 산출물 지도 |
@@ -377,7 +377,7 @@ prj08/
 </details>
 
 <details>
-<summary><b>11. Failure Analysis (6일차)</b> — 놓침의 96%가 작은 객체 → 가설 H1 확정</summary>
+<summary><b>11. Failure Analysis</b> — 놓침의 96%가 작은 객체 → 가설 H1 확정</summary>
 
 Baseline(baseline_v1 · imgsz 640)을 Val 74장에서 conf 0.25 로 예측해 보니 **놓침(FN) 159개 · 오검출(FP) 92개**가 나왔다.
 FN · FP 가 많은 사진 14장을 골라 정답(초록) · 놓친 정답(노랑, MISSED) · 예측(빨강)을 한 장에 겹친 비교 이미지(`scripts/13_failure_images.py`)로 직접 보고, 실패를 다음 가설로 나눴다.
@@ -401,7 +401,7 @@ FN · FP 가 많은 사진 14장을 골라 정답(초록) · 놓친 정답(노�
 </details>
 
 <details>
-<summary><b>12. Improvement (7일차)</b> — imgsz 1280 하나만 변경 → mAP50 0.756 · 놓침 60</summary>
+<summary><b>12. Improvement</b> — imgsz 1280 하나만 변경 → mAP50 0.756 · 놓침 60</summary>
 
 6일차 실패 분석에서 놓침 159개 중 153개가 작은 객체(H1)였기 때문에, 변수 하나만 바꾼 실험 exp001 로 **imgsz 640 → 1280** 을 시험했다 (smoke 1 epoch 최대 메모리 9.97GB < 11GB 기준 → 1280 채택).
 같은 kimchi_v1 · 같은 Val 74장에서 비교한 결과, mAP50 0.622 → **0.756**, mAP50-95 0.462 → **0.641**, Recall(conf 0.25) 0.591 → **0.846** 으로 올랐다.
@@ -413,7 +413,7 @@ FN · FP 가 많은 사진 14장을 골라 정답(초록) · 놓친 정답(노�
 </details>
 
 <details>
-<summary><b>13. Final Model (8일차)</b> — Test를 보기 전에 exp001을 Final로 확정</summary>
+<summary><b>13. Final Model</b> — Test를 보기 전에 exp001을 Final로 확정</summary>
 
 **Final Model = exp001** (`models/final/final_best.pt` · sha `029c0e92e594` = `models/improved/exp001_best.pt` · Git 제외).
 Frozen Test 를 보기 **전에** 같은 Val 74장 결과만으로 baseline_v1 과 exp001 중에서 골랐다 (`reports/final_model_selection.md` · 상태: 확정 · 커밋 후 Test).
@@ -431,7 +431,7 @@ Frozen Test 를 보기 **전에** 같은 Val 74장 결과만으로 baseline_v1 �
 </details>
 
 <details>
-<summary><b>14. Frozen Test (8일차)</b> — Test 1회 → mAP50 0.606 · 원인: 검증 세트 편중 · 새 촬영일</summary>
+<summary><b>14. Frozen Test</b> — Test 1회 → mAP50 0.606 · 원인: 검증 세트 편중 · 새 촬영일</summary>
 
 Final Model(exp001 · sha `029c0e92e594`)을 확정 · 커밋한 **뒤** Frozen Test 80장(지문 `4f9291849fe6`)을 imgsz 1280 으로 **1회** 평가했다 (`scripts/16_evaluate_final_test.py` · 실행 기록 `reports/final_test_runs.csv`).
 
@@ -461,7 +461,7 @@ Final Model(exp001 · sha `029c0e92e594`)을 확정 · 커밋한 **뒤** Frozen 
 </details>
 
 <details>
-<summary><b>15. Detection / Auto Label (8일차)</b> — AI 후보 43개 중 31개(72%) 수정 없이 승인</summary>
+<summary><b>15. Detection / Auto Label</b> — AI 후보 43개 중 31개(72%) 수정 없이 승인</summary>
 
 새 사진(학습 · Val · Test 에 안 쓴 사진)이 없어 **가이드 21.3 방식**으로, Frozen Test 평가를 끝낸 뒤 Test 사진 8장(Class · 촬영 세션 골고루 · `scripts/17_auto_label.py`)으로 시연했다. 정답 TXT 는 따로 보관하고(검수자 비공개), 이 결과로 모델을 다시 학습하지 않았다.
 
