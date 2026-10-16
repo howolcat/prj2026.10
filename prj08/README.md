@@ -2,7 +2,6 @@
 
 # 조각김치 이물 객체검출 (YOLO11)
 
-**[결과](#실험--결과) · [빠른 실행](#환경--실행--구조) · [한계](#한계--보안--인계) · [문서](#문서)**
 
 </div>
 
@@ -524,39 +523,5 @@ git diff --cached --name-only | grep -iE '\.png$'
 - **첫 연결점**: Bridge Holdout 146장 (BBox 778 · 교과 8 미사용 · `manifests/bridge_holdout.csv`)으로 Final Model(exp001 · imgsz 1280 · sha `029c0e92e594`)을 다시 확인
 - **넘기는 약점**: 나뭇잎 ↔ 나뭇가지 혼동 · 갈변 · 새 촬영 세션(4/24 G11에 Test FP 81% · FN 68%) · 정상 김치 0장 · 라벨 이슈 3건
 - **넘기는 할 일**: Class · 날짜 균형 검증 세트 · 두 Class 기준 재정리 → `kimchi_v2` · 갈변 데이터 · Negative 사진 · 현장 속도
-
-</details>
-
-## 문서
-
-<details>
-<summary><b>참고 문서</b> — split_policy · code_review · 실험 · 인계 문서 15종</summary>
-
-| 문서 | 내용 |
-|---|---|
-| [`docs/split_policy.md`](docs/split_policy.md) | Split 정책 · 근거 · 결정 기록 |
-| [`docs/code_review/README.md`](docs/code_review/README.md) | 파일별 코드 리뷰 (코드와 같은 폴더 구조) |
-| [`docs/code_flow.md`](docs/code_flow.md) | Mermaid 코드 흐름도 |
-| [`reports/audit_expected.md`](reports/audit_expected.md) | Audit 기대값 (Test Oracle) |
-| [`reports/issue_log.md`](reports/issue_log.md) | 문제 · 원인 · 해결 기록 |
-| [`reports/smoke_test.md`](reports/smoke_test.md) | Smoke Test 기록 · 가이드와 다른 점 |
-| [`reports/baseline_training_condition.md`](reports/baseline_training_condition.md) | Baseline 실제 학습 조건 · 실행 기록 · 4일차 Gate (10이 자동 생성) |
-| [`reports/failure_hypothesis.md`](reports/failure_hypothesis.md) | 6일차 실패 가설 H1~H4 · L · 가이드 19장 분류 대응 |
-| [`reports/improvement_experiment.md`](reports/improvement_experiment.md) | 7일차 개선 실험 계획 (변수 하나 · 상태: 확정) |
-| [`reports/exp001_training_condition.md`](reports/exp001_training_condition.md) | exp001 실제 학습 조건 · 실행 기록 (14가 자동 생성) |
-| [`reports/baseline_vs_improved.md`](reports/baseline_vs_improved.md) | Baseline vs exp001 같은 Val 비교 · Final Model 후보 |
-| [`reports/final_model_selection.md`](reports/final_model_selection.md) | 8일차 Final Model 선택 이유 · 원본 Weight · Frozen Test 조건 (Test 전에 커밋) |
-| [`reports/acceptance_test.md`](reports/acceptance_test.md) | 9일차 Acceptance Test (**ACCEPTED** · 33/33 · Final Gate 자가점검 포함) |
-| [`docs/handoff_subject14.md`](docs/handoff_subject14.md) | 교과 14 인계 (Bridge · Final · 성능 · 약점 · 할 일) |
-| [`docs/deliverables_map.md`](docs/deliverables_map.md) | 필수 산출물 vs 우리 산출물 구분 · 추가 파일을 만든 이유 |
-
-</details>
-
-<details>
-<summary><b>진행 기록</b> — 1~9일차 진행 상황</summary>
-
-> 교과 7에서 검수한 정답 데이터로 YOLO11 객체검출 모델을 학습 · 평가 · 개선한다.
->
-> **Dataset Version** `kimchi_v1` · **라벨 지문** `5c2b4fc2c3e6` · **진행 상황** 3일차 완료 (Split Freeze · data/yolo 구성 · Smoke Test) · 4일차 완료 (Baseline 학습) · 5일차 완료 (Baseline 평가) · 6일차 완료 (실패 분석 · H1 확정) · 7일차 완료 (exp001 imgsz 1280 · Final 후보) · 8일차 완료 (Final Model 확정 · Frozen Test 1회 · Auto Label → Human Review) · **9일차 완료** (Feature Freeze · Acceptance **ACCEPTED** 33/33 · 교과 14 Handoff 확정 · 태그 `subject8_final_v1`) · 산출물 8 (발표) 준비 중
 
 </details>
