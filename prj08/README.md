@@ -16,11 +16,11 @@
 <summary><b>팀</b> — 최용훈 PM · 심준형 Data / QA · 박건 Evaluation · Experiment · 김하민 Inference · Document</summary>
 
 | 팀원 | 역할 | 주요 작업 |
-|---|---|---|
-| <img src="https://github.com/yonghoonchoi88.png" width="80"><br>최용훈 [`@yonghoonchoi88`](https://github.com/yonghoonchoi88) | **PM / Integrator** | Split 정책 · `kimchi_v1` 확정 · Baseline 학습 · 평가 · exp001 · Final Model · Frozen Test 1회 · Acceptance 33/33 · Handoff |
-| <img src="https://github.com/simpson92.png" width="80"><br>심준형 [`@simpson92`](https://github.com/simpson92) | **Data / QA** · **Training** | 교과 7 FINAL 통계 · 환경 확인 · A PC 재현(08 → 09 PASS 19) · 코드 리뷰 문서 · branch 오검출 확인 · **Auto Label 공식 검수** |
-| <img src="https://github.com/howolcat.png" width="80"><br>박건 [`@howolcat`](https://github.com/howolcat) | **Evaluation / Failure** · **Experiment** | 교과 7 FINAL 확보 · 900장 Audit(03) · Split Freeze(06) · YOLO 데이터 구성 · 검증(08 · 09) · Smoke Test · `.gitignore` 보안 규칙 · 산출물 지도 |
-| <img src="https://github.com/hxxdxm.png" width="80"><br>김하민 [`@hxxdxm`](https://github.com/hxxdxm) | **Inference / Document** | README 초안 · Class 이름 통일 · 촬영 세션 · Leakage 분석(04) · Split 배정(05) · Dataset 요약(07) · branch 오검출 확인 · 요약 이미지 · Auto Label 검수 |
+|:-:|---|---|
+| <img src="https://github.com/yonghoonchoi88.png" width="80"><br>최용훈<br> [`@yonghoonchoi88`](https://github.com/yonghoonchoi88) | **PM / Integrator** | Split 정책 · `kimchi_v1` 확정 · Baseline 학습 · 평가 · exp001 · Final Model · Frozen Test 1회 · Acceptance 33/33 · Handoff |
+| <img src="https://github.com/simpson92.png" width="80"><br>심준형<br> [`@simpson92`](https://github.com/simpson92) | **Data / QA** · **Training** | 교과 7 FINAL 통계 · 환경 확인 · A PC 재현(08 → 09 PASS 19) · 코드 리뷰 문서 · branch 오검출 확인 · **Auto Label 공식 검수** |
+| <img src="https://github.com/howolcat.png" width="80"><br>박건<br> [`@howolcat`](https://github.com/howolcat) | **Evaluation / Failure** · **Experiment** | 교과 7 FINAL 확보 · 900장 Audit(03) · Split Freeze(06) · YOLO 데이터 구성 · 검증(08 · 09) · Smoke Test · `.gitignore` 보안 규칙 · 산출물 지도 |
+| <img src="https://github.com/hxxdxm.png" width="80"><br>김하민<br> [`@hxxdxm`](https://github.com/hxxdxm) | **Inference / Document** | README 초안 · Class 이름 통일 · 촬영 세션 · Leakage 분석(04) · Split 배정(05) · Dataset 요약(07) · branch 오검출 확인 · 요약 이미지 · Auto Label 검수 |
 
 > 역할은 발표 · 책임 기준이고, 실제 작업은 PR 리뷰와 교차 확인으로 함께 진행했습니다. 날짜별 기록: [`daily_csv/`](daily_csv/)
 
