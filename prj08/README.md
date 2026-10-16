@@ -73,7 +73,6 @@
 ### 6.1 처음 한 번 (환경 · 데이터 준비)
 
 ```bash
-cd ~/exe_01/prj07/prj07_team01/prj08        # 각자 레포 위치
 
 # 가상환경
 python3 -m venv .venv
@@ -131,6 +130,36 @@ LC_ALL=C cat data/subject7_final/labels/*.txt | sha256sum | cut -c1-12
 > `10_train_experiment.py`는 **① `--smoke` → `improvement_experiment.md`를 `상태: 확정`으로 → ② `--dry-run` → ③ 본 학습** 순서로 씁니다. `runs/exp001/` · `models/improved/exp001_best.pt`가 이미 있으면 덮어쓰지 않고 멈추므로, 다음 실험은 `configs/exp002.yaml`처럼 **새 이름**으로 만듭니다. 10 · 11은 둘 다 `--config`로 같은 실험 설정 파일을 받습니다.
 
 ## 7. 폴더 구조
+
+### 7.1 필수 산출물
+
+| No. | 산출물 | 가이드 지정 파일 |
+|--:|---|---|
+| 1 | 학습용 Dataset Version | `configs/dataset.yaml` · `manifests/split_manifest.csv` · `manifests/train.csv` · `val.csv` · `test.csv` · `bridge_holdout.csv` · `docs/split_policy.md` · `reports/dataset_summary.csv` |
+| 2 | Baseline Model | `models/baseline/baseline_best.pt` · `runs/baseline_v1/results.csv` · `reports/baseline_training_condition.md` · `reports/baseline_metrics.csv` |
+| 3 | Failure Analysis | `reports/failure_analysis.csv` · `demo/failure_analysis/*.jpg` · `reports/failure_hypothesis.md` |
+| 4 | Improved / Final Model | `models/improved/exp001_best.pt` · `models/final/final_best.pt` · `reports/improvement_experiment.md` · `reports/final_model_selection.md` |
+| 5 | 성능·실험 기록 | `reports/experiment_log.csv` · `reports/final_metrics.csv` · `reports/baseline_vs_improved.md` · `reports/baseline_metrics.csv` · `reports/figures/` (학습곡선 · Confusion Matrix) |
+| 6 | Detection · Auto Label | `demo/prediction_images/` · `demo/auto_label/candidate_labels/` · `demo/auto_label/reviewed_labels/` · `reports/auto_label_review.csv` |
+| 7 | 문서·교과 14 연결 | `README.md` · `reports/acceptance_test.md` · `docs/handoff_subject14.md` |
+| 8 | 최종 발표·시연 | `presentation/final_presentation.pdf` · `presentation/qna_guide.md` · `demo/final_detection_demo.mp4` · `demo/auto_label_human_review_demo.mp4` (또는 실시간 시연) |
+
+> ⚠ `models/` · `runs/` · `demo/`는 NDA · 용량 때문에 Git에서 제외합니다 (17장 데이터 보안).
+
+### 7.2 우리 산출물
+
+
+| 위치 | 개수 |
+|---|---|
+| `reports/` | 33 (그림 4 포함) |
+| `configs/` | 2 |
+| `splits/` | 1 |
+| `daily_csv/` | 4 |
+| `docs/` | 그림 7 · `code_flow.md` 1 · `code_review/` 26 |
+
+> 파일별로 왜 만들었는지는 [`docs/deliverables_map.md`](docs/deliverables_map.md)에 정리했습니다.
+
+### 7.3 전체 폴더 트리
 
 ```
 prj08/
@@ -577,7 +606,7 @@ Final Model(exp001 · sha `029c0e92e594`)을 확정 · 커밋한 **뒤** Frozen 
 ## 17. 데이터 보안
 
 - 기업 제공 데이터(NDA)는 Git · 디스코드 · 외부 클라우드에 올리지 않는다. (`data/`, `*.jpg`, `*.pt`, `runs/`, `models/` 제외)
-- **보안정책이 `.gitignore`보다 우선**한다 (가이드 22.2) · Public 레포 사용 가능 여부는 선생님 확인 중
+- **보안정책이 `.gitignore`보다 우선**한다 (가이드 22.2)
 - 커밋 전 확인 (`git add` 한 뒤 · 레포 최상위에서):
 
 ```bash
@@ -614,3 +643,4 @@ git diff --cached --name-only | grep -iE '\.png$'
 | [`reports/final_model_selection.md`](reports/final_model_selection.md) | 8일차 Final Model 선택 이유 · 원본 Weight · Frozen Test 조건 (Test 전에 커밋) |
 | [`reports/acceptance_test.md`](reports/acceptance_test.md) | 9일차 Acceptance Test (**ACCEPTED** · 33/33 · Final Gate 자가점검 포함) |
 | [`docs/handoff_subject14.md`](docs/handoff_subject14.md) | 교과 14 인계 (Bridge · Final · 성능 · 약점 · 할 일) |
+| [`docs/deliverables_map.md`](docs/deliverables_map.md) | 필수 산출물 vs 우리 산출물 구분 · 추가 파일을 만든 이유 |
