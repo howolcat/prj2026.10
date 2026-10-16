@@ -750,3 +750,159 @@ flowchart LR
 ```
 
 </details>
+
+
+## 4. 글로 적은 전체 지도 · 파일별 입력 · 출력
+
+1장 그림을 글로 옮긴 버전입니다. 그림이 안 보이는 환경이거나, 파일 이름으로 검색하고 싶을 때 씁니다. (README 8장에서 옮겨 옴)
+
+### 4-1. 일차별 실행 순서
+
+```
+[1일차]  01_check_environment.py ──→ 화면 출력 → 5장 팀원 환경 표
+
+[2일차]  02_make_audit_fixture.py ──→ data/audit_test/ (8쌍 + 버그 9종)
+              │
+              ▼
+         03_audit_subject7_final.py --fixture ──→ 9종 각 1건 검출 확인   (검사기부터 검사)
+         03_audit_subject7_final.py           ──→ reports/audit_issue · audit_check · audit_label_stats.csv
+              │  (import src.dataset_audit)            │
+              │                                        ▼
+         04_split_analysis.py ←──────────── audit_label_stats.csv
+              │  (import src.capture_group)
+              ▼
+         reports/class_scene_distribution · capture_group_* · capture_groups · filename_time_check.csv
+              │
+              ▼
+         [사람] 팀 회의 → docs/split_policy.md (숫자 근거 + 결정)
+
+[3일차 선행]
+         05_make_split.py ←── capture_groups.csv + audit_label_stats.csv + 정책 상수
+              ▼
+         splits/kimchi_v1_split.csv · reports/split_check.csv · split_summary.csv · Frozen Test 지문 4f9291849fe6
+
+[3일차]
+         06_freeze_split.py ←── splits/kimchi_v1_split.csv (검사 13항목 · 전부 PASS일 때만 Freeze)
+              ▼
+         manifests/split_manifest.csv · train · val · test · bridge_holdout.csv · reports/freeze_check.csv
+              ▼
+         07_dataset_summary.py ←── manifests/ + audit_label_stats.csv + configs/dataset.yaml (검사 8항목 · PASS일 때만 저장)
+              ▼
+         reports/dataset_summary.csv (산출물 1 · 네 역할 합 900)
+              ▼
+         08_build_yolo_dataset.py ←── manifests/ + data/subject7_final (복사만 · Bridge 제외)
+              ▼
+         data/yolo/{images,labels}/{train,val,test} · reports/yolo_build_summary.csv
+              ▼
+         09_verify_yolo_dataset.py ←── manifests/ + data/yolo + 원본 labels (읽기만)
+              ▼
+         reports/yolo_verify_check.csv (19항목 · 종료 코드 0 / 1)
+              ▼
+         [사람] 라벨 Preview 20장 (교과 7 도구 · 읽기 전용 작업 공간) ──→ reports/label_preview.md
+              ▼
+         Smoke Test: yolo detect train (1 epoch · Train 600 / Val 74) → predict (Val · conf 0.05 / 0.25)
+              ▼
+         runs/smoke_day3/weights/best.pt (Git 제외 · Baseline 아님) · reports/smoke_test.md
+
+[3일차 보완]  upgrade_manifest_schema_v1_to_v2.py : manifests/ v1 → v2 (1회 · reports/manifest_schema_check.csv)
+              (06 · 07 · archive · 08 · 09 · 10 · 11 · 12 · 13 · 14 · 15 · 16 · 17은 manifest 읽기 · 쓰기를 src/manifest.py 하나로 공유)
+
+[4일차]
+         10_train_baseline.py ←── configs/baseline.yaml + configs/dataset.yaml + manifests/ + data/yolo
+              │  (import src.manifest · src.train_detector · 학습 전 09 실행 → 종료 코드 0 확인)
+              │  학습 전 검사 12항목 · 전부 PASS일 때만 학습 (--dry-run: 검사 + 조건 문서만)
+              ▼
+         runs/baseline_v1/ (results.csv · weights) · models/baseline/baseline_best.pt (Git 제외)
+         reports/baseline_training_condition.md · reports/baseline_results.csv (Git)
+
+[5일차]
+         11_evaluate_baseline.py ←── models/baseline/baseline_best.pt + baseline_training_condition.md (상태 · sha) + manifests/val.csv + data/yolo (val)
+              │  (import src.manifest · src.evaluate_detector · 평가 전 09 실행 → 종료 코드 0 확인)
+              │  평가 전 검사 10항목 · split = val 고정 (Frozen Test · Bridge 미사용)
+              ▼
+         reports/baseline_metrics.csv · reports/figures/baseline_*.png · reports/baseline_val_image_check.csv · reports/baseline_class_check.csv (Git)
+         runs/baseline_v1_val/ · runs/predict/baseline_val_images/ (Git 제외 · NDA · 박스 그린 Val 이미지는 사람이 눈으로 확인)
+
+[6일차]
+         12_branch_fp_check.py ←── models/baseline/baseline_best.pt + baseline_training_condition.md (sha) + manifests/val.csv + data/yolo (val) + reports/baseline_val_image_check.csv (비교용)
+              │  (import src.manifest · src.evaluate_detector · 실행 전 09 실행 → 종료 코드 0 확인)
+              │  실행 전 검사 6항목 · Val branch 예측을 정답과 대조해 5종으로 분류 (TP · 중복 · 다른 이물 위 · 위치 어긋남 · 정답 없는 자리)
+              ▼
+         reports/branch_pred_check.csv (Git · human_check · memo는 사람이 채움) · runs/predict/branch_check/ (Git 제외 · NDA)
+              ▼
+         [사람] branch 박스 확인 (라벨 누락 · 김치 줄기 착각 · 다른 이물) ──→ reports/failure_analysis.csv H3 행 · (라벨 누락이면) reports/issue_log.md
+              ▼
+         [사람] FN · FP 많은 Val 사진 14장 선정 ──→ reports/failure_analysis.csv · reports/failure_hypothesis.md (H1~H4 · L)
+              ▼
+         13_failure_images.py ←── reports/failure_analysis.csv + models/baseline/baseline_best.pt + baseline_training_condition.md (sha) + manifests/val.csv + data/yolo (val)
+              │  (import src.manifest · src.evaluate_detector.match_boxes · Val만 · conf 0.25 · IoU 0.5 = 11과 같은 기준)
+              ▼
+         demo/failure_analysis/*_compare.jpg (Git 제외 · NDA · 정답 초록 · 놓침 노랑 · 예측 빨강) · reports/failure_image_list.csv (Git)
+              ▼
+         [사람] 10/15 회의 → H1 개선 대상 확정 ──→ configs/exp001.yaml · reports/improvement_experiment.md (변수 imgsz 하나 · 상태: 확정)
+
+[7일차]
+         14_train_experiment.py --smoke ←── configs/exp001.yaml (1 epoch · runs/exp001_smoke · 기록 안 남김 · 최대 9.97GB < 11GB → imgsz 1280)
+              ▼
+         14_train_experiment.py ←── configs/exp001.yaml + configs/baseline.yaml (학습 설정 차이 = 정확히 1개) + improvement_experiment.md (확정) + manifests/ + data/yolo
+              │  (import src.manifest · src.train_detector · 10을 모듈로 불러 지문 · git · 환경 도우미 재사용 · 학습 전 09 실행 → 종료 코드 0 확인)
+              ▼
+         runs/exp001/ · models/improved/exp001_best.pt (Git 제외) · reports/exp001_training_condition.md · reports/exp001_results.csv (Git)
+              ▼
+         15_evaluate_experiment.py ←── models/improved/exp001_best.pt + exp001_training_condition.md (상태 · sha) + reports/baseline_*.csv 3개 + reports/failure_analysis.csv
+              │  (import src.manifest · src.evaluate_detector · src.train_detector.TRAIN_KEYS · 11을 모듈로 불러 채점 함수 그대로 · 평가 전 09 실행)
+              │  평가 전 검사 10항목 · split = val 고정 (Frozen Test · Bridge 미사용)
+              ▼
+         reports/exp001_metrics · exp001_class_check · exp001_val_image_check.csv · reports/figures/exp001_*.png · reports/experiment_log.csv (Git)
+         runs/exp001_val/ · runs/predict/exp001_val_images/ (Git 제외)
+              ▼
+         [사람] reports/baseline_vs_improved.md 해석 · experiment_log.csv decision 작성 ──→ Frozen Test 를 보지 않고 exp001 을 Final Model 후보로
+
+[8일차]
+         [사람] reports/final_model_selection.md (상태: 확정) · models/improved/exp001_best.pt → models/final/final_best.pt ──→ 커밋 · 푸시 (Test 보다 먼저)
+              ▼
+         16_evaluate_final_test.py ←── models/final/final_best.pt + final_model_selection.md (확정 · 커밋 · sha) + configs/exp001.yaml (imgsz 1280) + data/yolo (test)
+              │  (11 · 10 을 모듈로 불러 채점 함수 · git 도우미 재사용 · allow_test=True · Test 지문 확인 · 1회 잠금)
+              ▼
+         reports/final_metrics · final_class_check · final_test_image_check · final_test_runs.csv · reports/figures/final_test_*.png (Git)
+         runs/final_test/ · runs/predict/final_test_images/ (Git 제외)
+              ▼
+         17_auto_label.py ←── models/final/final_best.pt + final_model_selection.md (sha) + reports/final_metrics.csv (16이 끝났다는 증거) + manifests/test.csv + data/yolo (test)
+              │  (16 을 모듈로 불러 Final 경로 · sha 규칙 공유 · import src.manifest · src.evaluate_detector.predict_images)
+              │  준비 검사 8항목 · Test 사진 8장 (Class · 세션 골고루 · 같은 입력이면 같은 목록) · Bridge · Train · Val 사진 거부
+              ▼
+         demo/prediction_images/ (Detection) · demo/auto_label/candidate_labels/ (후보 TXT) · review_workspace/ (검수 폴더) · gt_hidden/ (정답 · 비공개) (Git 제외)
+         reports/auto_label_candidates.csv (Git)
+              ▼
+         [사람] 교과 7 라벨링 프로그램 v4.1 (cd ../prj07 && python main.py) → review_workspace 열기 → 승인 · 수정 · 삭제 · 추가 → work/ · final/ 저장
+              ▼
+         18_auto_label_review.py ←── candidate_labels/ + review_workspace/{final,work}/labels + 작업대장 dataset_manifest.csv + gt_hidden/ (참고 비교만)
+              │  (import src.evaluate_detector.iou_xywh · match_boxes · 후보 ↔ 검수 1:1 짝짓기 · 승인 IoU ≥ 0.95)
+              ▼
+         demo/auto_label/reviewed_labels/ (Git 제외) · reports/auto_label_review.csv (Git · 승인 31 / 43)
+```
+
+### 4-2. 스크립트별 입력 · 출력 · 의존
+
+| 파일 | 입력 | 출력 | 의존 |
+|---|---|---|---|
+| `01_check_environment.py` | 현재 Python 환경 | 화면 | torch · ultralytics |
+| `02_make_audit_fixture.py` | `data/subject7_final` 앞 8쌍 | `data/audit_test/` | shutil |
+| `03_audit_subject7_final.py` | images · labels · 교과 7 Manifest · `EXPECTED` | `reports/audit_*.csv` | `src.dataset_audit` |
+| `04_split_analysis.py` | `audit_label_stats.csv` · images(EXIF) | `reports/` CSV 5개 | `src.capture_group` · PIL |
+| `05_make_split.py` | `capture_groups.csv` · `audit_label_stats.csv` | `splits/` · `reports/split_*.csv` | pandas만 (src 의존 없음) |
+| `06_freeze_split.py` | `splits/kimchi_v1_split.csv` · `audit_label_stats.csv` · images · labels | `manifests/` (v2) · `reports/freeze_check.csv` | `src.manifest` |
+| `07_dataset_summary.py` | `manifests/split_manifest.csv` · `audit_label_stats.csv` · `configs/dataset.yaml` | `reports/dataset_summary.csv` | `src.manifest` · PyYAML |
+| `upgrade_manifest_schema_v1_to_v2.py` | `manifests/` (v1) · split CSV · `audit_label_stats.csv` | `manifests/` (v2) · `reports/manifest_schema_check.csv` | `src.manifest` |
+| `08_build_yolo_dataset.py` | `manifests/split_manifest.csv` (`--from-split`이면 split CSV) · images · labels | `data/yolo/` · `reports/yolo_build_summary.csv` | `src.manifest` (읽기만) |
+| `09_verify_yolo_dataset.py` | `manifests/split_manifest.csv` · `data/yolo` · 원본 labels | `reports/yolo_verify_check.csv` | `src.manifest` (읽기만 · 08 import 안 함) |
+| Smoke Test (CLI) | `configs/dataset.yaml` → `data/yolo` train · val | `runs/smoke_day3/` · `reports/smoke_test.md` | ultralytics |
+| `10_train_baseline.py` | `configs/baseline.yaml` · `configs/dataset.yaml` · `manifests/` · `data/yolo` (09 검증 PASS) · 원본 labels (지문) | `runs/baseline_v1/` · `models/baseline/baseline_best.pt` · `reports/baseline_training_condition.md` · `reports/baseline_results.csv` | `src.manifest` · `src.train_detector` · PyYAML · torch · ultralytics · git |
+| `11_evaluate_baseline.py` | `models/baseline/baseline_best.pt` · `reports/baseline_training_condition.md` · `configs/baseline.yaml` · `manifests/val.csv` · `data/yolo` (val) | `reports/baseline_metrics.csv` · `reports/figures/` · `reports/baseline_val_image_check.csv` · `reports/baseline_class_check.csv` · `runs/baseline_v1_val/` · `runs/predict/baseline_val_images/` | `src.manifest` · `src.evaluate_detector` · PyYAML |
+| `12_branch_fp_check.py` | `models/baseline/baseline_best.pt` · `reports/baseline_training_condition.md` (sha) · `configs/dataset.yaml` · `manifests/val.csv` · `data/yolo` (val) · `reports/baseline_val_image_check.csv` (비교용) | `reports/branch_pred_check.csv` · `runs/predict/branch_check/` | `src.manifest` · `src.evaluate_detector` · PyYAML |
+| `13_failure_images.py` | `reports/failure_analysis.csv` · `models/baseline/baseline_best.pt` · `reports/baseline_training_condition.md` (sha) · `manifests/val.csv` · `data/yolo` (val) | `demo/failure_analysis/*_compare.jpg` · `reports/failure_image_list.csv` | `src.manifest` · `src.evaluate_detector` (`match_boxes`) · Pillow · ultralytics |
+| `14_train_experiment.py` | `configs/exp001.yaml` · `configs/baseline.yaml` · `reports/improvement_experiment.md` · `configs/dataset.yaml` · `manifests/` · `data/yolo` (09 검증 PASS) · 원본 labels (지문) | `runs/exp001/` (`--smoke`: `runs/exp001_smoke/`) · `models/improved/exp001_best.pt` · `reports/exp001_training_condition.md` · `reports/exp001_results.csv` | `src.manifest` · `src.train_detector` · `10_train_baseline.py` (importlib) · PyYAML · torch · git |
+| `15_evaluate_experiment.py` | `models/improved/exp001_best.pt` · `reports/exp001_training_condition.md` · `configs/exp001.yaml` · `configs/baseline.yaml` · `reports/baseline_*.csv` 3개 · `reports/failure_analysis.csv` · `data/yolo` (val) | `reports/exp001_metrics.csv` · `reports/exp001_class_check.csv` · `reports/exp001_val_image_check.csv` · `reports/figures/exp001_*.png` · `reports/experiment_log.csv` · `reports/baseline_vs_improved.md` (없을 때만) · `runs/exp001_val/` · `runs/predict/exp001_val_images/` | `src.manifest` · `src.evaluate_detector` · `src.train_detector` (`TRAIN_KEYS`) · `11_evaluate_baseline.py` (importlib) · PyYAML |
+| `16_evaluate_final_test.py` | `models/final/final_best.pt` · `reports/final_model_selection.md` (확정 · 커밋 · sha) · `reports/exp001_training_condition.md` (sha) · `configs/exp001.yaml` · `configs/dataset.yaml` · `manifests/` · `data/yolo` (test) | `reports/final_metrics.csv` · `reports/final_class_check.csv` · `reports/final_test_image_check.csv` · `reports/final_test_runs.csv` · `reports/figures/final_test_*.png` · `runs/final_test/` · `runs/predict/final_test_images/` | `src.manifest` · `src.evaluate_detector` (`allow_test=True`) · `10` · `11` (importlib) · PyYAML · git |
+| `17_auto_label.py` | `models/final/final_best.pt` · `reports/final_model_selection.md` (sha) · `reports/final_metrics.csv` (16 완료 증거) · `configs/exp001.yaml` (imgsz) · `manifests/` (4개 역할 확인) · `data/yolo` (test) | `demo/prediction_images/` · `demo/auto_label/candidate_labels/` · `demo/auto_label/review_workspace/` · `demo/auto_label/gt_hidden/` · `reports/auto_label_candidates.csv` | `src.manifest` · `src.evaluate_detector` (`predict_images`) · `16` (importlib) · PyYAML |
+| `18_auto_label_review.py` | `demo/auto_label/candidate_labels/` · `demo/auto_label/review_workspace/{final,work}/labels/` · `review_workspace/manifests/dataset_manifest.csv` · `demo/auto_label/gt_hidden/` | `demo/auto_label/reviewed_labels/` · `reports/auto_label_review.csv` | `src.evaluate_detector` (`iou_xywh` · `match_boxes`) |
