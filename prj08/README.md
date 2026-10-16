@@ -12,6 +12,20 @@
   <img src="docs/figures/readme_dashboard.png" alt="프로젝트 한눈에 보기: 핵심 숫자 4개, 데이터 분포, 성능 변화, Class 성적표, AI 라벨 검수 결과" width="100%">
 </p>
 
+<details>
+<summary><b>팀</b> — 최용훈 PM · 심준형 Data / QA · 박건 Evaluation · Experiment · 김하민 Inference · Document</summary>
+
+| 팀원 | 역할 | 주요 작업 |
+|---|---|---|
+| 최용훈 [`@yonghoonchoi88`](https://github.com/yonghoonchoi88) | **PM / Integrator** | Split 정책 · `kimchi_v1` 확정 · Baseline 학습 · 평가 · exp001 · Final Model · Frozen Test 1회 · Acceptance 33/33 · Handoff |
+| 심준형 [`@simpson92`](https://github.com/simpson92) | **Data / QA** · **Training** | 교과 7 FINAL 통계 · 환경 확인 · A PC 재현(08 → 09 PASS 19) · 코드 리뷰 문서 · branch 오검출 확인 · **Auto Label 공식 검수** |
+| 박건 [`@howolcat`](https://github.com/howolcat) | **Evaluation / Failure** · **Experiment** | 교과 7 FINAL 확보 · 900장 Audit(03) · Split Freeze(06) · YOLO 데이터 구성 · 검증(08 · 09) · Smoke Test · `.gitignore` 보안 규칙 · 산출물 지도 |
+| 김하민 [`@hxxdxm`](https://github.com/hxxdxm) | **Inference / Document** | README 초안 · Class 이름 통일 · 촬영 세션 · Leakage 분석(04) · Split 배정(05) · Dataset 요약(07) · branch 오검출 확인 · 요약 이미지 · Auto Label 검수 |
+
+> 역할은 발표 · 책임 기준이고, 실제 작업은 PR 리뷰와 교차 확인으로 함께 진행했습니다. 날짜별 기록: [`daily_csv/`](daily_csv/)
+
+</details>
+
 ## 개요 · 데이터
 
 <details>
@@ -475,7 +489,7 @@ Final Model(exp001 · sha `029c0e92e594`)을 확정 · 커밋한 **뒤** Frozen 
 
 </details>
 
-## 한계 · 보안 · 인계 · 팀
+## 한계 · 보안 · 인계
 
 <details>
 <summary><b>16. 알려진 한계</b> — 정상 김치 0장 · 검증 세트 편중 · 나뭇잎↔나뭇가지 · 갈변</summary>
@@ -519,20 +533,5 @@ git diff --cached --name-only | grep -iE '\.png$'
 - **첫 연결점**: Bridge Holdout 146장 (BBox 778 · 교과 8 미사용 · `manifests/bridge_holdout.csv`)으로 Final Model(exp001 · imgsz 1280 · sha `029c0e92e594`)을 다시 확인
 - **넘기는 약점**: 나뭇잎 ↔ 나뭇가지 혼동 · 갈변 · 새 촬영 세션(4/24 G11에 Test FP 81% · FN 68%) · 정상 김치 0장 · 라벨 이슈 3건
 - **넘기는 할 일**: Class · 날짜 균형 검증 세트 · 두 Class 기준 재정리 → `kimchi_v2` · 갈변 데이터 · Negative 사진 · 현장 속도
-
-</details>
-
-
-<details>
-<summary><b>19. 팀 역할</b> — PM 최용훈 · Data / QA 심준형 · Evaluation / Experiment 박건 · Inference / Document 김하민</summary>
-
-| 팀원 | 역할 | 주요 작업 |
-|---|---|---|
-| 최용훈 [`@yonghoonchoi88`](https://github.com/yonghoonchoi88) | **PM / Integrator** | Split 정책 · `kimchi_v1` 확정 · Baseline 학습 · 평가 · exp001 · Final Model · Frozen Test 1회 · Acceptance 33/33 · Handoff |
-| 심준형 [`@simpson92`](https://github.com/simpson92) | **Data / QA** · **Training** | 교과 7 FINAL 통계 · 환경 확인 · A PC 재현(08 → 09 PASS 19) · 코드 리뷰 문서 · branch 오검출 확인 · **Auto Label 공식 검수** |
-| 박건 [`@howolcat`](https://github.com/howolcat) | **Evaluation / Failure** · **Experiment** | 교과 7 FINAL 확보 · 900장 Audit(03) · Split Freeze(06) · YOLO 데이터 구성 · 검증(08 · 09) · Smoke Test · `.gitignore` 보안 규칙 · 산출물 지도 |
-| 김하민 [`@hxxdxm`](https://github.com/hxxdxm) | **Inference / Document** | README 초안 · Class 이름 통일 · 촬영 세션 · Leakage 분석(04) · Split 배정(05) · Dataset 요약(07) · branch 오검출 확인 · 요약 이미지 · Auto Label 검수 |
-
-> 역할은 발표 · 책임 기준이고, 실제 작업은 PR 리뷰와 교차 확인으로 함께 진행했습니다. 날짜별 기록: [`daily_csv/`](daily_csv/)
 
 </details>
