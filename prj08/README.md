@@ -2,7 +2,7 @@
 
 # 조각김치 이물 객체검출 (YOLO11)
 
-**[결과 한눈에](#자세히-보기) · [빠른 실행](#6-설치--실행-방법) · [폴더 · 산출물](#7-폴더-구조) · [한계](#16-알려진-한계) · [문서](#참고-문서)**
+**[결과](#실험--결과) · [빠른 실행](#환경--실행--구조) · [한계](#한계--보안--인계) · [문서](#문서)**
 
 </div>
 
@@ -13,28 +13,10 @@
   <img src="docs/figures/readme_dashboard.png" alt="프로젝트 한눈에 보기: 핵심 숫자 4개, 데이터 분포, 성능 변화, Class 성적표, AI 라벨 검수 결과" width="100%">
 </p>
 
-## 자세히 보기
-
-대시보드의 숫자마다 근거가 되는 장으로 바로 이동할 수 있습니다.
-
-| 대시보드 | 궁금한 점 | 자세히 |
-|---|---|---|
-| 분석 · **96%** | 왜 입력 해상도를 바꿨나? | [11. 실패 분석](#11-failure-analysis-6일차) |
-| 개선 · **−62%** | 무엇을 바꿨고, 무엇이 좋아졌나? | [10. Baseline](#10-baseline) → [12. Improvement](#12-improvement-7일차) |
-| 검증 · **0.606** | 왜 테스트 점수가 검증보다 낮나? | [13. Final Model](#13-final-model-8일차) → [14. Frozen Test](#14-frozen-test-8일차) |
-| 활용 · **72%** | AI 라벨을 사람이 어떻게 검수했나? | [15. Auto Label](#15-detection--auto-label-8일차) |
-| ① 데이터 분포 | 데이터를 어떻게 검수하고 나눴나? | [3. Dataset](#3-dataset-설명) · [4. Class](#4-class) · [9. Split](#9-dataset-split) |
-| ③ Class 성적표 | 약점과 다음 할 일은? | [16. 알려진 한계](#16-알려진-한계) · [18. Handoff](#18-교과-14-handoff) |
-| — | 직접 실행해 보려면? | [6. 설치 · 실행 방법](#6-설치--실행-방법) |
-
----
-
-## 1. 프로젝트 목적
-
-교과 7에서 검수한 정답 데이터로 YOLO11n을 학습 · 평가 · 개선하고, Auto Label → Human Review까지 연결한다.
+## 개요 · 데이터
 
 <details>
-<summary>펼쳐 보기</summary>
+<summary><b>1. 프로젝트 목적</b> — 라벨링 → 학습 → 평가 → Auto Label → Human Review까지 한 사이클</summary>
 
 - 교과 7 FINAL(JPG 900장 + YOLO TXT 900개)을 학습용 Dataset으로 구성한다.
 - YOLO11n Baseline을 학습하고 Validation에서 Precision · Recall · mAP · FP · FN을 분석한다.
@@ -43,12 +25,8 @@
 
 </details>
 
-## 2. 교과 7 → 교과 8 연결
-
-교과 7 FINAL 900장(BBox 4,601 · 전체 QA PASS)을 읽기 전용으로 그대로 사용한다.
-
 <details>
-<summary>펼쳐 보기</summary>
+<summary><b>2. 교과 7 → 교과 8 연결</b> — 교과 7 FINAL 900장 · BBox 4,601 · 전체 QA PASS를 읽기 전용으로 사용</summary>
 
 - 교과 7 FINAL: `data/subject7_final/` (원본: `master_data/final` · Git 미포함 · 읽기 전용)
 - JPG 900장 / YOLO TXT 900개 · Pair 900 · 동일 이미지(md5) 0쌍
@@ -59,12 +37,8 @@
 
 </details>
 
-## 3. Dataset 설명
-
-원본은 3묶음 900장 — 학습데이터1 train 500 · 학습데이터2 train 220 · validation 180.
-
 <details>
-<summary>펼쳐 보기</summary>
+<summary><b>3. Dataset 설명</b> — 원본 3묶음 900장 (학습데이터1 500 · 학습데이터2 400)</summary>
 
 | source_dataset | original_split | 수량 |
 |---|---|---:|
@@ -75,7 +49,8 @@
 
 </details>
 
-## 4. Class
+<details>
+<summary><b>4. Class</b> — 이물 6종 사용 · 플라스틱류 41% · 고무장갑 0건(미사용)</summary>
 
 | ID | 이물 종류 | 영문 이름 | 사용 | BBox | 비율 |
 |---|---|---|---|---:|---:|
@@ -91,12 +66,12 @@
 > **Dataset Version: `kimchi_v1`** · 라벨 지문(sha256 앞 12자리): `5c2b4fc2c3e6` · 5명 일치 확인 (2026-10-12)
 > 교과 7 문서(qa_summary · handoff)는 4,602개로 적혀 있지만, 10/08 라벨 추가 수정(Class 2→0 56개 등)을 반영한 4,601개를 기준으로 한다. 상세: `reports/issue_log.md`, `docs/split_policy.md`
 
-## 5. 실행환경
+</details>
 
-Python 3.10 · PyTorch 2.14.1+cu130 · Ultralytics 8.4.175 · RTX 3060 — 팀원 전원 환경 · 라벨 지문 일치 확인.
+## 환경 · 실행 · 구조
 
 <details>
-<summary>펼쳐 보기</summary>
+<summary><b>5. 실행환경</b> — Python 3.10 · PyTorch 2.14.1+cu130 · Ultralytics 8.4.175 · RTX 3060</summary>
 
 | 항목 | 값 |
 |---|---|
@@ -119,12 +94,8 @@ Python 3.10 · PyTorch 2.14.1+cu130 · Ultralytics 8.4.175 · RTX 3060 — 팀�
 
 </details>
 
-## 6. 설치 · 실행 방법
-
-가상환경 → torch(cu130) → requirements → 교과 7 FINAL 복사 → `scripts/01` ~ `18` 순서대로 실행.
-
 <details>
-<summary>펼쳐 보기</summary>
+<summary><b>6. 설치 · 실행 방법</b> — 가상환경 → torch → requirements → 데이터 복사 → scripts 01~18 실행</summary>
 
 ### 6.1 처음 한 번 (환경 · 데이터 준비)
 
@@ -185,8 +156,6 @@ LC_ALL=C cat data/subject7_final/labels/*.txt | sha256sum | cut -c1-12
 
 > `14_train_experiment.py`는 **① `--smoke` → `improvement_experiment.md`를 `상태: 확정`으로 → ② `--dry-run` → ③ 본 학습** 순서로 씁니다. `runs/exp001/` · `models/improved/exp001_best.pt`가 이미 있으면 덮어쓰지 않고 멈추므로, 다음 실험은 `configs/exp002.yaml`처럼 **새 이름**으로 만듭니다. 14 · 15는 둘 다 `--config`로 같은 실험 설정 파일을 받습니다.
 
-</details>
-
 ### 6.3 스크립트 번호 규칙 · 옛 번호 대응표
 
 - **번호 = 실행 순서** (6.2 실행표 순서 그대로). 예전에는 중간에 추가한 스크립트에 `02a` · `05a` · `09a`처럼 알파벳을 붙였지만, 10/16에 실행 순서대로 다시 매겼습니다.
@@ -216,12 +185,10 @@ LC_ALL=C cat data/subject7_final/labels/*.txt | sha256sum | cut -c1-12
 
 > 태그 `subject8_final_v1`(9일차 확정본)은 옛 이름 기준입니다. 그 시점 코드로 확인할 때는 이 표를 참고합니다.
 
-## 7. 폴더 구조
-
-가이드 필수 산출물 8종 · 이를 뒷받침하는 우리 산출물 · 전체 폴더 트리.
+</details>
 
 <details>
-<summary>펼쳐 보기</summary>
+<summary><b>7. 폴더 구조</b> — 필수 산출물 8종 · 우리 산출물 · 전체 폴더 트리</summary>
 
 ### 7.1 필수 산출물
 
@@ -384,14 +351,12 @@ prj08/
 
 </details>
 
-## 8. 실행 순서와 데이터 흐름
+<details>
+<summary><b>8. 실행 순서와 데이터 흐름</b> — 1~9일차 파이프라인 그림 · 스크립트별 입력과 결과 파일</summary>
 
 ![교과 8 전체 파이프라인 한눈에 보기 — 1~9일차 · 주황 = 사람의 결정](docs/figures/pipeline_overview.svg)
 
 > 위 그림은 **단계만** 보여 줍니다 (주황 = 사람이 정한 지점 · 검정 = 실행 스크립트). 일차별 상세 그림은 [`docs/code_flow.md`](docs/code_flow.md) 1장, import 관계는 3장, 아래는 실행 순서를 글로 적은 전체 지도입니다.
-
-<details>
-<summary>일차별 스크립트 · 결과 파일 흐름 펼쳐 보기</summary>
 
 ```
 [1일차]  01_check_environment.py ──→ 화면 출력 → 5장 팀원 환경 표
@@ -544,12 +509,10 @@ prj08/
 
 </details>
 
-## 9. Dataset Split
-
-5분 촬영 세션 단위로 Train 600 · Val 74 · Test 80 · Bridge 146 배정 — 세션 누수 0건 · 합격 기준 8/8 PASS.
+## 실험 · 결과
 
 <details>
-<summary>펼쳐 보기</summary>
+<summary><b>9. Dataset Split</b> — 5분 촬영 세션 단위 600 / 74 / 80 / 146 · 세션 누수 0건</summary>
 
 **상태**: 정책 확정 (2026-10-12 · 팀 회의) · 배정 선행 완료 · **3일차 Freeze 완료** (2026-10-13 · `manifests/` v2 · 검사 13항목 PASS)
 
@@ -570,12 +533,8 @@ prj08/
 
 </details>
 
-## 10. Baseline
-
-YOLO11n · imgsz 640 · 50 epoch → Val mAP50 0.622 · 놓침 159 · 오검출 92.
-
 <details>
-<summary>펼쳐 보기</summary>
+<summary><b>10. Baseline</b> — YOLO11n · imgsz 640 → Val mAP50 0.622 · 놓침 159</summary>
 
 **상태**: 4일차 학습 완료 · 5일차 Validation 평가 완료 (`scripts/11_evaluate_baseline.py`)
 
@@ -603,12 +562,8 @@ YOLO11n · imgsz 640 · 50 epoch → Val mAP50 0.622 · 놓침 159 · 오검출 
 
 </details>
 
-## 11. Failure Analysis (6일차)
-
-놓침 159개 중 153개(96%)가 작은 객체 → 가설 H1(작은 객체)을 개선 대상으로 확정.
-
 <details>
-<summary>펼쳐 보기</summary>
+<summary><b>11. Failure Analysis (6일차)</b> — 놓침의 96%가 작은 객체 → 가설 H1 확정</summary>
 
 Baseline(baseline_v1 · imgsz 640)을 Val 74장에서 conf 0.25 로 예측해 보니 **놓침(FN) 159개 · 오검출(FP) 92개**가 나왔다.
 FN · FP 가 많은 사진 14장을 골라 정답(초록) · 놓친 정답(노랑, MISSED) · 예측(빨강)을 한 장에 겹친 비교 이미지(`scripts/13_failure_images.py`)로 직접 보고, 실패를 다음 가설로 나눴다.
@@ -631,12 +586,8 @@ FN · FP 가 많은 사진 14장을 골라 정답(초록) · 놓친 정답(노�
 
 </details>
 
-## 12. Improvement (7일차)
-
-imgsz 640 → 1280 하나만 바꿔 Val mAP50 0.622 → 0.756 · 놓침 159 → 60 (갈변은 그대로).
-
 <details>
-<summary>펼쳐 보기</summary>
+<summary><b>12. Improvement (7일차)</b> — imgsz 1280 하나만 변경 → mAP50 0.756 · 놓침 60</summary>
 
 6일차 실패 분석에서 놓침 159개 중 153개가 작은 객체(H1)였기 때문에, 변수 하나만 바꾼 실험 exp001 로 **imgsz 640 → 1280** 을 시험했다 (smoke 1 epoch 최대 메모리 9.97GB < 11GB 기준 → 1280 채택).
 같은 kimchi_v1 · 같은 Val 74장에서 비교한 결과, mAP50 0.622 → **0.756**, mAP50-95 0.462 → **0.641**, Recall(conf 0.25) 0.591 → **0.846** 으로 올랐다.
@@ -647,12 +598,8 @@ imgsz 640 → 1280 하나만 바꿔 Val mAP50 0.622 → 0.756 · 놓침 159 → 
 
 </details>
 
-## 13. Final Model (8일차)
-
-Test를 보기 전에 Val 결과만으로 exp001(imgsz 1280)을 Final Model로 확정.
-
 <details>
-<summary>펼쳐 보기</summary>
+<summary><b>13. Final Model (8일차)</b> — Test를 보기 전에 exp001을 Final로 확정</summary>
 
 **Final Model = exp001** (`models/final/final_best.pt` · sha `029c0e92e594` = `models/improved/exp001_best.pt` · Git 제외).
 Frozen Test 를 보기 **전에** 같은 Val 74장 결과만으로 baseline_v1 과 exp001 중에서 골랐다 (`reports/final_model_selection.md` · 상태: 확정 · 커밋 후 Test).
@@ -669,12 +616,8 @@ Frozen Test 를 보기 **전에** 같은 Val 74장 결과만으로 baseline_v1 �
 
 </details>
 
-## 14. Frozen Test (8일차)
-
-Test 80장 1회 평가 → mAP50 0.606 · 하락 원인은 검증 세트 편중과 새 촬영 세션.
-
 <details>
-<summary>펼쳐 보기</summary>
+<summary><b>14. Frozen Test (8일차)</b> — Test 1회 → mAP50 0.606 · 원인: 검증 세트 편중 · 새 촬영일</summary>
 
 Final Model(exp001 · sha `029c0e92e594`)을 확정 · 커밋한 **뒤** Frozen Test 80장(지문 `4f9291849fe6`)을 imgsz 1280 으로 **1회** 평가했다 (`scripts/16_evaluate_final_test.py` · 실행 기록 `reports/final_test_runs.csv`).
 
@@ -703,12 +646,8 @@ Final Model(exp001 · sha `029c0e92e594`)을 확정 · 커밋한 **뒤** Frozen 
 
 </details>
 
-## 15. Detection / Auto Label (8일차)
-
-Test 사진 8장 시연 → AI 후보 43개 중 31개(72%)를 사람이 수정 없이 승인.
-
 <details>
-<summary>펼쳐 보기</summary>
+<summary><b>15. Detection / Auto Label (8일차)</b> — AI 후보 43개 중 31개(72%) 수정 없이 승인</summary>
 
 새 사진(학습 · Val · Test 에 안 쓴 사진)이 없어 **가이드 21.3 방식**으로, Frozen Test 평가를 끝낸 뒤 Test 사진 8장(Class · 촬영 세션 골고루 · `scripts/17_auto_label.py`)으로 시연했다. 정답 TXT 는 따로 보관하고(검수자 비공개), 이 결과로 모델을 다시 학습하지 않았다.
 
@@ -736,12 +675,10 @@ Test 사진 8장 시연 → AI 후보 43개 중 31개(72%)를 사람이 수정 �
 
 </details>
 
-## 16. 알려진 한계
-
-정상 김치 0장 · 검증 세트 편중 · 나뭇잎 ↔ 나뭇가지 혼동 · 갈변 약점 등 — 다음 단계로 인계.
+## 한계 · 보안 · 인계
 
 <details>
-<summary>펼쳐 보기</summary>
+<summary><b>16. 알려진 한계</b> — 정상 김치 0장 · 검증 세트 편중 · 나뭇잎↔나뭇가지 · 갈변</summary>
 
 - **정상 김치(Negative) 0장** → 정상 김치를 이물로 잘못 찾는(FP) 경향을 평가할 수 없음 · 5일차 확인 결과 Val에도 정상 김치 사진이 없어 측정 불가 → 대신 이물 장면 안의 배경 오검출(정답 없는 자리)로 일부 확인 (`reports/baseline_val_image_check.csv`)
 - **object_only 150장은 전부 Train** → "이물만 있는 장면"의 성능은 평가하지 않음
@@ -757,12 +694,8 @@ Test 사진 8장 시연 → AI 후보 43개 중 31개(72%)를 사람이 수정 �
 
 </details>
 
-## 17. 데이터 보안
-
-기업 데이터(NDA) · 가중치는 Git에 올리지 않는다 — 커밋 전 확인 명령 2개.
-
 <details>
-<summary>펼쳐 보기</summary>
+<summary><b>17. 데이터 보안</b> — 기업 데이터 · 가중치는 Git 제외 · 커밋 전 확인 명령</summary>
 
 - 기업 제공 데이터(NDA)는 Git · 디스코드 · 외부 클라우드에 올리지 않는다. (`data/`, `*.jpg`, `*.pt`, `runs/`, `models/` 제외)
 - **보안정책이 `.gitignore`보다 우선**한다 (가이드 22.2)
@@ -778,7 +711,8 @@ git diff --cached --name-only | grep -iE '\.png$'
 
 </details>
 
-## 18. 교과 14 Handoff
+<details>
+<summary><b>18. 교과 14 Handoff</b> — Bridge 146장으로 재확인 · 약점과 할 일 인계 · ACCEPTED 33/33</summary>
 
 **상태**: 확정 (10/15 · 9일차) — [`docs/handoff_subject14.md`](docs/handoff_subject14.md) · Acceptance **ACCEPTED** (33/33 · FAIL 0 · [`reports/acceptance_test.md`](reports/acceptance_test.md))
 
@@ -786,7 +720,12 @@ git diff --cached --name-only | grep -iE '\.png$'
 - **넘기는 약점**: 나뭇잎 ↔ 나뭇가지 혼동 · 갈변 · 새 촬영 세션(4/24 G11에 Test FP 81% · FN 68%) · 정상 김치 0장 · 라벨 이슈 3건
 - **넘기는 할 일**: Class · 날짜 균형 검증 세트 · 두 Class 기준 재정리 → `kimchi_v2` · 갈변 데이터 · Negative 사진 · 현장 속도
 
-## 참고 문서
+</details>
+
+## 문서
+
+<details>
+<summary><b>참고 문서</b> — split_policy · code_review · 실험 · 인계 문서 15종</summary>
 
 | 문서 | 내용 |
 |---|---|
@@ -806,10 +745,10 @@ git diff --cached --name-only | grep -iE '\.png$'
 | [`docs/handoff_subject14.md`](docs/handoff_subject14.md) | 교과 14 인계 (Bridge · Final · 성능 · 약점 · 할 일) |
 | [`docs/deliverables_map.md`](docs/deliverables_map.md) | 필수 산출물 vs 우리 산출물 구분 · 추가 파일을 만든 이유 |
 
-## 진행 기록
+</details>
 
 <details>
-<summary>일차별 진행 기록 펼쳐 보기</summary>
+<summary><b>진행 기록</b> — 1~9일차 진행 상황</summary>
 
 > 교과 7에서 검수한 정답 데이터로 YOLO11 객체검출 모델을 학습 · 평가 · 개선한다.
 >
