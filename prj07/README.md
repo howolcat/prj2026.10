@@ -83,6 +83,7 @@ prj07_team01/
 │   ├── merge_results.py              # 팀원 결과 묶기(pack) · 합치기(merge)
 │   └── label_stats.py                # RAW vs FINAL 라벨 통계 (Class별 BBox · 변경 내역 · RAW 점검)
 ├── docs/
+│   ├── code_review/                  # 코드와 같은 폴더 구조의 리뷰 .md (src · tools · configs)
 │   ├── project_baseline.md           # 팀 기준
 │   ├── class_guide.md                # Class 기준서
 │   ├── bbox_guide.md                 # BBox 기준서
