@@ -2,27 +2,48 @@
 
 ### [이 데이터는 교육용으로 제작된 100% 가상 데이터입니다]
 
-조각김치 이미지 900장의 이물질 BBox 라벨을 **검수 · 수정 · 교차검수**하고,
-산출물(**Dataset Manifest · QA Summary · Test Report · Handoff**)까지 만들어 주는 팀 프로젝트입니다.
-
+조각김치 이물 사진 900장의 YOLO 라벨을 검수하는 프로그램을 직접 만들고,
+**1차 검수 → 다른 사람의 교차검수**로 900장 전부 **QA PASS** 시켰습니다.
+그 과정에서 기존 라벨의 **52%(469장)를 고쳤고**, 결과를 [PRJ08](../prj08) 학습 데이터와 인수인계 문서로 넘겼습니다.
 
 <p align="center">
-  <img src="docs/final_yolo_images/app_main.png" width="900" alt="라벨링 프로그램 실행 화면">
-  <br><sub>라벨링 프로그램 실행 화면 (v4.1 · 사진 영역 blur) — 검수자 교차검수 · REVIEW 사유 선택 · BBox 5개</sub>
+  <img src="docs/final_yolo_images/07_main.png" width="900" alt="PRJ07 한눈에 보기 - 900장 이중 검수 결과">
+  <br><sub>PRJ07 한눈에 보기 — 900장 1차 검수 → 교차검수 → QA PASS (사진 영역 blur)</sub>
 </p>
 
----
+<details>
+<summary><b>팀</b> — 최용훈 PM · 박건 Program / Validation · 심준형 QA / Test · 김하민 Docs / Guide · 이승훈 Feature / Record</summary>
 
-<h2>1. 프로젝트 소개 <a href="https://www.figma.com/design/1B9QcM36Ne1j5sTHXcOAAV/1%25EC%25A1%25B0?node-id=160-143&t=7V3xsWXdhC4pMg7t-0"><img src="https://img.shields.io/badge/Figma_바로가기-F24E1E?logo=figma&logoColor=white" align="right"></a></h2>
+| 팀원 | 역할 | 주요 작업 |
+|:-:|:-:|---|
+| <img src="https://github.com/yonghoonchoi88.png" width="80"><br>최용훈<br> [`@yonghoonchoi88`](https://github.com/yonghoonchoi88) | **PM / Integrator** | 저장소 · 모듈 구조 분리 · `classes.yaml` · `data/raw · work · final` 구조 · 교차검수(본인 PASS 금지) · 반려 · 테스트 · QA · Handoff 자동 생성 · 5명 결과 취합 · Dataset Manifest · Acceptance Test 기록 · 1차 150장 · 교차 83장 |
+| <img src="https://github.com/howolcat.png" width="80"><br>박건<br> [`@howolcat`](https://github.com/howolcat) | **Program / Validation** | 화면 구성 · 작업자 / 검수자 기능 · pre-commit · 전체 Validation(F7 · 최종 PASS 900) · manifest / history CSV 분리 · `label_stats` · QA Summary 5장 · BBox 기준서 보완 · v4.1 표기 · 1차 150장 · **교차 594장** |
+| <img src="https://github.com/simpson92.png" width="80"><br>심준형<br> [`@simpson92`](https://github.com/simpson92) | **QA / Test** | v1.0 · v2.1 기능 QA · REVIEW 사유 6종 · status 자동 판정 · `make_reports` · `merge_results` · Golden 20 · Pilot 50 자동 테스트 · FINAL 라벨 증빙 문서 · 1차 250장 · 교차 123장 |
+| <img src="https://github.com/hxxdxm.png" width="80"><br>김하민<br> [`@hxxdxm`](https://github.com/hxxdxm) | **Docs / Guide** | v1.0 초안 · RAW → FINAL 직행 금지 · Class 기준서 · BBox 기준서 · Project Baseline · Handoff 8장 주의사항 · 11개 산출물 최종 점검 · 1차 250장 |
+| <img src="https://github.com/lee26060715.png" width="80"><br>이승훈<br> [`@lee26060715`](https://github.com/lee26060715) | **Feature / Record** | 작업 방향(기존 박스 수정) · Figma · scene_type · 작업 기록 CSV · 팀 결과 zip 묶음 · 합치기 · 목록 필터 · Git 커밋 이력 · Acceptance Test 시험자 · 1차 100장 · 교차 100장 |
+
+> 역할은 책임 기준이고, 실제 작업은 PR 리뷰와 교차 확인으로 함께 진행했습니다. 검수 장수: [`docs/project_baseline.md`](docs/project_baseline.md) 2.1 · 날짜별 기록: [`daily_csv/`](daily_csv/) · 커밋 이력: [`docs/git_commit_log.md`](docs/git_commit_log.md)
+
+</details>
+
+## 개요 · 기능
+
+<details>
+<summary><b>1. 프로젝트 소개</b> — 900장 라벨 검수 · 수정 → QA PASS 만 data/final → PRJ08 로 전달</summary>
+
+<a href="https://www.figma.com/design/1B9QcM36Ne1j5sTHXcOAAV/1%25EC%25A1%25B0?node-id=160-143&t=7V3xsWXdhC4pMg7t-0"><img src="https://img.shields.io/badge/Figma_바로가기-F24E1E?logo=figma&logoColor=white"></a>
 
 | 항목 | 내용 |
 |---|---|
 | 대상 | 조각김치 이미지 900장 (기존 데이터셋 여러 개 · train / validation) |
 | 목표 | 기존 YOLO 라벨을 검수 · 수정 → **QA PASS 데이터만** `data/final` 에 정리 → Final Model(YOLO 학습)로 전달 |
 | 라벨 형식 | YOLO TXT (`class x_center y_center width height`, 0~1) |
-| 팀 | 최용훈(팀장) · 박건 · 이승훈 · 김하민 · 심준형 |
+| 팀 | 최용훈(팀장) · 박건 · 이승훈 · 김하민 · 심준형 (역할은 위 **팀** 표) |
 
-## 2. 주요 기능
+</details>
+
+<details>
+<summary><b>2. 주요 기능</b> — 라벨 편집 · 1차 검수 · 교차검수 · 작업대장 · 전체 Validation · 자동 테스트 · 산출물 생성</summary>
 
 | 구분 | 기능 |
 |---|---|
@@ -37,7 +58,12 @@
 | 산출물 생성 | `manifests/dataset_manifest.csv` · `reports/qa_summary.md` · `reports/test_report.md` · `docs/subject08_handoff.md` |
 | 팀 결과 합치기 | 현재 결과를 zip 으로 묶고 저장(원본 이미지 제외)및 zip 불러오기 기능 |
 
-## 3. 폴더 구조
+</details>
+
+## 설치 · 실행 · 사용
+
+<details>
+<summary><b>3. 폴더 구조</b> — main.py · src(ui · bbox · yolo · validation · records · qa) · tools · docs · manifests · reports · data(Git 제외)</summary>
 
 ```
 prj07_team01/ 
@@ -84,7 +110,10 @@ prj07_team01/
     └── final/labels/                 # QA PASS TXT
 ```
 
-## 4. 설치 방법
+</details>
+
+<details>
+<summary><b>4. 설치 방법</b> — venv 만들기 → 켜기 → pip install (pillow · pyyaml)</summary>
 
 ```bash
 # WSL / Ubuntu
@@ -96,7 +125,10 @@ source .venv/bin/activate                  # 2) 켜기 → 앞에 (.venv) 표시
 pip install -r requirements.txt            # 3) 패키지 설치 (pillow, pyyaml)
 ```
 
-## 5. 실행 방법
+</details>
+
+<details>
+<summary><b>5. 실행 방법</b> — python main.py · 처음 한 번 원본을 data/raw 에 복사</summary>
 
 ```bash
 python main.py
@@ -104,7 +136,10 @@ python main.py
 
 처음 한 번만: 원본 데이터셋 폴더를 `data/raw/` 안에 **복사**해 넣습니다. (원래 폴더 모양 그대로)
 
-## 6. 사용 순서
+</details>
+
+<details>
+<summary><b>6. 사용 순서</b> — 역할 선택 → data 폴더 열기 → 검수 · 저장 → F7 Validation → 결과 묶음 · 합치기 → 산출물 생성</summary>
 
 1. 왼쪽 위 **작업자 정보**에서 `작업자(1차 검수)` 또는 `검수자(교차검수)`를 고르고 이름을 고릅니다.
 2. **파일 > data 폴더 열기 (Ctrl+O)** → `data` 폴더를 선택합니다. (raw 안의 데이터셋이 하나의 목록으로 모입니다)
@@ -118,7 +153,12 @@ python main.py
 8. **파일 > 내 결과 묶음 만들기** → zip 을 팀장에게 전달 → 팀장이 **팀원 결과 묶음 합치기**
 9. 팀장: **검사 > 산출물 생성** → `reports/`, `manifests/`, `docs/` 를 커밋
 
-## 7. 상태 값 (dataset_manifest.csv)
+</details>
+
+## 데이터 · 기준
+
+<details>
+<summary><b>7. 상태 값 (dataset_manifest.csv)</b> — status DONE · EDITED · REVIEW · qa_status WAIT → PASS · scene_type 4종 · review_reason 6종</summary>
 
 ```csv
 file_name,source_dataset,original_split,scene_type,worker,status,qa_status,review_reason
@@ -156,7 +196,10 @@ file_name,source_dataset,original_split,scene_type,worker,status,qa_status,revie
 
 > 목록은 `configs/classes.yaml` 에서 바꿀 수 있습니다.
 
-## 8. YOLO TXT 형식
+</details>
+
+<details>
+<summary><b>8. YOLO TXT 형식</b> — class_id x_center y_center width height (모두 0~1)</summary>
 
 ```text
 class_id x_center y_center width height      ← 모두 0~1 (이미지 크기로 나눈 값)
@@ -165,7 +208,12 @@ class_id x_center y_center width height      ← 모두 0~1 (이미지 크기로
 
 - BBox 가 없는 이미지는 **빈 TXT** — `scene_type = normal_kimchi` 일 때만 정상으로 봅니다.
 
-## 9. Class 설정 (`configs/classes.yaml`)
+</details>
+
+<details>
+<summary><b>9. Class 설정</b> — 0~6 · Class 4 고무장갑은 사용 안 함 (발견 시 REVIEW)</summary>
+
+`configs/classes.yaml`
 
 | Class ID | 이물 종류 | 사용 |
 |:---:|---|:---:|
@@ -179,14 +227,20 @@ class_id x_center y_center width height      ← 모두 0~1 (이미지 크기로
 
 자세한 기준: [`docs/class_guide.md`](docs/class_guide.md)
 
-## 10. BBox 기준
+</details>
+
+<details>
+<summary><b>10. BBox 기준</b> — 기존 박스 확인 · 수정이 기본 · 타이트하게 · 애매하면 REVIEW</summary>
 
 - 기존 박스를 **확인 · 수정**하는 것이 기본 → 프로그램은 **선택 이동 모드**로 시작합니다.
 - 박스는 이물질에 맞춰 **타이트하게**. 애매하면 REVIEW + 사유.
 
 자세한 기준: [`docs/bbox_guide.md`](docs/bbox_guide.md)
 
-## 11. 데이터 위치와 흐름
+</details>
+
+<details>
+<summary><b>11. 데이터 위치와 흐름</b> — raw → work → final · raw 수정 금지 · 본인 PASS 금지 · final = QA PASS 만</summary>
 
 ```
 data/raw  ──작업자 1차 검수──▶  data/work/labels  ──검수자 QA PASS──▶  data/final/images + labels
@@ -201,7 +255,12 @@ data/raw  ──작업자 1차 검수──▶  data/work/labels  ──검수�
 | final = QA PASS 만 | PASS 된 이미지를 작업자가 다시 저장하거나 검수자가 반려하면 **final 에서 빠지고** WAIT 로 돌아감 |
 | 라벨 읽는 순서 | work → final → raw |
 
-## 12. 산출물 (교과 7)
+</details>
+
+## 산출물 · 품질
+
+<details>
+<summary><b>12. 산출물 (교과 7)</b> — 11개 산출물 · 라벨 통계 · Validation 오류 8종</summary>
 
 | 번호 | 산출물 | 위치 | 만드는 방법 |
 |:---:|---|---|---|
@@ -251,7 +310,12 @@ python -m tools.label_stats --data data > reports/label_stats.md  # 파일로 �
 | `scene` | scene_type 과 BBox 개수가 맞지 않음 |
 | `manifest` | manifest 상태 오류 (PASS 인데 final 없음, REVIEW 인데 사유 없음 등) |
 
-## 13. 팀 작업 (결과 합치기)
+</details>
+
+## 팀 작업 · 규칙
+
+<details>
+<summary><b>13. 팀 작업 (결과 합치기)</b> — 결과(TXT · CSV)만 zip 으로 pack → 팀장 merge (최신 작업 우선 · 충돌 목록)</summary>
 
 원본 900장은 Git 에 없으므로 각자 PC 의 `data/` 에서 작업하고, **결과(TXT · CSV)만** 주고받습니다.
 
@@ -268,7 +332,10 @@ python -m tools.merge_results merge --data data ../박건_1007.zip ../이승훈_
 - 팀장이 합친 결과를 다시 pack 해서 나눠 주면 모두 같은 상태가 됩니다.
 - ⚠ 작업 분배는 **이미지 범위를 겹치지 않게** 나누는 것이 가장 안전합니다.
 
-## 14. 주의사항
+</details>
+
+<details>
+<summary><b>14. 주의사항</b> — data · handoff 는 Git 제외 · raw 수정 금지 · 데이터 외부 유출 금지 · 단축키 · 알려진 제한사항</summary>
 
 - `data/` (원본 900장 · work · final) 와 `handoff_subject08/` 는 **Git 에 올리지 않습니다.**
 - `data/raw/` 원본은 **절대 수정하지 않습니다.**
@@ -283,7 +350,10 @@ python -m tools.merge_results merge --data data ../박건_1007.zip ../이승훈_
 - 데이터에 정상 김치(`normal_kimchi`) 이미지가 **0장**입니다. 이물이 없는 김치에서의 오탐(False Positive)은 이 데이터만으로 평가하기 어렵습니다. → [`docs/subject08_handoff.md`](docs/subject08_handoff.md) 8.2 참고
 - Golden · Pilot 자동 테스트는 **좌표 변환 · 저장 · Reload 로직**을 검증합니다. 실제 마우스 조작(드래그 · Zoom/Pan)은 README 기반 Acceptance Test 에서 사람이 확인했습니다. → [`reports/test_report.md`](reports/test_report.md) 4장
 
-## 15. Git · 버전 규칙
+</details>
+
+<details>
+<summary><b>15. Git · 버전 규칙</b> — 개인 branch → PR → merge · feat / fix / docs / chore · 기능 = 정수 · 버그 = 소수점</summary>
 
 - 개인 branch(`ch` 등)에 커밋 → push → Pull Request → merge. **main 에 직접 올리지 않습니다.**
 - 커밋 메시지: `feat:` 새 기능 · `fix:` 버그 수정 · `docs:` 문서 · `chore:` 기타
@@ -293,9 +363,10 @@ python -m tools.merge_results merge --data data ../박건_1007.zip ../이승훈_
 | 새 기능 추가 | 정수 자리 올림 | 3.0 → 4.0 |
 | 버그 수정 | 소수점 자리 올림 | 4.0 → 4.1 |
 
----
+</details>
 
-## 16. 버전 변경 이력
+<details>
+<summary><b>16. 버전 변경 이력</b> — 1.0 (10/02) → 4.1 (10/08)</summary>
 
 | 날짜 | 버전 | 내용 |
 |---|:---:|---|
@@ -305,3 +376,5 @@ python -m tools.merge_results merge --data data ../박건_1007.zip ../이승훈_
 | 2026-10-06 | 3.0 | data 폴더 통합 (여러 데이터셋을 하나로) · source_dataset · original_split · qa_status |
 | 2026-10-07 | 4.0 | 교과 7 기준으로 재설계: `data/raw · work · final(images+labels)` · **dataset_manifest.csv (8개 컬럼)** · status 자동 판정(DONE/EDITED) · REVIEW + review_reason 6종 · 검수자 QA PASS / 반려 · 교차검수(본인 PASS 금지) · 이미지 목록 필터 · 전체 Validation 창 · Golden/Pilot 자동 테스트 · QA Summary · Test Report · Handoff 자동 생성 · 팀 결과 pack/merge |
 | 2026-10-08 | 4.1 | `tools/label_stats.py` 추가 (RAW vs FINAL 통계) · 설치 순서 수정 (venv) · 작업대장 컬럼 설명 수정 · 11개 산출물 표 정리 · QA Summary 5장 / Handoff 8장 통계 보강 · FINAL 라벨 증빙 문서 추가 · Acceptance Test 기록 |
+
+</details>
