@@ -74,3 +74,7 @@ prj08/**/*.jpg
 prj08/**/*.jpeg
 prj08/**/*.JPG
 prj08/**/*.JPEG
+
+# demo/ 는 폴더 전체 제외 (발표용 비교 이미지 등 원본 사진이 들어갈 수 있음)
+detection-model/demo/
+prj08/demo/
